@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Photo development and printing - FOTOCENTER in Skövde">
+    <title>FOTOCENTER Philippines - Photo Development & Printing</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1 class="logo">FOTOCENTER</h1>
+                <p class="logo-sub">Philippines</p>
+            </div>
+
+            <!-- CART MODAL -->
+            <div id="cartModal" class="modal">
+                <div class="modal-content cart-modal-content">
+                    <span class="close-modal" onclick="closeCartModal()">&times;</span>
+                    <h3>Your Cart</h3>
+                    <div id="cartItemsList" class="cart-items-list"></div>
+                    <div class="cart-summary">
+                        <div>Total: <span id="cartTotalAmount">₱ 0.00</span></div>
+                        <div class="cart-actions">
+                            <button onclick="clearCart()">Clear</button>
+                            <button onclick="proceedToCheckout()">Checkout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOGIN MODAL -->
+            <div id="loginModal" class="modal">
+                <div class="modal-content login-modal-content">
+                    <span class="close-modal" onclick="closeLoginModal()">&times;</span>
+                    <div class="login-box branded-login">
+                        <h2>FOTOCENTER Login</h2>
+                        <form id="loginForm" onsubmit="handleLoginModal(event)">
+                            <div class="form-group">
+                                <label for="modalEmail">Email</label>
+                                <input id="modalEmail" type="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalPassword">Password</label>
+                                <input id="modalPassword" type="password" required>
+                            </div>
+                            <div class="form-group remember-row">
+                                <label><input type="checkbox" id="rememberMe"> Remember Me</label>
+                                <a href="#" onclick="alert('Password reset flow simulated'); return false;">Forgot?</a>
+                            </div>
+                            <div class="social-login">
+                                <button type="button" onclick="simulateSocialLogin('google')">Sign in with Google</button>
+                                <button type="button" onclick="simulateSocialLogin('facebook')">Sign in with Facebook</button>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit">Login</button>
+                            </div>
+                            <p class="small">Don't have an account? <a href="#" onclick="navigateTo('signup'); closeLoginModal(); return false;">Register</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="navigateTo('home'); return false;">Home</a></li>
+                <li><a href="#" onclick="navigateTo('photos'); return false;">Editor</a></li>
+                <li><a href="#" onclick="navigateTo('shop'); return false;">Shop</a></li>
+                <li><a href="#" onclick="navigateTo('contact'); return false;">Info</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="#" class="login-link" onclick="openLoginModal(); return false;">Log in</a>
+                <button class="cart-btn">🛒 Cart <span id="cartCount" class="cart-badge">0</span></button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="login" class="page">
+            <div class="login-container">
+                <div class="login-box">
+                    <h2>Welcome Back</h2>
+                    <p class="login-subtitle">Sign in to your FOTOCENTER account</p>
+
+                    <form class="login-form" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                        </div>
+
+                        <button type="submit" class="login-btn">Sign In</button>
+                    </form>
+
+                    <div class="divider">
+                        <span>or</span>
+                    </div>
+
+                    <button class="google-btn" onclick="signUpWithGoogle()">
+                        <svg class="google-icon" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        Sign up with Google
+                    </button>
+
+                    <p class="login-footer">Don't have an account? <a href="#" onclick="navigateTo('signup'); return false;">Create one</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SHOP PAGE -->
+        <section id="shop" class="page">
+            <div class="container">
+                <h2>Shop</h2>
+                <p>Explore our personalized photo products.</p>
+                <div id="shopProductsGrid" class="products-grid"></div>
+            </div>
+        </section>
+
+        <section id="signup" class="page">
+            <div class="login-container">
+                <div class="login-box">
+                    <h2>Create Account</h2>
+                    <p class="login-subtitle">Join FOTOCENTER today</p>
+
+                    <form class="login-form" onsubmit="handleSignUp(event)">
+                        <div class="form-group">
+                            <label for="signupName">Full Name</label>
+                            <input type="text" id="signupName" placeholder="Your full name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="signupEmail">Email Address</label>
+                            <input type="email" id="signupEmail" placeholder="your@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" id="signupPassword" placeholder="Create a password" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="signupConfirm">Confirm Password</label>
+                            <input type="password" id="signupConfirm" placeholder="Confirm your password" required>
+                        </div>
+
+                        <button type="submit" class="login-btn">Create Account</button>
+                    </form>
+
+                    <div class="divider">
+                        <span>or</span>
+                    </div>
+
+                    <button class="google-btn" onclick="signUpWithGoogle()">
+                        <svg class="google-icon" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        Sign up with Google
+                    </button>
+
+                    <p class="login-footer">Already have an account? <a href="#" onclick="navigateTo('login'); return false;">Sign in</a></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="home" class="page active">
+            <header class="hero">
+                <div class="hero-content">
+                    <h2>Welcome to FOTOCENTER PH</h2>
+                    <p>Paper copies for your digital photos</p>
+                    <button class="cta-btn" onclick="navigateTo('photos'); return false;">Start Ordering</button>
+                </div>
+            </header>
+            <section class="products-section">
+                <div class="products-container">
+                    <div id="products" class="products-grid"></div>
+                </div>
+            </section>
+        </section>
+
+        <section id="product-detail" class="page">
+            <div class="detail-container">
+                <button class="back-btn" onclick="navigateTo('home'); return false;">← Back</button>
+                <div id="detail-content"></div>
+            </div>
+        </section>
+
+        <section id="photos" class="page">
+            <div class="container">
+                <div class="photos-header">
+                    <h2>Photo Upload & Editing</h2>
+                    <p>Upload your photos and customize them before ordering prints.</p>
+                    <div class="mode-selector">
+                        <button id="uploadModeBtn" class="mode-btn active" onclick="switchPhotoMode('upload')">Upload Photos</button>
+                        <button id="printModeBtn" class="mode-btn" onclick="switchPhotoMode('prints')">Order Prints</button>
+                    </div>
+                </div>
+
+                <!-- Upload & Editing Section -->
+                <div id="uploadView" class="upload-view active-view">
+                    <div class="upload-section">
+                        <div class="upload-box" id="dropArea">
+                            <input type="file" id="photoInput" accept="image/*" multiple class="file-input">
+                            <label for="photoInput" class="upload-label">
+                                <div class="upload-icon">📸</div>
+                                <h3>Upload Your Photos</h3>
+                                <p>Click to browse or drag and drop images here</p>
+                                <p class="file-types">Supports JPG, PNG, GIF up to 10MB each</p>
+                                <div class="upload-stats">
+                                    <p>Uploaded: <span id="uploadCount">0</span> photos</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div id="uploadedImages" class="uploaded-images">
+                            <!-- Uploaded thumbnails will appear here -->
+                        </div>
+
+                        <div id="editorContainer" class="editor-container">
+                            <div class="editor-header">
+                                <div class="editor-header-content">
+                                    <h3 class="editor-title">PHOTO EDITOR</h3>
+                                    <div class="editor-header-right">
+                                        <div class="product-dropdown-container">
+                                            <button class="product-dropdown-btn" id="productDropdownBtn">
+                                                Products ▼
+                                            </button>
+                                            <div class="product-dropdown-menu" id="productDropdownMenu">
+                                                <!-- Dropdown items will be populated by JavaScript -->
+                                            </div>
+                                        </div>
+                                        <div class="current-product-badge" id="currentProductBadge">
+                                            <span class="badge-text">None</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="editor-subtitle">Select a photo to edit from above</p>
+                            </div>
+
+                            <div class="editor-main">
+                                <div class="canvas-container">
+                                    <canvas id="photoCanvas"></canvas>
+                                    <div class="canvas-overlay" id="canvasOverlay">
+                                        <p>Select a photo to start editing</p>
+                                    </div>
+                                </div>
+
+                                <div class="editor-sidebar">
+                                    <div class="editor-tools">
+                                        <h4>Edit Tools</h4>
+
+                                        <div class="tool-group">
+                                            <label>Brightness</label>
+                                            <div class="slider-container">
+                                                <button class="slider-btn minus" onclick="adjustBrightness(-10)">-</button>
+                                                <input type="range" id="brightnessSlider" min="0" max="200" value="100" class="slider">
+                                                <button class="slider-btn plus" onclick="adjustBrightness(10)">+</button>
+                                                <span id="brightnessValue">100%</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="tool-group">
+                                            <label>Contrast</label>
+                                            <div class="slider-container">
+                                                <button class="slider-btn minus" onclick="adjustContrast(-10)">-</button>
+                                                <input type="range" id="contrastSlider" min="0" max="200" value="100" class="slider">
+                                                <button class="slider-btn plus" onclick="adjustContrast(10)">+</button>
+                                                <span id="contrastValue">100%</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="tool-group">
+                                            <label>Saturation</label>
+                                            <div class="slider-container">
+                                                <button class="slider-btn minus" onclick="adjustSaturation(-10)">-</button>
+                                                <input type="range" id="saturationSlider" min="0" max="200" value="100" class="slider">
+                                                <button class="slider-btn plus" onclick="adjustSaturation(10)">+</button>
+                                                <span id="saturationValue">100%</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="tool-group">
+                                            <label>Rotate & Flip</label>
+                                            <div class="button-group">
+                                                <button class="tool-btn" onclick="rotateImage(-90)">↺ 90°</button>
+                                                <button class="tool-btn" onclick="rotateImage(90)">↻ 90°</button>
+                                                <button class="tool-btn" onclick="flipHorizontal()">⬌ Flip H</button>
+                                                <button class="tool-btn" onclick="flipVertical()">⬍ Flip V</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="tool-group">
+                                            <label>Filters</label>
+                                            <div class="filters-grid">
+                                                <button class="filter-btn" onclick="applyFilter('none')">None</button>
+                                                <button class="filter-btn" onclick="applyFilter('grayscale')">Grayscale</button>
+                                                <button class="filter-btn" onclick="applyFilter('sepia')">Sepia</button>
+                                                <button class="filter-btn" onclick="applyFilter('vintage')">Vintage</button>
+                                                <button class="filter-btn" onclick="applyFilter('cool')">Cool</button>
+                                                <button class="filter-btn" onclick="applyFilter('warm')">Warm</button>
+                                                <button class="filter-btn" onclick="applyFilter('vivid')">Vivid</button>
+                                                <button class="filter-btn" onclick="applyFilter('noir')">Noir</button>
+                                                <button class="filter-btn" onclick="applyFilter('lomo')">Lomo</button>
+                                                <button class="filter-btn" onclick="applyFilter('dreamy')">Dreamy</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="tool-group">
+                                            <label>Advanced Tools</label>
+                                            <div class="button-group">
+                                                <button class="tool-btn" onclick="toggleCrop()">Crop</button>
+                                                <button class="tool-btn" onclick="toggleTextOverlay()">Add Text</button>
+                                                <button class="tool-btn" onclick="reduceRedEye()">Red-Eye</button>
+                                                <button class="tool-btn" onclick="autoEnhance()">Auto Enhance</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="action-buttons">
+                                        <button id="undoBtn" class="action-btn" onclick="undo()">Undo</button>
+                                        <button id="redoBtn" class="action-btn" onclick="redo()">Redo</button>
+                                        <button id="resetBtn" class="action-btn reset-btn" onclick="resetImage()">Reset All</button>
+                                        <button id="saveBtn" class="action-btn save-btn" onclick="saveImage()">Save Edits</button>
+                                        <button id="downloadBtn" class="action-btn download-btn" onclick="downloadImage()">Download</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="editor-footer">
+                                <h4>Print Options</h4>
+                                <div class="print-options">
+                                    <div class="print-option">
+                                        <label>
+                                            <input type="radio" name="printSize" value="4x6" checked>
+                                            4x6 inches
+                                            <span class="print-price">₱ 25.00</span>
+                                        </label>
+                                    </div>
+                                    <div class="print-option">
+                                        <label>
+                                            <input type="radio" name="printSize" value="5x7">
+                                            5x7 inches
+                                            <span class="print-price">₱ 35.00</span>
+                                        </label>
+                                    </div>
+                                    <div class="print-option">
+                                        <label>
+                                            <input type="radio" name="printSize" value="8x10">
+                                            8x10 inches
+                                            <span class="print-price">₱ 50.00</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <button id="addToCart" class="add-cart-btn" onclick="addPhotoToCart()">
+                                    <span class="cart-icon">🛒</span>
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Print Products Section -->
+                <div id="printsView" class="prints-view" style="display: none;">
+                    <div class="print-products-grid" id="printProductsGrid">
+                        <!-- Print products will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cards" class="page">
+            <div class="container">
+                <h2>Photo Cards</h2>
+                <p>Create personalized greeting cards for every occasion.</p>
+
+                <!-- Upload & Editing Section for Cards -->
+                <div class="mode-selector">
+                    <button id="cardsUploadModeBtn" class="mode-btn active" onclick="switchCardsMode('upload')">Upload Photos</button>
+                    <button id="cardsProductsModeBtn" class="mode-btn" onclick="switchCardsMode('products')">Card Products</button>
+                </div>
+
+                <div id="cardsUploadView" class="upload-view active-view">
+                    <div class="upload-section">
+                        <div class="upload-box" id="cardsDropArea">
+                            <input type="file" id="cardsPhotoInput" accept="image/*" multiple class="file-input">
+                            <label for="cardsPhotoInput" class="upload-label">
+                                <div class="upload-icon">📸</div>
+                                <h3>Upload Your Photos for Cards</h3>
+                                <p>Click to browse or drag and drop images here</p>
+                                <p class="file-types">Supports JPG, PNG, GIF up to 10MB each</p>
+                                <div class="upload-stats">
+                                    <p>Uploaded: <span id="cardsUploadCount">0</span> photos</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div id="cardsUploadedImages" class="uploaded-images">
+                            <!-- Uploaded thumbnails will appear here -->
+                        </div>
+
+                        <div id="cardsEditorContainer" class="editor-container">
+                            <div class="editor-header">
+                                <h3>Card Photo Editor</h3>
+                                <p>Select a photo to edit for your card</p>
+                            </div>
+
+                            <div class="editor-main">
+                                <div class="canvas-container">
+                                    <canvas id="cardsPhotoCanvas"></canvas>
+                                    <div class="canvas-overlay" id="cardsCanvasOverlay">
+                                        <p>Select a photo to start editing</p>
+                                    </div>
+                                </div>
+
+                                <div class="editor-sidebar">
+                                    <div class="editor-tools">
+                                        <h4>Edit Tools</h4>
+
+                                        <div class="tool-group">
+                                            <label>Brightness</label>
+                                            <div class="slider-container">
+                                                <button class="slider-btn minus" onclick="adjustCardsBrightness(-10)">-</button>
+                                                <input type="range" id="cardsBrightnessSlider" min="0" max="200" value="100" class="slider">
+                                                <button class="slider-btn plus" onclick="adjustCardsBrightness(10)">+</button>
+                                                <span id="cardsBrightnessValue">100%</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="tool-group">
+                                            <label>Contrast</label>
+                                            <div class="slider-container">
+                                                <button class="slider-btn minus" onclick="adjustCardsContrast(-10)">-</button>
+                                                <input type="range" id="cardsContrastSlider" min="0" max="200" value="100" class="slider">
+                                                <button class="slider-btn plus" onclick="adjustCardsContrast(10)">+</button>
+                                                <span id="cardsContrastValue">100%</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="tool-group">
+                                            <label>Saturation</label>
+                                            <div class="slider-container">
+                                                <button class="slider-btn minus" onclick="adjustCardsSaturation(-10)">-</button>
+                                                <input type="range" id="cardsSaturationSlider" min="0" max="200" value="100" class="slider">
+                                                <button class="slider-btn plus" onclick="adjustCardsSaturation(10)">+</button>
+                                                <span id="cardsSaturationValue">100%</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="tool-group">
+                                            <label>Rotate & Flip</label>
+                                            <div class="button-group">
+                                                <button class="tool-btn" onclick="rotateCardsImage(-90)">↺ 90°</button>
+                                                <button class="tool-btn" onclick="rotateCardsImage(90)">↻ 90°</button>
+                                                <button class="tool-btn" onclick="flipCardsHorizontal()">⬌ Flip H</button>
+                                                <button class="tool-btn" onclick="flipCardsVertical()">⬍ Flip V</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="tool-group">
+                                            <label>Filters</label>
+                                            <div class="filters-grid">
+                                                <button class="filter-btn" onclick="applyCardsFilter('none')">None</button>
+                                                <button class="filter-btn" onclick="applyCardsFilter('grayscale')">Grayscale</button>
+                                                <button class="filter-btn" onclick="applyCardsFilter('sepia')">Sepia</button>
+                                                <button class="filter-btn" onclick="applyCardsFilter('vintage')">Vintage</button>
+                                                <button class="filter-btn" onclick="applyCardsFilter('cool')">Cool</button>
+                                                <button class="filter-btn" onclick="applyCardsFilter('warm')">Warm</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="action-buttons">
+                                        <button id="cardsResetBtn" class="action-btn reset-btn" onclick="resetCardsImage()">Reset All</button>
+                                        <button id="cardsSaveBtn" class="action-btn save-btn" onclick="saveCardsImage()">Save Edits</button>
+                                        <button id="cardsDownloadBtn" class="action-btn download-btn" onclick="downloadCardsImage()">Download</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="editor-footer">
+                                <h4>Card Options</h4>
+                                <div class="print-options">
+                                    <div class="print-option">
+                                        <label>
+                                            <input type="radio" name="cardsSize" value="5x7" checked>
+                                            5x7 inch Card
+                                            <span class="print-price">₱ 150.00</span>
+                                        </label>
+                                    </div>
+                                    <div class="print-option">
+                                        <label>
+                                            <input type="radio" name="cardsSize" value="8x10">
+                                            8x10 inch Card
+                                            <span class="print-price">₱ 250.00</span>
+                                        </label>
+                                    </div>
+                                    <div class="print-option">
+                                        <label>
+                                            <input type="radio" name="cardsSize" value="folded">
+                                            Folded Greeting Card
+                                            <span class="print-price">₱ 350.00</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <button id="cardsAddToCart" class="add-cart-btn" onclick="addCardsToCart()">
+                                    <span class="cart-icon">🛒</span>
+                                    Add Card to Cart - <span id="cardsSelectedPrice">₱ 150.00</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Products Section -->
+                <div id="cardsProductsView" class="prints-view" style="display: none;">
+                    <div class="print-products-grid" id="cardsProductsGrid">
+                        <!-- Card products will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="calendars" class="page">
+            <div class="container">
+                <div class="photos-header">
+                    <h2>Custom Calendars</h2>
+                    <p>Create personalized calendars with your photos. Perfect for gifts or home decoration.</p>
+
+                    <div class="mode-selector">
+                        <button id="calendarsUploadModeBtn" class="mode-btn active" onclick="switchCalendarsMode('upload')">Create Your Own</button>
+                        <button id="calendarsProductsModeBtn" class="mode-btn" onclick="switchCalendarsMode('products')">Calendar Products</button>
+                    </div>
+                </div>
+
+                <!-- Create Your Own Calendar Section -->
+                <div id="calendarsUploadView" class="upload-view active-view">
+                    <div class="upload-section">
+                        <div class="upload-box" id="calendarsDropArea">
+                            <input type="file" id="calendarsPhotoInput" accept="image/*" multiple class="file-input">
+                            <label for="calendarsPhotoInput" class="upload-label">
+                                <div class="upload-icon">📅</div>
+                                <h3>Upload Your Photos for Calendar</h3>
+                                <p>Upload 12 photos (one for each month) or let us create a collage</p>
+                                <p class="file-types">Supports JPG, PNG up to 10MB each</p>
+                                <div class="upload-stats">
+                                    <p>Uploaded: <span id="calendarsUploadCount">0</span> photos</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div id="calendarsUploadedImages" class="uploaded-images">
+                            <!-- Uploaded thumbnails will appear here -->
+                        </div>
+
+                        <div class="calendar-customizer">
+                            <div class="calendar-preview-container">
+                                <div class="calendar-preview" id="calendarPreview">
+                                    <div class="calendar-header">
+                                        <h4>2025</h4>
+                                        <h3>Your Custom Calendar</h3>
+                                    </div>
+                                    <div class="calendar-month-grid">
+                                        <!-- Months will be generated here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="calendar-options">
+                                <h4>Calendar Options</h4>
+
+                                <div class="option-group">
+                                    <label>Calendar Type</label>
+                                    <select id="calendarType" class="option-select" onchange="updateCalendarPreview()">
+                                        <option value="desk">Desk Calendar</option>
+                                        <option value="wall">Wall Calendar</option>
+                                        <option value="mini">Mini Calendar</option>
+                                        <option value="photo">Photo Calendar</option>
+                                    </select>
+                                </div>
+
+                                <div class="option-group">
+                                    <label>Size</label>
+                                    <select id="calendarSize" class="option-select" onchange="updateCalendarPrice()">
+                                        <option value="8x10">8x10 inches</option>
+                                        <option value="12x12">12x12 inches</option>
+                                        <option value="8.5x11">8.5x11 inches (Letter)</option>
+                                        <option value="11x17">11x17 inches (Tabloid)</option>
+                                    </select>
+                                </div>
+
+                                <div class="option-group">
+                                    <label>Start Month</label>
+                                    <select id="startMonth" class="option-select">
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+
+                                <div class="option-group">
+                                    <label>Paper Type</label>
+                                    <select id="paperType" class="option-select" onchange="updateCalendarPrice()">
+                                        <option value="glossy">Glossy Photo Paper</option>
+                                        <option value="matte">Matte Photo Paper (+₱100)</option>
+                                        <option value="premium">Premium Cardstock (+₱200)</option>
+                                    </select>
+                                </div>
+
+                                <div class="option-group">
+                                    <label>Binding</label>
+                                    <select id="bindingType" class="option-select" onchange="updateCalendarPrice()">
+                                        <option value="spiral">Spiral Binding</option>
+                                        <option value="wire">Wire-O Binding (+₱50)</option>
+                                        <option value="hardcover">Hardcover (+₱300)</option>
+                                    </select>
+                                </div>
+
+                                <div class="option-group">
+                                    <label>Quantity</label>
+                                    <div class="quantity-control">
+                                        <button onclick="updateCalendarQuantity(-1)">-</button>
+                                        <input type="number" id="calendarQuantity" min="1" value="1" onchange="updateCalendarPrice()">
+                                        <button onclick="updateCalendarQuantity(1)">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="price-summary">
+                                    <div class="price-details">
+                                        <span>Base Price:</span>
+                                        <span id="basePrice">₱ 800.00</span>
+                                    </div>
+                                    <div class="price-details">
+                                        <span>Options:</span>
+                                        <span id="optionsPrice">₱ 0.00</span>
+                                    </div>
+                                    <div class="price-total">
+                                        <span>Total:</span>
+                                        <span id="calendarTotalPrice">₱ 800.00</span>
+                                    </div>
+                                </div>
+
+                                <button id="addCalendarToCart" class="add-cart-btn" onclick="addCustomCalendarToCart()">
+                                    <span class="cart-icon">🛒</span>
+                                    Add Calendar to Cart - <span id="calendarFinalPrice">₱ 800.00</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Products Section -->
+                <div id="calendarsProductsView" class="prints-view" style="display: none;">
+                    <div class="print-products-grid" id="calendarsProductsGrid">
+                        <!-- Calendar products will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="photobook" class="page">
+            <div class="container">
+                <h2>Photo Book</h2>
+                <p>Unleash your creativity with our photo books.</p>
+            </div>
+        </section>
+
+        <section id="gifts" class="page">
+            <div class="container">
+                <h2>Photo Gifts</h2>
+                <p>Canvas, mouse pads and other photo gifts to show off your images.</p>
+            </div>
+        </section>
+
+        <section id="canvas" class="page">
+            <div class="container">
+                <h2>Canvas</h2>
+                <p>Your favorite photo mounted on canvas - a stylish decoration solution.</p>
+            </div>
+        </section>
+
+        <section id="contact" class="page">
+            <div class="container contact-info">
+                <h2>FOTOCENTER PH BRANCH</h2>
+                <div class="contact-details">
+                    <p><strong>Address:</strong> St. Agatha Homes, Malolos, Bulacan</p>
+                    <p><strong>Phone:</strong> (+63) 929 725 2291</p>
+                    <p><strong>Email:</strong> <a href="mailto:kyle.baltazar@fotocenter.se">kyle.baltazar@fotocenter.se</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="modal-icon">✅</div>
+            <h3>Photo Added to Cart!</h3>
+            <p>Your edited photo has been successfully added to your shopping cart.</p>
+            <div class="modal-actions">
+                <button class="modal-btn continue-btn" onclick="closeModal()">Continue Editing</button>
+                <button class="modal-btn cart-view-btn" onclick="viewCart()">View Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-modal">
+            <span class="close-modal" onclick="closeCartModal()">&times;</span>
+            <h3>Your Shopping Cart</h3>
+            <div class="cart-items" id="cartItemsList">
+                <!-- Cart items will be displayed here -->
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cartTotalAmount">₱ 0.00</span>
+                </div>
+                <div class="cart-actions">
+                    <button class="modal-btn continue-btn" onclick="closeCartModal()">Continue Shopping</button>
+                    <button class="modal-btn checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>FOTOCENTER PH BRANCH</h3>
+                <p>St. Agatha Homes, Malolos, Bulacan</p>
+                <p>Phone: (+63) 929 725 2291<br>Email: <a href="mailto:kyle.baltazar@fotocenter.se">kyle.baltazar@fotocenter.se</a></p>
+            </div>
+            <div class="footer-section">
+                <h3>Menu</h3>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="navigateTo('home'); return false;">Home</a></li>
+                    <li><a href="#" onclick="navigateTo('photos'); return false;">Photos</a></li>
+                    <li><a href="#" onclick="navigateTo('cards'); return false;">Photo Cards</a></li>
+                    <li><a href="#" onclick="navigateTo('calendars'); return false;">Calendars</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Terms</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Terms of Use</a></li>
+                    <li><a href="#">Payment Terms</a></li>
+                    <li><a href="#">Cookie Details</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; Powered by FOTOCENTER. By continuing to use our website we assume you agree to the use of cookies.</p>
+        </div>
+    </footer>
+
+    <!-- Reviews Carousel -->
+    <section class="reviews-section">
+        <div class="container">
+            <h3>Customer Reviews</h3>
+            <div class="review-carousel">
+                <button class="carousel-nav left" onclick="prevReview()">◀</button>
+                <div id="reviewsContainer" class="reviews-container">
+                    <!-- reviews inserted here -->
+                </div>
+                <button class="carousel-nav right" onclick="nextReview()">▶</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Widget -->
+    <div id="chatWidget" class="chat-widget">
+        <div id="chatBox" class="chat-box">
+            <div class="chat-header">
+                <h3>FOTOCENTER Support</h3>
+                <button class="chat-close" onclick="toggleChat()">✕</button>
+            </div>
+
+            <!-- Horizontal FAQ Bar -->
+            <div class="chat-faq-bar" id="chatFaqBar">
+                <div class="faq-scroll-container">
+                    <div class="faq-items">
+                        <div class="faq-item" onclick="selectFaqQuestion('pricing')">
+                            <span class="faq-icon">💰</span>
+                            <span class="faq-text">Pricing</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('delivery')">
+                            <span class="faq-icon">🚚</span>
+                            <span class="faq-text">Delivery</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('upload')">
+                            <span class="faq-icon">📤</span>
+                            <span class="faq-text">Upload</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('quality')">
+                            <span class="faq-icon">✨</span>
+                            <span class="faq-text">Quality</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('editing')">
+                            <span class="faq-icon">🎨</span>
+                            <span class="faq-text">Editing</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('payment')">
+                            <span class="faq-icon">💳</span>
+                            <span class="faq-text">Payment</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('sizes')">
+                            <span class="faq-icon">📏</span>
+                            <span class="faq-text">Sizes</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('refund')">
+                            <span class="faq-icon">↩️</span>
+                            <span class="faq-text">Refunds</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-scroll-indicator left">‹</div>
+                <div class="faq-scroll-indicator right">›</div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will appear here -->
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Type your message..." class="chat-input">
+                <button onclick="sendMessage()" class="chat-send-btn">Send</button>
+            </div>
+        </div>
+        <button id="chatToggleBtn" class="chat-toggle-btn" onclick="toggleChat()" title="Chat with us">
+            <img src="https://tse2.mm.bing.net/th/id/OIP.Il1NAN2piMWTFt8ZUoG8cwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Chat" class="chat-icon-img">
+        </button>
+    </div>
+
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
