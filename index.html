@@ -6,6 +6,8 @@
     <meta name="description" content="Photo development and printing - FOTOCENTER in Skövde">
     <title>FOTOCENTER Philippines - Photo Development & Printing</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600&family=Nunito:wght@400&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar">
@@ -173,6 +175,7 @@
             </div>
         </section>
 
+        <!-- HOMEPAGE - REDESIGNED -->
         <section id="home" class="page active">
             <header class="hero">
                 <div class="hero-content">
@@ -181,9 +184,48 @@
                     <button class="cta-btn" onclick="navigateTo('photos'); return false;">Start Ordering</button>
                 </div>
             </header>
-            <section class="products-section">
-                <div class="products-container">
-                    <div id="products" class="products-grid"></div>
+
+            <!-- NEW: Video + Text Section (replaces product grid) -->
+            <section class="home-content-section">
+                <div class="container">
+                    <!-- Video Section -->
+                    <div class="video-wrapper">
+                        <iframe width="100%"
+                                height="500"
+                                src="https://www.youtube.com/embed/RuXa_yxZMGI?autoplay=1&loop=1&playlist=RuXa_yxZMGI&mute=1&rel=0"
+                                title="FOTOCENTER Tutorial"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+
+                    <!-- Two Column Text Section -->
+                    <div class="text-columns">
+                        <!-- Left Column -->
+                        <div class="text-card left-card">
+                            <h2 class="card-heading">Your <span class="memories-word">MEMORIES</span> deserve more than just a screen.</h2>
+                            <p class="card-subheading">We help you transform your favorite digital moments into:</p>
+                            <ul class="card-list">
+                                <li>• Stunning photo cards for any occasion</li>
+                                <li>• Personalized calendars to cherish all year</li>
+                                <li>• Beautiful canvas prints for your walls</li>
+                                <li>• And more...</li>
+                            </ul>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="text-card right-card">
+                            <h2 class="card-heading">Turn your <span class="memories-word">MEMORIES</span> into art you can hold.</h2>
+                            <ul class="card-list check-list">
+                                <li>✓ Upload any photo</li>
+                                <li>✓ Edit with our easy-to-use tools</li>
+                                <li>✓ Choose from 6 product types</li>
+                                <li>✓ Get high-quality prints delivered</li>
+                            </ul>
+                            <p class="card-footer-text">All with our simple online editor.</p>
+                        </div>
+                    </div>
                 </div>
             </section>
         </section>
