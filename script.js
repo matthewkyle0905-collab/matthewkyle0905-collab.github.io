@@ -3395,26 +3395,35 @@ function initSearchBar() {
     searchInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            performSearch(this.value.trim());
+            const query = this.value.trim();
+            if (query) {
+                performSearch(query);
+            } else {
+                // If empty, just go to shop
+                navigateTo('shop');
+            }
         }
     });
     
-    // Handle search icon click (optional)
+    // Handle search icon click
     const searchIcon = document.querySelector('.search-icon');
     if (searchIcon) {
         searchIcon.addEventListener('click', function() {
-            performSearch(searchInput.value.trim());
+            const query = searchInput.value.trim();
+            if (query) {
+                performSearch(query);
+            }
         });
     }
+    
+    console.log('Search bar initialized'); // Debug
 }
 
 // Perform search
 function performSearch(query) {
-    if (!query) {
-        // If empty search, just go to shop page
-        navigateTo('shop');
-        return;
-    }
+    console.log('Performing search for:', query); // Debug
+    
+    if (!query) return;
     
     // Save to localStorage
     localStorage.setItem('lastSearch', query);
@@ -3426,53 +3435,68 @@ function performSearch(query) {
     // Small delay to ensure shop page is loaded
     setTimeout(() => {
         filterProducts(query);
-    }, 100);
+    }, 300);
 }
 
 // Filter products based on search query
 function filterProducts(query) {
-    const shopGrid = document.getElementById('shopProductsGrid');
-    if (!shopGrid) return;
+    console.log('Filtering products for:', query); // Debug
     
-    const productCards = shopGrid.querySelectorAll('.product-card');
-    if (productCards.length === 0) {
-        // If products aren't loaded yet, wait and retry
-        setTimeout(() => filterProducts(query), 500);
+    const shopGrid = document.getElementById('shopProductsGrid');
+    if (!shopGrid) {
+        console.log('Shop grid not found');
         return;
     }
+    
+    // Make sure products are rendered
+    if (!shopGrid.hasChildNodes() || shopGrid.children.length === 0) {
+        console.log('No products in grid, rendering first...');
+        renderShopProducts();
+        setTimeout(() => filterProducts(query), 200);
+        return;
+    }
+    
+    const productCards = shopGrid.querySelectorAll('.product-card');
+    console.log('Found', productCards.length, 'product cards');
+    
+    if (productCards.length === 0) return;
     
     const searchTerm = query.toLowerCase();
     let matchCount = 0;
     
-    // Add search-active class to container
-    document.querySelector('.products-grid')?.classList.add('search-active');
+    // Remove any existing no-results message
+    const existingNoResults = shopGrid.querySelector('.no-results-message');
+    if (existingNoResults) existingNoResults.remove();
     
     // Show search results info
     const searchInfo = document.getElementById('searchResultsInfo');
     const searchText = document.getElementById('searchResultsText');
+    
     if (searchInfo && searchText) {
         searchInfo.style.display = 'flex';
-        searchText.innerHTML = `Search results for: <span>"${query}"</span>`;
     }
     
     // Loop through all product cards
     productCards.forEach(card => {
         const title = card.querySelector('h3, h4')?.textContent.toLowerCase() || '';
         const desc = card.querySelector('.product-desc, p')?.textContent.toLowerCase() || '';
-        const price = card.querySelector('.price')?.textContent.toLowerCase() || '';
+        const priceText = card.querySelector('.price')?.textContent.toLowerCase() || '';
         
         // Check if search term matches
-        if (title.includes(searchTerm) || desc.includes(searchTerm) || price.includes(searchTerm)) {
+        if (title.includes(searchTerm) || desc.includes(searchTerm) || priceText.includes(searchTerm)) {
             // Match found - highlight
             card.classList.add('search-highlight');
             card.classList.remove('search-dim');
             matchCount++;
+            console.log('Match found:', title); // Debug
         } else {
             // No match - dim with blur
             card.classList.add('search-dim');
             card.classList.remove('search-highlight');
         }
     });
+    
+    console.log('Total matches:', matchCount); // Debug
     
     // Update results count
     if (searchText) {
@@ -3485,7 +3509,7 @@ function filterProducts(query) {
         noResults.className = 'no-results-message';
         noResults.innerHTML = `
             <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                <h3>😕 No products found</h3>
+                <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: var(--text);">😕 No products found</h3>
                 <p>Try searching for: photo cards, calendar, canvas, photo book, mouse pads, double cards</p>
             </div>
         `;
@@ -3495,12 +3519,19 @@ function filterProducts(query) {
 
 // Clear search
 function clearSearch() {
+    console.log('Clearing search'); // Debug
+    
+    const shopGrid = document.getElementById('shopProductsGrid');
+    if (!shopGrid) return;
+    
     // Remove search classes
-    document.querySelectorAll('.product-card').forEach(card => {
+    shopGrid.querySelectorAll('.product-card').forEach(card => {
         card.classList.remove('search-highlight', 'search-dim');
     });
     
-    document.querySelector('.products-grid')?.classList.remove('search-active');
+    // Remove no-results message
+    const noResults = shopGrid.querySelector('.no-results-message');
+    if (noResults) noResults.remove();
     
     // Hide search info
     const searchInfo = document.getElementById('searchResultsInfo');
@@ -3513,43 +3544,8 @@ function clearSearch() {
     if (searchInput) {
         searchInput.value = '';
     }
-    
-    // Reset to default products
-    renderShopProducts();
 }
 
-// Override renderShopProducts to work with search
-const originalRenderShopProducts = renderShopProducts;
-renderShopProducts = function() {
-    originalRenderShopProducts();
-    
-    // Check if we need to reapply search
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput && searchInput.value.trim()) {
-        setTimeout(() => {
-            filterProducts(searchInput.value.trim());
-        }, 100);
-    }
-};
-
-// Add no-results-message style if not exists
-const style = document.createElement('style');
-style.textContent = `
-    .no-results-message {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 3rem;
-        color: var(--text-muted);
-    }
-    .no-results-message h3 {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        color: var(--text);
-    }
-`;
-document.head.appendChild(style);
-
-// Initialize search when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initSearchBar();
-});
+// Make functions globally available
+window.performSearch = performSearch;
+window.clearSearch = clearSearch;
