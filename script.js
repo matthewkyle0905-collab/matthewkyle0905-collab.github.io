@@ -3378,3 +3378,178 @@ function initPrintOptions() {
         customSizeContainer.style.display = 'none';
     }
 }
+// ============== SEARCH BAR FUNCTIONS ==============
+
+// Store last search query
+let lastSearchQuery = localStorage.getItem('lastSearch') || 'canvas prints...';
+
+// Initialize search bar
+function initSearchBar() {
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
+    // Set placeholder to last search
+    searchInput.placeholder = lastSearchQuery;
+    
+    // Handle Enter key
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch(this.value.trim());
+        }
+    });
+    
+    // Handle search icon click (optional)
+    const searchIcon = document.querySelector('.search-icon');
+    if (searchIcon) {
+        searchIcon.addEventListener('click', function() {
+            performSearch(searchInput.value.trim());
+        });
+    }
+}
+
+// Perform search
+function performSearch(query) {
+    if (!query) {
+        // If empty search, just go to shop page
+        navigateTo('shop');
+        return;
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('lastSearch', query);
+    document.getElementById('searchInput').placeholder = query;
+    
+    // Navigate to shop page
+    navigateTo('shop');
+    
+    // Small delay to ensure shop page is loaded
+    setTimeout(() => {
+        filterProducts(query);
+    }, 100);
+}
+
+// Filter products based on search query
+function filterProducts(query) {
+    const shopGrid = document.getElementById('shopProductsGrid');
+    if (!shopGrid) return;
+    
+    const productCards = shopGrid.querySelectorAll('.product-card');
+    if (productCards.length === 0) {
+        // If products aren't loaded yet, wait and retry
+        setTimeout(() => filterProducts(query), 500);
+        return;
+    }
+    
+    const searchTerm = query.toLowerCase();
+    let matchCount = 0;
+    
+    // Add search-active class to container
+    document.querySelector('.products-grid')?.classList.add('search-active');
+    
+    // Show search results info
+    const searchInfo = document.getElementById('searchResultsInfo');
+    const searchText = document.getElementById('searchResultsText');
+    if (searchInfo && searchText) {
+        searchInfo.style.display = 'flex';
+        searchText.innerHTML = `Search results for: <span>"${query}"</span>`;
+    }
+    
+    // Loop through all product cards
+    productCards.forEach(card => {
+        const title = card.querySelector('h3, h4')?.textContent.toLowerCase() || '';
+        const desc = card.querySelector('.product-desc, p')?.textContent.toLowerCase() || '';
+        const price = card.querySelector('.price')?.textContent.toLowerCase() || '';
+        
+        // Check if search term matches
+        if (title.includes(searchTerm) || desc.includes(searchTerm) || price.includes(searchTerm)) {
+            // Match found - highlight
+            card.classList.add('search-highlight');
+            card.classList.remove('search-dim');
+            matchCount++;
+        } else {
+            // No match - dim with blur
+            card.classList.add('search-dim');
+            card.classList.remove('search-highlight');
+        }
+    });
+    
+    // Update results count
+    if (searchText) {
+        searchText.innerHTML = `Found <span>${matchCount}</span> result${matchCount !== 1 ? 's' : ''} for: <span>"${query}"</span>`;
+    }
+    
+    // If no matches, show message
+    if (matchCount === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results-message';
+        noResults.innerHTML = `
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <h3>😕 No products found</h3>
+                <p>Try searching for: photo cards, calendar, canvas, photo book, mouse pads, double cards</p>
+            </div>
+        `;
+        shopGrid.appendChild(noResults);
+    }
+}
+
+// Clear search
+function clearSearch() {
+    // Remove search classes
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.classList.remove('search-highlight', 'search-dim');
+    });
+    
+    document.querySelector('.products-grid')?.classList.remove('search-active');
+    
+    // Hide search info
+    const searchInfo = document.getElementById('searchResultsInfo');
+    if (searchInfo) {
+        searchInfo.style.display = 'none';
+    }
+    
+    // Clear input
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    // Reset to default products
+    renderShopProducts();
+}
+
+// Override renderShopProducts to work with search
+const originalRenderShopProducts = renderShopProducts;
+renderShopProducts = function() {
+    originalRenderShopProducts();
+    
+    // Check if we need to reapply search
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && searchInput.value.trim()) {
+        setTimeout(() => {
+            filterProducts(searchInput.value.trim());
+        }, 100);
+    }
+};
+
+// Add no-results-message style if not exists
+const style = document.createElement('style');
+style.textContent = `
+    .no-results-message {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-muted);
+    }
+    .no-results-message h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--text);
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize search when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initSearchBar();
+});
