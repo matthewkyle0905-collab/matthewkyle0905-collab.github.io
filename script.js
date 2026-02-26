@@ -3493,4 +3493,245 @@ document.addEventListener('DOMContentLoaded', function () {
     if (advancedDiv) {
         advancedDiv.style.display = 'none';
     }
+
+    // ============== REDESIGNED PRINT OPTIONS FUNCTIONS ==============
+
+    // Global variables for print options
+    let currentQuantity = 1;
+    let currentAdvancedQuantity = 1;
+    let isAdvancedOpen = false;
+    let basePricePerUnit = 25;
+
+    // Toggle advanced options - FIXED to show only ONE button at a time
+    function toggleAdvancedOptions() {
+        const advancedDiv = document.getElementById('advancedPrintOptions');
+        const toggleBtn = document.getElementById('toggleAdvancedBtn');
+
+        if (!advancedDiv || !toggleBtn) return;
+
+        isAdvancedOpen = !isAdvancedOpen;
+
+        if (isAdvancedOpen) {
+            advancedDiv.style.display = 'block';
+            toggleBtn.textContent = '− Less Options';
+            // Sync simple quantity to advanced
+            document.getElementById('advancedQuantityDisplay').textContent = currentQuantity;
+            currentAdvancedQuantity = currentQuantity;
+            calculateAdvancedPrice();
+        } else {
+            advancedDiv.style.display = 'none';
+            toggleBtn.textContent = '+ More Options';
+            // Sync advanced quantity back to simple
+            currentQuantity = currentAdvancedQuantity;
+            document.getElementById('quantityDisplay').textContent = currentQuantity;
+            updateSimpleTotal();
+        }
+    }
+
+    // Update quantity in simple view
+    function updateQuantity(change) {
+        currentQuantity = Math.max(1, currentQuantity + change);
+        document.getElementById('quantityDisplay').textContent = currentQuantity;
+
+        updateSimpleTotal();
+
+        if (isAdvancedOpen) {
+            currentAdvancedQuantity = currentQuantity;
+            document.getElementById('advancedQuantityDisplay').textContent = currentQuantity;
+            calculateAdvancedPrice();
+        }
+    }
+
+    // Update quantity in advanced view
+    function updateAdvancedQuantity(change) {
+        currentAdvancedQuantity = Math.max(1, currentAdvancedQuantity + change);
+        document.getElementById('advancedQuantityDisplay').textContent = currentAdvancedQuantity;
+        document.getElementById('breakdownQuantity').textContent = currentAdvancedQuantity;
+
+        currentQuantity = currentAdvancedQuantity;
+        document.getElementById('quantityDisplay').textContent = currentQuantity;
+
+        calculateAdvancedPrice();
+    }
+
+    // Update simple view total
+    function updateSimpleTotal() {
+        const selectedSize = document.querySelector('input[name="printSize"]:checked');
+        let pricePerUnit = 25;
+
+        if (selectedSize) {
+            const sizeValue = selectedSize.value;
+            switch (sizeValue) {
+                case '4x6': pricePerUnit = 25; break;
+                case '5x7': pricePerUnit = 35; break;
+                case '8x10': pricePerUnit = 50; break;
+                case '11x14': pricePerUnit = 80; break;
+                default: pricePerUnit = 25;
+            }
+        }
+
+        basePricePerUnit = pricePerUnit;
+        const total = pricePerUnit * currentQuantity;
+        document.getElementById('simpleTotalPrice').textContent = `₱${total.toFixed(2)}`;
+        document.getElementById('finalPrice').textContent = `₱${total.toFixed(2)}`;
+    }
+
+    // Calculate advanced view price
+    function calculateAdvancedPrice() {
+        let basePrice = 25;
+        const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
+
+        if (selectedSize) {
+            const sizeValue = selectedSize.value;
+            if (sizeValue === 'custom') {
+                const width = parseFloat(document.getElementById('customWidth').value) || 8;
+                const height = parseFloat(document.getElementById('customHeight').value) || 10;
+                const area = width * height;
+                basePrice = Math.max(25, Math.round(area * 0.5));
+            } else {
+                switch (sizeValue) {
+                    case '4x6': basePrice = 25; break;
+                    case '5x7': basePrice = 35; break;
+                    case '8x10': basePrice = 50; break;
+                    case '11x14': basePrice = 80; break;
+                    case '16x20': basePrice = 150; break;
+                    default: basePrice = 25;
+                }
+            }
+        }
+
+        let paperUpgrade = 0;
+        const glossyChecked = document.getElementById('paperGlossy')?.checked || false;
+        const matteChecked = document.getElementById('paperMatte')?.checked || false;
+
+        if (glossyChecked) paperUpgrade += 10;
+        if (matteChecked) paperUpgrade += 15;
+
+        const priceBeforeQuantity = basePrice + paperUpgrade;
+        const totalPrice = priceBeforeQuantity * currentAdvancedQuantity;
+
+        document.getElementById('basePrice').textContent = `₱${basePrice.toFixed(2)}`;
+        document.getElementById('paperUpgradePrice').textContent = `₱${paperUpgrade.toFixed(2)}`;
+        document.getElementById('quantityMultiplier').textContent = `₱${(priceBeforeQuantity * currentAdvancedQuantity).toFixed(2)}`;
+        document.getElementById('advancedTotalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
+        document.getElementById('finalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
+
+        basePricePerUnit = basePrice;
+        document.getElementById('simpleTotalPrice').textContent = `₱${(basePrice * currentQuantity).toFixed(2)}`;
+    }
+
+    // Handle advanced size selection
+    function onAdvancedSizeSelect() {
+        const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
+        if (!selectedSize) return;
+
+        if (selectedSize.value === 'custom') {
+            document.getElementById('customWidth').disabled = false;
+            document.getElementById('customHeight').disabled = false;
+            document.getElementById('customUnit').disabled = false;
+        } else {
+            document.getElementById('customWidth').disabled = true;
+            document.getElementById('customHeight').disabled = true;
+            document.getElementById('customUnit').disabled = true;
+
+            const simpleRadio = document.querySelector(`input[name="printSize"][value="${selectedSize.value}"]`);
+            if (simpleRadio) {
+                simpleRadio.checked = true;
+            }
+        }
+
+        calculateAdvancedPrice();
+    }
+
+    // Override addPhotoToCart
+    const originalAddPhotoToCart = window.addPhotoToCart;
+    window.addPhotoToCart = function () {
+        if (currentImageIndex === -1) {
+            alert('Please upload and select an image first.');
+            return;
+        }
+
+        let size, price, paperType = 'standard', sizeMode = 'fill', isCustom = false;
+        let customWidth = null, customHeight = null, customUnit = 'inches';
+
+        if (isAdvancedOpen) {
+            const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
+            size = selectedSize ? selectedSize.value : '4x6';
+
+            if (size === 'custom') {
+                isCustom = true;
+                customWidth = document.getElementById('customWidth').value;
+                customHeight = document.getElementById('customHeight').value;
+                customUnit = document.getElementById('customUnit').value;
+                size = `${customWidth} x ${customHeight} ${customUnit}`;
+            }
+
+            if (document.getElementById('paperGlossy')?.checked) paperType = 'glossy';
+            if (document.getElementById('paperMatte')?.checked) paperType = 'matte';
+
+            const sizeModeRadio = document.querySelector('input[name="sizeMode"]:checked');
+            sizeMode = sizeModeRadio ? sizeModeRadio.value : 'fill';
+
+            price = document.getElementById('advancedTotalPrice').textContent;
+        } else {
+            const selectedSize = document.querySelector('input[name="printSize"]:checked');
+            size = selectedSize ? selectedSize.value : '4x6';
+            price = document.getElementById('simpleTotalPrice').textContent;
+        }
+
+        const cartItem = {
+            id: 'photo-' + Date.now(),
+            type: 'photo',
+            name: `Printed Photo (${size})`,
+            image: canvas.toDataURL('image/jpeg', 0.9),
+            price: price,
+            size: size,
+            quantity: isAdvancedOpen ? currentAdvancedQuantity : currentQuantity,
+            paperType: paperType,
+            sizeMode: sizeMode,
+            isCustom: isCustom,
+            customDimensions: isCustom ? { width: customWidth, height: customHeight, unit: customUnit } : null,
+            originalName: uploadedImages[currentImageIndex]?.name || 'photo',
+            timestamp: new Date().toISOString()
+        };
+
+        addToCart(cartItem);
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set up radio listeners
+        document.querySelectorAll('input[name="printSize"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                updateSimpleTotal();
+                if (isAdvancedOpen) {
+                    const advancedRadio = document.querySelector(`input[name="advancedPrintSize"][value="${this.value}"]`);
+                    if (advancedRadio) {
+                        advancedRadio.checked = true;
+                        calculateAdvancedPrice();
+                    }
+                }
+            });
+        });
+
+        // Set up advanced input listeners
+        const advancedInputs = ['customWidth', 'customHeight', 'customUnit'];
+        advancedInputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', calculateAdvancedPrice);
+            }
+        });
+
+        // Initial update
+        updateSimpleTotal();
+
+        // Hide advanced view initially
+        const advancedDiv = document.getElementById('advancedPrintOptions');
+        if (advancedDiv) {
+            advancedDiv.style.display = 'none';
+        }
+    });
+
+
 });
