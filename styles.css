@@ -94,7 +94,7 @@ body {
     .nav-links a {
         color: var(--text);
         text-decoration: none;
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         transition: var(--transition);
         position: relative;
     }
@@ -147,7 +147,7 @@ body {
     padding: 0.5rem 1rem;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     transition: var(--transition);
 }
 
@@ -3110,6 +3110,7 @@ body {
         flex-wrap: wrap;
     }
 }
+
 
 
 
