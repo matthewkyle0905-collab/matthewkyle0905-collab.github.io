@@ -201,11 +201,6 @@ const templates = {
     doublecards: null
 };
 
-// REMOVED templatePlacements - no longer needed
-// const templatePlacements = {
-//     calendar: { x: 0, y: 0, width: 100, height: 50 }
-// };
-
 function getEventClient(e) {
     if (e.touches && e.touches[0]) return e.touches[0];
     return e;
@@ -657,6 +652,9 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(() => {
         selectProduct('photocards');
     }, 500);
+    
+    // Initialize print options
+    initPrintOptions();
 });
 
 function updateCartBadgeOnLoad() {
@@ -1432,8 +1430,6 @@ function saveCurrentAdjustments() {
 }
 
 // ============== FIXED UNDO/REDO SYSTEM ==============
-// Now properly updates imgObj.original on undo/redo
-
 function pushSnapshotForCurrentImage() {
     if (currentImageIndex === -1 || !canvas) return;
 
@@ -1443,10 +1439,9 @@ function pushSnapshotForCurrentImage() {
     if (!imgObj.history) imgObj.history = [];
     if (!imgObj.redo) imgObj.redo = [];
 
-    // Don't push duplicate
     if (imgObj.history[imgObj.history.length - 1] !== snapshot) {
         imgObj.history.push(snapshot);
-        imgObj.redo = []; // Clear redo on new action
+        imgObj.redo = [];
         console.log('📸 History saved. Length:', imgObj.history.length);
     }
 
@@ -1467,18 +1462,14 @@ function undo() {
 
     console.log('↩️ Undo called. Current history length:', imgObj.history.length);
 
-    // Save current to redo
     const current = canvas.toDataURL('image/png');
     imgObj.redo.push(current);
 
-    // Go back one step
-    imgObj.history.pop(); // Remove current
+    imgObj.history.pop();
     const previous = imgObj.history[imgObj.history.length - 1];
 
-    // 🔥 CRITICAL: Update the original source for next crop!
     imgObj.original = previous;
 
-    // Load it
     const img = new Image();
     img.onload = function () {
         canvas.width = img.width;
@@ -1506,17 +1497,13 @@ function redo() {
 
     console.log('↪️ Redo called. Redo stack length:', imgObj.redo.length);
 
-    // Get next from redo
     const next = imgObj.redo.pop();
 
-    // Save current to history
     const current = canvas.toDataURL('image/png');
     imgObj.history.push(current);
 
-    // 🔥 CRITICAL: Update the original source for next crop!
     imgObj.original = next;
 
-    // Load next
     const img = new Image();
     img.onload = function () {
         canvas.width = img.width;
@@ -1535,7 +1522,6 @@ function resetImage() {
 
     const imgObj = uploadedImages[currentImageIndex];
 
-    // Reset adjustments
     adjustments = {
         brightness: 100,
         contrast: 100,
@@ -1546,14 +1532,11 @@ function resetImage() {
     };
     currentFilter = 'none';
 
-    // Reset to base original (THE FIRST UPLOADED IMAGE)
     imgObj.original = imgObj.baseOriginal;
 
-    // Reset history
     imgObj.history = [imgObj.baseOriginal];
     imgObj.redo = [];
 
-    // Draw
     const img = new Image();
     img.onload = function () {
         canvas.width = img.width;
@@ -1590,8 +1573,7 @@ function updateUndoRedoButtons() {
     console.log(`🔄 Undo: ${canUndo ? 'enabled' : 'disabled'}, Redo: ${canRedo ? 'enabled' : 'disabled'}`);
 }
 
-// ============== FIXED DRAWIMAGE FUNCTION - NO TEMPLATE MODE ==============
-// Now calendar works exactly like all other products
+// ============== FIXED DRAWIMAGE FUNCTION ==============
 function drawImage() {
     if (currentImageIndex === -1 || !canvas || !ctx) return;
 
@@ -1602,24 +1584,15 @@ function drawImage() {
         console.log('📸 Drawing image. Product:', currentProduct);
         console.log('Image dimensions:', img.width, 'x', img.height);
 
-        // ---------- NO TEMPLATE MODE (All products work the same) ----------
-        console.log('🖼️ Standard mode');
-
-        // Save context state
         ctx.save();
 
-        // IMPORTANT: Do NOT change canvas size during crop preview
-        // Keep canvas at its original size (usually the full image size)
         if (!cropTool.active) {
-            // Only resize canvas when not cropping
             canvas.width = img.width;
             canvas.height = img.height;
         }
 
-        // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Apply transformations
         ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.rotate((adjustments.rotation * Math.PI) / 180);
 
@@ -1628,7 +1601,6 @@ function drawImage() {
 
         ctx.translate(-canvas.width / 2, -canvas.height / 2);
 
-        // Apply filters
         let filterString = `brightness(${adjustments.brightness}%) contrast(${adjustments.contrast}%) saturate(${adjustments.saturation}%)`;
         if (currentFilter !== 'none' && editorFeatures.filters[currentFilter]) {
             filterString += ' ' + editorFeatures.filters[currentFilter];
@@ -1636,19 +1608,15 @@ function drawImage() {
         ctx.filter = filterString;
 
         if (cropTool.active) {
-            // During crop preview, draw the FULL image but we'll overlay the crop box
             ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
 
-            // Store image position (full image fills canvas)
             cropTool.imageX = 0;
             cropTool.imageY = 0;
             cropTool.imageWidth = canvas.width;
             cropTool.imageHeight = canvas.height;
         } else {
-            // No crop - draw full image
             ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
 
-            // Store image position for crop tool (full image at 0,0)
             cropTool.imageX = 0;
             cropTool.imageY = 0;
             cropTool.imageWidth = canvas.width;
@@ -1657,17 +1625,6 @@ function drawImage() {
 
         ctx.restore();
 
-        console.log('📍 Image position:', {
-            x: cropTool.imageX,
-            y: cropTool.imageY,
-            w: cropTool.imageWidth,
-            h: cropTool.imageHeight,
-            rotation: adjustments.rotation,
-            flipH: adjustments.flipHorizontal,
-            flipV: adjustments.flipVertical
-        });
-
-        // Draw text overlay if active
         if (editorFeatures.textOverlay.active) {
             const text = editorFeatures.textOverlay;
             ctx.save();
@@ -1684,7 +1641,6 @@ function drawImage() {
 
         drawWatermark();
 
-        // If crop is active, update handles position
         if (cropTool.active) {
             console.log('✂️ Crop active, updating handles');
             setTimeout(() => {
@@ -1720,7 +1676,6 @@ function setupDropdownMenu() {
 
     if (!dropdownBtn || !dropdownMenu) return;
 
-    // Populate dropdown menu
     const productTypes = ['photocards', 'calendar', 'photobook', 'canvas', 'mousepads', 'doublecards'];
 
     dropdownMenu.innerHTML = productTypes.map(type => {
@@ -1736,36 +1691,29 @@ function setupDropdownMenu() {
         `;
     }).join('');
 
-    // Toggle dropdown on button click
     dropdownBtn.addEventListener('click', function (e) {
         e.stopPropagation();
         dropdownMenu.classList.toggle('show');
     });
 
-    // Handle dropdown item selection
     dropdownMenu.querySelectorAll('.dropdown-item').forEach(item => {
         item.addEventListener('click', function (e) {
             e.stopPropagation();
             const productType = this.getAttribute('data-product');
 
-            // Update active states
             dropdownMenu.querySelectorAll('.dropdown-item').forEach(el => {
                 el.classList.remove('active');
             });
             this.classList.add('active');
 
-            // Update badge
             updateProductBadge(productType);
 
-            // Close dropdown
             dropdownMenu.classList.remove('show');
 
-            // Call existing selectProduct function
             selectProduct(productType);
         });
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', function () {
         dropdownMenu.classList.remove('show');
     });
@@ -1788,18 +1736,14 @@ function updateProductBadge(productType) {
 function selectProduct(type) {
     currentProduct = type;
 
-    // Update active state on any remaining old buttons (for backward compatibility)
     document.querySelectorAll('.product-btn').forEach(b => {
         b.classList.toggle('active', b.getAttribute('data-product') === type);
     });
 
-    // Update badge
     updateProductBadge(type);
 
-    // Update print options
     updatePrintOptions(type);
 
-    // Load template if available (calendar now has null, so no template)
     if (templates[type]) {
         templateImage = new Image();
         templateImage.onload = function () {
@@ -1861,25 +1805,21 @@ function setupCropHandles() {
     console.log('Container rect:', containerRect);
     console.log('Canvas rect:', canvasRect);
 
-    // Calculate the scale factor between canvas pixels and screen pixels
     const scaleX = canvasRect.width / canvas.width;
     const scaleY = canvasRect.height / canvas.height;
 
     console.log('Scale factors:', { scaleX, scaleY });
 
-    // Calculate crop box position relative to the IMAGE area in canvas coordinates
     const cropCanvasX = cropTool.imageX + (cropTool.x / 100) * cropTool.imageWidth;
     const cropCanvasY = cropTool.imageY + (cropTool.y / 100) * cropTool.imageHeight;
     const cropCanvasW = (cropTool.width / 100) * cropTool.imageWidth;
     const cropCanvasH = (cropTool.height / 100) * cropTool.imageHeight;
 
-    // Convert to screen coordinates (pixels on screen)
     const screenX = canvasRect.left + (cropCanvasX * scaleX);
     const screenY = canvasRect.top + (cropCanvasY * scaleY);
     const screenW = cropCanvasW * scaleX;
     const screenH = cropCanvasH * scaleY;
 
-    // Convert to position relative to container
     const relX = screenX - containerRect.left;
     const relY = screenY - containerRect.top;
 
@@ -1967,23 +1907,19 @@ function updateCropHandlesPosition() {
     const containerRect = container.getBoundingClientRect();
     const canvasRect = canvas.getBoundingClientRect();
 
-    // Calculate scale factors
     const scaleX = canvasRect.width / canvas.width;
     const scaleY = canvasRect.height / canvas.height;
 
-    // Calculate crop box position in canvas coordinates
     const cropCanvasX = cropTool.imageX + (cropTool.x / 100) * cropTool.imageWidth;
     const cropCanvasY = cropTool.imageY + (cropTool.y / 100) * cropTool.imageHeight;
     const cropCanvasW = (cropTool.width / 100) * cropTool.imageWidth;
     const cropCanvasH = (cropTool.height / 100) * cropTool.imageHeight;
 
-    // Convert to screen coordinates
     const screenX = canvasRect.left + (cropCanvasX * scaleX);
     const screenY = canvasRect.top + (cropCanvasY * scaleY);
     const screenW = cropCanvasW * scaleX;
     const screenH = cropCanvasH * scaleY;
 
-    // Convert to position relative to container
     const relX = screenX - containerRect.left;
     const relY = screenY - containerRect.top;
 
@@ -2160,7 +2096,6 @@ function toggleCrop() {
 
         showCropControls();
 
-        // Small delay to ensure DOM is ready
         setTimeout(() => {
             console.log('Setting up crop handles...');
             setupCropHandles();
@@ -2211,7 +2146,6 @@ function hideCropControls() {
 function applyCrop() {
     if (currentImageIndex === -1 || !cropTool.active) return;
 
-    // Save current state to history before cropping
     pushSnapshotForCurrentImage();
 
     const image = uploadedImages[currentImageIndex];
@@ -2221,7 +2155,6 @@ function applyCrop() {
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
 
-        // IMPORTANT: Use the ORIGINAL image dimensions, not the displayed dimensions
         const sx = (cropTool.x / 100) * img.width;
         const sy = (cropTool.y / 100) * img.height;
         const sWidth = (cropTool.width / 100) * img.width;
@@ -2230,22 +2163,17 @@ function applyCrop() {
         tempCanvas.width = sWidth;
         tempCanvas.height = sHeight;
 
-        // Draw the cropped portion from the original image
         tempCtx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
 
-        // Update the image with the cropped version
         image.original = tempCanvas.toDataURL();
 
-        // Reset crop tool
         cropTool.active = false;
         removeCropHandles();
         hideCropControls();
 
-        // Redraw with cropped image
         drawImage();
         saveCurrentAdjustments();
 
-        // Push cropped state to history
         setTimeout(() => {
             pushSnapshotForCurrentImage();
             console.log('✅ Crop applied and saved to history');
@@ -2463,35 +2391,6 @@ function downloadImage() {
     link.download = `edited-${uploadedImages[currentImageIndex].name}`;
     link.href = canvas.toDataURL('image/jpeg', 0.9);
     link.click();
-}
-
-function addPhotoToCart() {
-    if (currentImageIndex === -1) {
-        alert('Please upload and select an image first.');
-        return;
-    }
-
-    const selectedSize = document.querySelector('input[name="printSize"]:checked');
-    if (!selectedSize) {
-        alert('Please select a print size.');
-        return;
-    }
-
-    const size = selectedSize.value;
-    const price = getPriceForSize(size);
-
-    const cartItem = {
-        id: 'photo-' + Date.now(),
-        type: 'photo',
-        name: `Printed Photo (${size}) - ${uploadedImages[currentImageIndex].name}`,
-        image: canvas.toDataURL('image/jpeg', 0.9),
-        price: `₱ ${price.toFixed(2)}`,
-        size: size,
-        originalName: uploadedImages[currentImageIndex].name,
-        quantity: 1
-    };
-
-    addToCart(cartItem);
 }
 
 // ============== UPDATED GET PRICE FOR SIZE ==============
@@ -3220,27 +3119,18 @@ function getCardPriceForSize(size) {
     return prices[size] || 150.00;
 }
 
-// ============== DEBUG: Test calendar image loading (now removed) ==============
-// setTimeout(() => {
-//     const testImg = new Image();
-//     testImg.onload = () => console.log('✅ Calendar template ready at: images/calendar.JPG');
-//     testImg.onerror = () => console.error('❌ Calendar template NOT found at: images/calendar.JPG');
-//     testImg.src = 'images/calendar.JPG';
-// }, 1000);
-
-// ============== NEW PRINT OPTIONS FUNCTIONS ==============
+// ============== REDESIGNED PRINT OPTIONS FUNCTIONS ==============
 
 // Global variables for print options
 let currentQuantity = 1;
 let currentAdvancedQuantity = 1;
 let isAdvancedOpen = false;
-let basePricePerUnit = 25; // Default 4x6 price
+let basePricePerUnit = 25;
 
-// Toggle advanced options
+// Toggle advanced options - FIXED to show only ONE button at a time
 function toggleAdvancedOptions() {
     const advancedDiv = document.getElementById('advancedPrintOptions');
     const toggleBtn = document.getElementById('toggleAdvancedBtn');
-    const simpleDiv = document.getElementById('simplePrintOptions');
 
     if (!advancedDiv || !toggleBtn) return;
 
@@ -3248,14 +3138,14 @@ function toggleAdvancedOptions() {
 
     if (isAdvancedOpen) {
         advancedDiv.style.display = 'block';
-        toggleBtn.textContent = '− Hide Advanced Options';
+        toggleBtn.textContent = '− Less Options';
         // Sync simple quantity to advanced
         document.getElementById('advancedQuantityDisplay').textContent = currentQuantity;
         currentAdvancedQuantity = currentQuantity;
         calculateAdvancedPrice();
     } else {
         advancedDiv.style.display = 'none';
-        toggleBtn.textContent = '+ Advanced Options';
+        toggleBtn.textContent = '+ More Options';
         // Sync advanced quantity back to simple
         currentQuantity = currentAdvancedQuantity;
         document.getElementById('quantityDisplay').textContent = currentQuantity;
@@ -3267,11 +3157,9 @@ function toggleAdvancedOptions() {
 function updateQuantity(change) {
     currentQuantity = Math.max(1, currentQuantity + change);
     document.getElementById('quantityDisplay').textContent = currentQuantity;
-
-    // Update base price calculation
+    
     updateSimpleTotal();
-
-    // If advanced is open, sync quantity
+    
     if (isAdvancedOpen) {
         currentAdvancedQuantity = currentQuantity;
         document.getElementById('advancedQuantityDisplay').textContent = currentQuantity;
@@ -3284,23 +3172,21 @@ function updateAdvancedQuantity(change) {
     currentAdvancedQuantity = Math.max(1, currentAdvancedQuantity + change);
     document.getElementById('advancedQuantityDisplay').textContent = currentAdvancedQuantity;
     document.getElementById('breakdownQuantity').textContent = currentAdvancedQuantity;
-
-    // Sync back to simple
+    
     currentQuantity = currentAdvancedQuantity;
     document.getElementById('quantityDisplay').textContent = currentQuantity;
-
+    
     calculateAdvancedPrice();
 }
 
 // Update simple view total
 function updateSimpleTotal() {
-    // Get selected size price
     const selectedSize = document.querySelector('input[name="printSize"]:checked');
-    let pricePerUnit = 25; // Default
-
+    let pricePerUnit = 25;
+    
     if (selectedSize) {
         const sizeValue = selectedSize.value;
-        switch (sizeValue) {
+        switch(sizeValue) {
             case '4x6': pricePerUnit = 25; break;
             case '5x7': pricePerUnit = 35; break;
             case '8x10': pricePerUnit = 50; break;
@@ -3308,32 +3194,27 @@ function updateSimpleTotal() {
             default: pricePerUnit = 25;
         }
     }
-
+    
     basePricePerUnit = pricePerUnit;
     const total = pricePerUnit * currentQuantity;
     document.getElementById('simpleTotalPrice').textContent = `₱${total.toFixed(2)}`;
     document.getElementById('finalPrice').textContent = `₱${total.toFixed(2)}`;
 }
 
-// Calculate advanced view price with all options
+// Calculate advanced view price
 function calculateAdvancedPrice() {
-    // Base price from selected size
-    let basePrice = 25; // Default
+    let basePrice = 25;
     const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
-
+    
     if (selectedSize) {
         const sizeValue = selectedSize.value;
         if (sizeValue === 'custom') {
-            // Calculate custom size price by area
             const width = parseFloat(document.getElementById('customWidth').value) || 8;
             const height = parseFloat(document.getElementById('customHeight').value) || 10;
-            const unit = document.getElementById('customUnit').value;
-
-            // Simple area-based pricing (₱0.5 per sq inch)
             const area = width * height;
             basePrice = Math.max(25, Math.round(area * 0.5));
         } else {
-            switch (sizeValue) {
+            switch(sizeValue) {
                 case '4x6': basePrice = 25; break;
                 case '5x7': basePrice = 35; break;
                 case '8x10': basePrice = 50; break;
@@ -3343,76 +3224,80 @@ function calculateAdvancedPrice() {
             }
         }
     }
-
-    // Paper upgrades
+    
     let paperUpgrade = 0;
     const glossyChecked = document.getElementById('paperGlossy')?.checked || false;
     const matteChecked = document.getElementById('paperMatte')?.checked || false;
-
+    
     if (glossyChecked) paperUpgrade += 10;
     if (matteChecked) paperUpgrade += 15;
-
-    // Calculate totals
+    
     const priceBeforeQuantity = basePrice + paperUpgrade;
     const totalPrice = priceBeforeQuantity * currentAdvancedQuantity;
-
-    // Update breakdown display
+    
     document.getElementById('basePrice').textContent = `₱${basePrice.toFixed(2)}`;
     document.getElementById('paperUpgradePrice').textContent = `₱${paperUpgrade.toFixed(2)}`;
     document.getElementById('quantityMultiplier').textContent = `₱${(priceBeforeQuantity * currentAdvancedQuantity).toFixed(2)}`;
     document.getElementById('advancedTotalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
-
-    // Update final price in add to cart button
     document.getElementById('finalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
-
-    // Update simple view total for consistency
+    
     basePricePerUnit = basePrice;
     document.getElementById('simpleTotalPrice').textContent = `₱${(basePrice * currentQuantity).toFixed(2)}`;
 }
 
-// Handle when advanced size is selected
+// Handle when advanced size is selected - NEW with custom size toggle
 function onAdvancedSizeSelect() {
     const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
     if (!selectedSize) return;
-
+    
+    const customSizeContainer = document.getElementById('customSizeContainer');
+    
     if (selectedSize.value === 'custom') {
-        // Enable custom size inputs
+        // Show custom size inputs
+        if (customSizeContainer) {
+            customSizeContainer.style.display = 'block';
+        }
+        
+        // Enable inputs
         document.getElementById('customWidth').disabled = false;
         document.getElementById('customHeight').disabled = false;
         document.getElementById('customUnit').disabled = false;
     } else {
-        // Disable custom size inputs
+        // Hide custom size inputs
+        if (customSizeContainer) {
+            customSizeContainer.style.display = 'none';
+        }
+        
+        // Disable inputs
         document.getElementById('customWidth').disabled = true;
         document.getElementById('customHeight').disabled = true;
         document.getElementById('customUnit').disabled = true;
-
+        
         // Sync with simple view radio
         const simpleRadio = document.querySelector(`input[name="printSize"][value="${selectedSize.value}"]`);
         if (simpleRadio) {
             simpleRadio.checked = true;
         }
     }
-
+    
     calculateAdvancedPrice();
 }
 
-// Override the existing addPhotoToCart function to include new options
+// Override addPhotoToCart
 const originalAddPhotoToCart = window.addPhotoToCart;
-window.addPhotoToCart = function () {
+window.addPhotoToCart = function() {
     if (currentImageIndex === -1) {
         alert('Please upload and select an image first.');
         return;
     }
-
-    // Get all options based on which view is active
+    
     let size, price, paperType = 'standard', sizeMode = 'fill', isCustom = false;
     let customWidth = null, customHeight = null, customUnit = 'inches';
-
+    
     if (isAdvancedOpen) {
-        // Advanced view
         const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
         size = selectedSize ? selectedSize.value : '4x6';
-
+        
         if (size === 'custom') {
             isCustom = true;
             customWidth = document.getElementById('customWidth').value;
@@ -3420,24 +3305,20 @@ window.addPhotoToCart = function () {
             customUnit = document.getElementById('customUnit').value;
             size = `${customWidth} x ${customHeight} ${customUnit}`;
         }
-
-        // Paper type
+        
         if (document.getElementById('paperGlossy')?.checked) paperType = 'glossy';
         if (document.getElementById('paperMatte')?.checked) paperType = 'matte';
-
-        // Size mode
+        
         const sizeModeRadio = document.querySelector('input[name="sizeMode"]:checked');
         sizeMode = sizeModeRadio ? sizeModeRadio.value : 'fill';
-
+        
         price = document.getElementById('advancedTotalPrice').textContent;
     } else {
-        // Simple view
         const selectedSize = document.querySelector('input[name="printSize"]:checked');
         size = selectedSize ? selectedSize.value : '4x6';
         price = document.getElementById('simpleTotalPrice').textContent;
     }
-
-    // Create cart item with all details
+    
     const cartItem = {
         id: 'photo-' + Date.now(),
         type: 'photo',
@@ -3453,19 +3334,16 @@ window.addPhotoToCart = function () {
         originalName: uploadedImages[currentImageIndex]?.name || 'photo',
         timestamp: new Date().toISOString()
     };
-
-    // Add to cart using existing function
+    
     addToCart(cartItem);
 };
 
-// Initialize print options when page loads
-document.addEventListener('DOMContentLoaded', function () {
-    // Set up radio button listeners for simple view
+// Initialize print options
+function initPrintOptions() {
+    // Set up radio listeners for simple view
     document.querySelectorAll('input[name="printSize"]').forEach(radio => {
-        radio.addEventListener('change', function () {
+        radio.addEventListener('change', function() {
             updateSimpleTotal();
-
-            // Sync with advanced view if open
             if (isAdvancedOpen) {
                 const advancedRadio = document.querySelector(`input[name="advancedPrintSize"][value="${this.value}"]`);
                 if (advancedRadio) {
@@ -3475,7 +3353,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-
+    
     // Set up listeners for advanced inputs
     const advancedInputs = ['customWidth', 'customHeight', 'customUnit'];
     advancedInputs.forEach(id => {
@@ -3484,254 +3362,19 @@ document.addEventListener('DOMContentLoaded', function () {
             element.addEventListener('input', calculateAdvancedPrice);
         }
     });
-
+    
     // Initial update
     updateSimpleTotal();
-
+    
     // Hide advanced view initially
     const advancedDiv = document.getElementById('advancedPrintOptions');
     if (advancedDiv) {
         advancedDiv.style.display = 'none';
     }
-
-    // ============== REDESIGNED PRINT OPTIONS FUNCTIONS ==============
-
-    // Global variables for print options
-    let currentQuantity = 1;
-    let currentAdvancedQuantity = 1;
-    let isAdvancedOpen = false;
-    let basePricePerUnit = 25;
-
-    // Toggle advanced options - FIXED to show only ONE button at a time
-    function toggleAdvancedOptions() {
-        const advancedDiv = document.getElementById('advancedPrintOptions');
-        const toggleBtn = document.getElementById('toggleAdvancedBtn');
-
-        if (!advancedDiv || !toggleBtn) return;
-
-        isAdvancedOpen = !isAdvancedOpen;
-
-        if (isAdvancedOpen) {
-            advancedDiv.style.display = 'block';
-            toggleBtn.textContent = '− Less Options';
-            // Sync simple quantity to advanced
-            document.getElementById('advancedQuantityDisplay').textContent = currentQuantity;
-            currentAdvancedQuantity = currentQuantity;
-            calculateAdvancedPrice();
-        } else {
-            advancedDiv.style.display = 'none';
-            toggleBtn.textContent = '+ More Options';
-            // Sync advanced quantity back to simple
-            currentQuantity = currentAdvancedQuantity;
-            document.getElementById('quantityDisplay').textContent = currentQuantity;
-            updateSimpleTotal();
-        }
+    
+    // Hide custom size container initially
+    const customSizeContainer = document.getElementById('customSizeContainer');
+    if (customSizeContainer) {
+        customSizeContainer.style.display = 'none';
     }
-
-    // Update quantity in simple view
-    function updateQuantity(change) {
-        currentQuantity = Math.max(1, currentQuantity + change);
-        document.getElementById('quantityDisplay').textContent = currentQuantity;
-
-        updateSimpleTotal();
-
-        if (isAdvancedOpen) {
-            currentAdvancedQuantity = currentQuantity;
-            document.getElementById('advancedQuantityDisplay').textContent = currentQuantity;
-            calculateAdvancedPrice();
-        }
-    }
-
-    // Update quantity in advanced view
-    function updateAdvancedQuantity(change) {
-        currentAdvancedQuantity = Math.max(1, currentAdvancedQuantity + change);
-        document.getElementById('advancedQuantityDisplay').textContent = currentAdvancedQuantity;
-        document.getElementById('breakdownQuantity').textContent = currentAdvancedQuantity;
-
-        currentQuantity = currentAdvancedQuantity;
-        document.getElementById('quantityDisplay').textContent = currentQuantity;
-
-        calculateAdvancedPrice();
-    }
-
-    // Update simple view total
-    function updateSimpleTotal() {
-        const selectedSize = document.querySelector('input[name="printSize"]:checked');
-        let pricePerUnit = 25;
-
-        if (selectedSize) {
-            const sizeValue = selectedSize.value;
-            switch (sizeValue) {
-                case '4x6': pricePerUnit = 25; break;
-                case '5x7': pricePerUnit = 35; break;
-                case '8x10': pricePerUnit = 50; break;
-                case '11x14': pricePerUnit = 80; break;
-                default: pricePerUnit = 25;
-            }
-        }
-
-        basePricePerUnit = pricePerUnit;
-        const total = pricePerUnit * currentQuantity;
-        document.getElementById('simpleTotalPrice').textContent = `₱${total.toFixed(2)}`;
-        document.getElementById('finalPrice').textContent = `₱${total.toFixed(2)}`;
-    }
-
-    // Calculate advanced view price
-    function calculateAdvancedPrice() {
-        let basePrice = 25;
-        const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
-
-        if (selectedSize) {
-            const sizeValue = selectedSize.value;
-            if (sizeValue === 'custom') {
-                const width = parseFloat(document.getElementById('customWidth').value) || 8;
-                const height = parseFloat(document.getElementById('customHeight').value) || 10;
-                const area = width * height;
-                basePrice = Math.max(25, Math.round(area * 0.5));
-            } else {
-                switch (sizeValue) {
-                    case '4x6': basePrice = 25; break;
-                    case '5x7': basePrice = 35; break;
-                    case '8x10': basePrice = 50; break;
-                    case '11x14': basePrice = 80; break;
-                    case '16x20': basePrice = 150; break;
-                    default: basePrice = 25;
-                }
-            }
-        }
-
-        let paperUpgrade = 0;
-        const glossyChecked = document.getElementById('paperGlossy')?.checked || false;
-        const matteChecked = document.getElementById('paperMatte')?.checked || false;
-
-        if (glossyChecked) paperUpgrade += 10;
-        if (matteChecked) paperUpgrade += 15;
-
-        const priceBeforeQuantity = basePrice + paperUpgrade;
-        const totalPrice = priceBeforeQuantity * currentAdvancedQuantity;
-
-        document.getElementById('basePrice').textContent = `₱${basePrice.toFixed(2)}`;
-        document.getElementById('paperUpgradePrice').textContent = `₱${paperUpgrade.toFixed(2)}`;
-        document.getElementById('quantityMultiplier').textContent = `₱${(priceBeforeQuantity * currentAdvancedQuantity).toFixed(2)}`;
-        document.getElementById('advancedTotalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
-        document.getElementById('finalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
-
-        basePricePerUnit = basePrice;
-        document.getElementById('simpleTotalPrice').textContent = `₱${(basePrice * currentQuantity).toFixed(2)}`;
-    }
-
-    // Handle advanced size selection
-    function onAdvancedSizeSelect() {
-        const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
-        if (!selectedSize) return;
-
-        if (selectedSize.value === 'custom') {
-            document.getElementById('customWidth').disabled = false;
-            document.getElementById('customHeight').disabled = false;
-            document.getElementById('customUnit').disabled = false;
-        } else {
-            document.getElementById('customWidth').disabled = true;
-            document.getElementById('customHeight').disabled = true;
-            document.getElementById('customUnit').disabled = true;
-
-            const simpleRadio = document.querySelector(`input[name="printSize"][value="${selectedSize.value}"]`);
-            if (simpleRadio) {
-                simpleRadio.checked = true;
-            }
-        }
-
-        calculateAdvancedPrice();
-    }
-
-    // Override addPhotoToCart
-    const originalAddPhotoToCart = window.addPhotoToCart;
-    window.addPhotoToCart = function () {
-        if (currentImageIndex === -1) {
-            alert('Please upload and select an image first.');
-            return;
-        }
-
-        let size, price, paperType = 'standard', sizeMode = 'fill', isCustom = false;
-        let customWidth = null, customHeight = null, customUnit = 'inches';
-
-        if (isAdvancedOpen) {
-            const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
-            size = selectedSize ? selectedSize.value : '4x6';
-
-            if (size === 'custom') {
-                isCustom = true;
-                customWidth = document.getElementById('customWidth').value;
-                customHeight = document.getElementById('customHeight').value;
-                customUnit = document.getElementById('customUnit').value;
-                size = `${customWidth} x ${customHeight} ${customUnit}`;
-            }
-
-            if (document.getElementById('paperGlossy')?.checked) paperType = 'glossy';
-            if (document.getElementById('paperMatte')?.checked) paperType = 'matte';
-
-            const sizeModeRadio = document.querySelector('input[name="sizeMode"]:checked');
-            sizeMode = sizeModeRadio ? sizeModeRadio.value : 'fill';
-
-            price = document.getElementById('advancedTotalPrice').textContent;
-        } else {
-            const selectedSize = document.querySelector('input[name="printSize"]:checked');
-            size = selectedSize ? selectedSize.value : '4x6';
-            price = document.getElementById('simpleTotalPrice').textContent;
-        }
-
-        const cartItem = {
-            id: 'photo-' + Date.now(),
-            type: 'photo',
-            name: `Printed Photo (${size})`,
-            image: canvas.toDataURL('image/jpeg', 0.9),
-            price: price,
-            size: size,
-            quantity: isAdvancedOpen ? currentAdvancedQuantity : currentQuantity,
-            paperType: paperType,
-            sizeMode: sizeMode,
-            isCustom: isCustom,
-            customDimensions: isCustom ? { width: customWidth, height: customHeight, unit: customUnit } : null,
-            originalName: uploadedImages[currentImageIndex]?.name || 'photo',
-            timestamp: new Date().toISOString()
-        };
-
-        addToCart(cartItem);
-    };
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function () {
-        // Set up radio listeners
-        document.querySelectorAll('input[name="printSize"]').forEach(radio => {
-            radio.addEventListener('change', function () {
-                updateSimpleTotal();
-                if (isAdvancedOpen) {
-                    const advancedRadio = document.querySelector(`input[name="advancedPrintSize"][value="${this.value}"]`);
-                    if (advancedRadio) {
-                        advancedRadio.checked = true;
-                        calculateAdvancedPrice();
-                    }
-                }
-            });
-        });
-
-        // Set up advanced input listeners
-        const advancedInputs = ['customWidth', 'customHeight', 'customUnit'];
-        advancedInputs.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener('input', calculateAdvancedPrice);
-            }
-        });
-
-        // Initial update
-        updateSimpleTotal();
-
-        // Hide advanced view initially
-        const advancedDiv = document.getElementById('advancedPrintOptions');
-        if (advancedDiv) {
-            advancedDiv.style.display = 'none';
-        }
-    });
-
-
-});
+}
