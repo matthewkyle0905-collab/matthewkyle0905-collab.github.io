@@ -470,23 +470,9 @@
                                         </div>
                                     </div>
 
-                                    <!-- Custom Size -->
+                                    <!-- Standard Sizes - Button Style (CUSTOM SIZE INPUTS REMOVED FROM HERE) -->
                                     <div class="advanced-section">
-                                        <h5>Custom Size</h5>
-                                        <div class="custom-size-row">
-                                            <input type="number" id="customWidth" class="custom-size-input" min="1" max="100" value="8" placeholder="W">
-                                            <span class="size-separator">x</span>
-                                            <input type="number" id="customHeight" class="custom-size-input" min="1" max="100" value="10" placeholder="H">
-                                            <select id="customUnit" class="custom-unit-select">
-                                                <option value="inches">in</option>
-                                                <option value="cm">cm</option>
-                                            </select>
-                                        </div>
-                                        <p class="size-note">or select standard:</p>
-                                    </div>
-
-                                    <!-- Standard Sizes - Button Style -->
-                                    <div class="advanced-section">
+                                        <h5>Size</h5>
                                         <div class="advanced-sizes-grid">
                                             <label class="print-size-btn small">
                                                 <input type="radio" name="advancedPrintSize" value="4x6" checked onchange="onAdvancedSizeSelect()">
@@ -513,10 +499,24 @@
                                                 <span class="size-label">16x20"</span>
                                                 <span class="size-price">₱150</span>
                                             </label>
-                                            <label class="print-size-btn small custom">
+                                            <label class="print-size-btn small custom" id="customSizeBtn">
                                                 <input type="radio" name="advancedPrintSize" value="custom" onchange="onAdvancedSizeSelect()">
                                                 <span class="size-label">Custom</span>
                                             </label>
+                                        </div>
+                                        
+                                        <!-- CUSTOM SIZE INPUTS - Hidden by default, appears when Custom is selected -->
+                                        <div id="customSizeContainer" style="display: none; margin-top: 1rem;">
+                                            <div class="custom-size-row">
+                                                <input type="number" id="customWidth" class="custom-size-input" min="1" max="100" value="8" placeholder="W">
+                                                <span class="size-separator">x</span>
+                                                <input type="number" id="customHeight" class="custom-size-input" min="1" max="100" value="10" placeholder="H">
+                                                <select id="customUnit" class="custom-unit-select">
+                                                    <option value="inches">in</option>
+                                                    <option value="cm">cm</option>
+                                                </select>
+                                            </div>
+                                            <p class="size-note">Price calculated by area (₱0.50 per sq inch)</p>
                                         </div>
                                     </div>
 
