@@ -64,12 +64,26 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- NAV LINKS -->
             <ul class="nav-links">
                 <li><a href="#" onclick="navigateTo('home'); return false;">Home</a></li>
                 <li><a href="#" onclick="navigateTo('photos'); return false;">Editor</a></li>
                 <li><a href="#" onclick="navigateTo('shop'); return false;">Shop</a></li>
                 <li><a href="#" onclick="navigateTo('contact'); return false;">Info</a></li>
             </ul>
+
+            <!-- ============== NEW SEARCH BAR ============== -->
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" 
+                       class="search-input" 
+                       id="searchInput"
+                       placeholder="canvas prints..."
+                       autocomplete="off">
+            </div>
+
+            <!-- NAV ACTIONS -->
             <div class="nav-actions">
                 <a href="#" class="login-link" onclick="openLoginModal(); return false;">Log in</a>
                 <button class="cart-btn">🛒 Cart <span id="cartCount" class="cart-badge">0</span></button>
@@ -117,11 +131,15 @@
             </div>
         </section>
 
-        <!-- SHOP PAGE -->
+        <!-- SHOP PAGE (with search results) -->
         <section id="shop" class="page">
             <div class="container">
                 <h2>Shop</h2>
                 <p>Explore our personalized photo products.</p>
+                <div id="searchResultsInfo" class="search-results-info" style="display: none;">
+                    <span id="searchResultsText"></span>
+                    <button id="clearSearchBtn" onclick="clearSearch()">✕ Clear</button>
+                </div>
                 <div id="shopProductsGrid" class="products-grid"></div>
             </div>
         </section>
