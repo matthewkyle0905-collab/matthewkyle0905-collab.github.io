@@ -378,34 +378,185 @@
                                 </div>
                             </div>
 
+                            <!-- ============== NEW PRINT OPTIONS SECTION (PROGRESSIVE) ============== -->
                             <div class="editor-footer">
                                 <h4>Print Options</h4>
-                                <div class="print-options">
-                                    <div class="print-option">
-                                        <label>
+
+                                <!-- SIMPLE VIEW (Default) -->
+                                <div class="print-options-simple" id="simplePrintOptions">
+                                    <!-- Standard Sizes -->
+                                    <div class="standard-sizes">
+                                        <label class="size-option">
                                             <input type="radio" name="printSize" value="4x6" checked>
-                                            4x6 inches
-                                            <span class="print-price">₱ 25.00</span>
+                                            <span class="size-label">4x6"</span>
+                                            <span class="size-price">₱25</span>
                                         </label>
-                                    </div>
-                                    <div class="print-option">
-                                        <label>
+                                        <label class="size-option">
                                             <input type="radio" name="printSize" value="5x7">
-                                            5x7 inches
-                                            <span class="print-price">₱ 35.00</span>
+                                            <span class="size-label">5x7"</span>
+                                            <span class="size-price">₱35</span>
+                                        </label>
+                                        <label class="size-option">
+                                            <input type="radio" name="printSize" value="8x10">
+                                            <span class="size-label">8x10"</span>
+                                            <span class="size-price">₱50</span>
+                                        </label>
+                                        <label class="size-option">
+                                            <input type="radio" name="printSize" value="11x14">
+                                            <span class="size-label">11x14"</span>
+                                            <span class="size-price">₱80</span>
                                         </label>
                                     </div>
-                                    <div class="print-option">
-                                        <label>
-                                            <input type="radio" name="printSize" value="8x10">
-                                            8x10 inches
-                                            <span class="print-price">₱ 50.00</span>
-                                        </label>
+
+                                    <!-- Quantity Control -->
+                                    <div class="quantity-control-simple">
+                                        <span class="quantity-label">Quantity:</span>
+                                        <div class="quantity-buttons">
+                                            <button type="button" class="quantity-btn" onclick="updateQuantity(-1)">−</button>
+                                            <span class="quantity-display" id="quantityDisplay">1</span>
+                                            <button type="button" class="quantity-btn" onclick="updateQuantity(1)">+</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Toggle Button -->
+                                    <button type="button" class="toggle-advanced-btn" id="toggleAdvancedBtn" onclick="toggleAdvancedOptions()">
+                                        + Advanced Options
+                                    </button>
+
+                                    <!-- Total Price -->
+                                    <div class="simple-total">
+                                        <span>Total:</span>
+                                        <span class="total-price" id="simpleTotalPrice">₱25.00</span>
                                     </div>
                                 </div>
+
+                                <!-- ADVANCED VIEW (Hidden by default) -->
+                                <div class="print-options-advanced" id="advancedPrintOptions">
+                                    <div class="advanced-header">
+                                        <button type="button" class="toggle-advanced-btn" onclick="toggleAdvancedOptions()">
+                                            − Hide Advanced Options
+                                        </button>
+                                    </div>
+
+                                    <!-- Paper Type -->
+                                    <div class="advanced-section">
+                                        <h5>Paper Type</h5>
+                                        <div class="paper-options">
+                                            <label class="paper-option">
+                                                <input type="checkbox" id="paperGlossy" onchange="calculateAdvancedPrice()">
+                                                <span class="paper-label">Glossy Finish</span>
+                                                <span class="paper-price">+₱10</span>
+                                            </label>
+                                            <label class="paper-option">
+                                                <input type="checkbox" id="paperMatte" onchange="calculateAdvancedPrice()">
+                                                <span class="paper-label">Matte Finish</span>
+                                                <span class="paper-price">+₱15</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Size Mode -->
+                                    <div class="advanced-section">
+                                        <h5>Size Mode</h5>
+                                        <div class="size-mode-options">
+                                            <label class="mode-option">
+                                                <input type="radio" name="sizeMode" value="fill" checked onchange="calculateAdvancedPrice()">
+                                                <span>Fill Frame (crops to fit)</span>
+                                            </label>
+                                            <label class="mode-option">
+                                                <input type="radio" name="sizeMode" value="fit" onchange="calculateAdvancedPrice()">
+                                                <span>Fit Frame (with borders)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Custom Size -->
+                                    <div class="advanced-section">
+                                        <h5>Custom Size</h5>
+                                        <div class="custom-size-inputs">
+                                            <input type="number" id="customWidth" class="custom-size-input" min="1" max="100" value="8" placeholder="Width" onchange="calculateAdvancedPrice()">
+                                            <span class="size-separator">x</span>
+                                            <input type="number" id="customHeight" class="custom-size-input" min="1" max="100" value="10" placeholder="Height" onchange="calculateAdvancedPrice()">
+                                            <select id="customUnit" class="custom-unit" onchange="calculateAdvancedPrice()">
+                                                <option value="inches">inches</option>
+                                                <option value="cm">cm</option>
+                                            </select>
+                                        </div>
+                                        <p class="size-note">or select standard size below</p>
+                                    </div>
+
+                                    <!-- Standard Sizes (in advanced) -->
+                                    <div class="advanced-section">
+                                        <h5>Standard Sizes</h5>
+                                        <div class="advanced-sizes">
+                                            <label class="size-option advanced-size-option">
+                                                <input type="radio" name="advancedPrintSize" value="4x6" checked onchange="onAdvancedSizeSelect()">
+                                                <span class="size-label">4x6"</span>
+                                                <span class="size-price">₱25</span>
+                                            </label>
+                                            <label class="size-option advanced-size-option">
+                                                <input type="radio" name="advancedPrintSize" value="5x7" onchange="onAdvancedSizeSelect()">
+                                                <span class="size-label">5x7"</span>
+                                                <span class="size-price">₱35</span>
+                                            </label>
+                                            <label class="size-option advanced-size-option">
+                                                <input type="radio" name="advancedPrintSize" value="8x10" onchange="onAdvancedSizeSelect()">
+                                                <span class="size-label">8x10"</span>
+                                                <span class="size-price">₱50</span>
+                                            </label>
+                                            <label class="size-option advanced-size-option">
+                                                <input type="radio" name="advancedPrintSize" value="11x14" onchange="onAdvancedSizeSelect()">
+                                                <span class="size-label">11x14"</span>
+                                                <span class="size-price">₱80</span>
+                                            </label>
+                                            <label class="size-option advanced-size-option">
+                                                <input type="radio" name="advancedPrintSize" value="16x20" onchange="onAdvancedSizeSelect()">
+                                                <span class="size-label">16x20"</span>
+                                                <span class="size-price">₱150</span>
+                                            </label>
+                                            <label class="size-option advanced-size-option" id="customSizeOption">
+                                                <input type="radio" name="advancedPrintSize" value="custom" onchange="onAdvancedSizeSelect()">
+                                                <span class="size-label">Custom</span>
+                                                <span class="size-price">(by area)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quantity (again for advanced) -->
+                                    <div class="advanced-section">
+                                        <h5>Quantity</h5>
+                                        <div class="quantity-control-advanced">
+                                            <button type="button" class="quantity-btn" onclick="updateAdvancedQuantity(-1)">−</button>
+                                            <span class="quantity-display" id="advancedQuantityDisplay">1</span>
+                                            <button type="button" class="quantity-btn" onclick="updateAdvancedQuantity(1)">+</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Price Breakdown -->
+                                    <div class="price-breakdown">
+                                        <div class="breakdown-row">
+                                            <span>Base Price:</span>
+                                            <span id="basePrice">₱25.00</span>
+                                        </div>
+                                        <div class="breakdown-row">
+                                            <span>Paper Upgrade:</span>
+                                            <span id="paperUpgradePrice">₱0.00</span>
+                                        </div>
+                                        <div class="breakdown-row">
+                                            <span>Quantity (<span id="breakdownQuantity">1</span>x):</span>
+                                            <span id="quantityMultiplier">₱0.00</span>
+                                        </div>
+                                        <div class="breakdown-total">
+                                            <span>TOTAL:</span>
+                                            <span id="advancedTotalPrice">₱25.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ADD TO CART BUTTON (always visible) -->
                                 <button id="addToCart" class="add-cart-btn" onclick="addPhotoToCart()">
                                     <span class="cart-icon">🛒</span>
-                                    Add to Cart
+                                    Add to Cart - <span id="finalPrice">₱25.00</span>
                                 </button>
                             </div>
                         </div>
