@@ -470,7 +470,7 @@ function loadChatHistory() {
 
 // Cart management functions
 function updateCartStorage() {
-    localStorage.setItem('fotocenterCart', JSON.stringify(shoppingCart));
+    localStorage.setItem('focenterCart', JSON.stringify(shoppingCart));
 }
 
 function addToCart(item) {
@@ -655,6 +655,15 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Initialize print options
     initPrintOptions();
+    
+    // Initialize Google API
+    initializeGoogleApi();
+    
+    // Disable buttons until Google API is ready
+    const testBtn = document.getElementById('testGoogleDriveBtn');
+    const orderBtn = document.getElementById('completeOrderBtn');
+    if (testBtn) testBtn.disabled = true;
+    if (orderBtn) orderBtn.disabled = true;
 });
 
 function updateCartBadgeOnLoad() {
@@ -3550,11 +3559,11 @@ function clearSearch() {
 window.performSearch = performSearch;
 window.clearSearch = clearSearch;
 
-// ============== GOOGLE DRIVE ORDER PROCESSING ==============
+// ============== FIXED GOOGLE DRIVE ORDER PROCESSING ==============
 
 // Google Drive Configuration
-const CLIENT_ID = '758191937461-epcuq05oanl0cq8oedgj5pt32h79nojr.apps.googleusercontent.com'; // ← YOU NEED TO ADD THIS
-const API_KEY = 'AIzaSyA0_S5lH8BwyvekzmG2s5qxt0_MAmLKOiM';      // ← YOU NEED TO ADD THIS
+const CLIENT_ID = '758191937461-epcuq05oanl0cq8oedgj5pt32h79nojr.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyA0_S5lH8BwyvekzmG2s5qxt0_MAmLKOiM';
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
@@ -3562,6 +3571,7 @@ const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 let tokenClient;
 let gapiInited = false;
 let gisInited = false;
+let rootFolderId = null; // Will store the C8FOCENTER/orders folder ID
 
 // Initialize Google API
 function initializeGoogleApi() {
@@ -3590,48 +3600,52 @@ function maybeEnableButtons() {
     }
 }
 
-// Test Google Drive connection
-async function testGoogleDriveConnection() {
-    const btn = document.getElementById('testGoogleDriveBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner"></span> Testing...';
-    btn.disabled = true;
+// Helper: Convert base64 to binary blob
+function base64ToBlob(base64, mimeType) {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], {type: mimeType});
+}
 
+// Find or create the C8FOCENTER/orders folder structure
+async function getOrCreateOrdersFolder() {
     try {
-        const response = await new Promise((resolve, reject) => {
-            tokenClient.callback = (resp) => {
-                if (resp.error !== undefined) {
-                    reject(resp);
-                }
-                resolve(resp);
-            };
-            tokenClient.requestAccessToken();
+        // Search for existing C8FOCENTER folder
+        const response = await gapi.client.drive.files.list({
+            q: "name='C8FOCENTER' and mimeType='application/vnd.google-apps.folder' and trashed=false",
+            fields: 'files(id, name)',
+            spaces: 'drive'
         });
-
-        // Test creating a folder
-        const folderName = 'FOTOCENTER_TEST_' + Date.now();
-        const folder = await createDriveFolder(folderName);
         
-        // Test uploading a file
-        const testContent = 'FOTOCENTER Connection Test\nDate: ' + new Date().toLocaleString();
-        const file = await uploadFileToDrive('test.txt', testContent, folder.id);
+        let c8Folder;
+        if (response.result.files.length > 0) {
+            c8Folder = response.result.files[0];
+        } else {
+            // Create C8FOCENTER folder
+            c8Folder = await createDriveFolder('C8FOCENTER');
+        }
         
-        btn.innerHTML = '✅ Connected!';
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }, 3000);
+        // Search for orders folder inside C8FOCENTER
+        const ordersResponse = await gapi.client.drive.files.list({
+            q: `name='orders' and '${c8Folder.id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+            fields: 'files(id, name)',
+            spaces: 'drive'
+        });
         
-        alert('✅ Google Drive connected successfully!\nTest folder created: ' + folderName);
-        
+        if (ordersResponse.result.files.length > 0) {
+            return ordersResponse.result.files[0].id;
+        } else {
+            // Create orders folder inside C8FOCENTER
+            const ordersFolder = await createDriveFolder('orders', c8Folder.id);
+            return ordersFolder.id;
+        }
     } catch (error) {
-        console.error('Drive test failed:', error);
-        btn.innerHTML = '❌ Failed';
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }, 3000);
-        alert('❌ Google Drive connection failed. Check console for details.');
+        console.error('Error finding/creating orders folder:', error);
+        throw error;
     }
 }
 
@@ -3639,9 +3653,11 @@ async function testGoogleDriveConnection() {
 async function createDriveFolder(folderName, parentId = null) {
     const metadata = {
         name: folderName,
-        mimeType: 'application/vnd.google-apps.folder',
-        parents: parentId ? [parentId] : []
+        mimeType: 'application/vnd.google-apps.folder'
     };
+    if (parentId) {
+        metadata.parents = [parentId];
+    }
     
     const response = await gapi.client.drive.files.create({
         resource: metadata,
@@ -3651,13 +3667,25 @@ async function createDriveFolder(folderName, parentId = null) {
     return response.result;
 }
 
-// Upload file to Google Drive
+// Upload file to Google Drive (FIXED: now handles binary images correctly)
 async function uploadFileToDrive(fileName, content, folderId) {
     const boundary = '-------' + Date.now();
     const delimiter = '\r\n--' + boundary + '\r\n';
     const closeDelimiter = '\r\n--' + boundary + '--';
     
-    const contentType = fileName.endsWith('.jpg') ? 'image/jpeg' : 'text/plain';
+    // Determine content type and prepare content
+    let contentType;
+    let bodyContent;
+    
+    if (fileName.endsWith('.jpg')) {
+        contentType = 'image/jpeg';
+        // Convert base64 to binary blob
+        const blob = base64ToBlob(content, 'image/jpeg');
+        bodyContent = blob;
+    } else {
+        contentType = 'text/plain';
+        bodyContent = content;
+    }
     
     const metadata = {
         name: fileName,
@@ -3665,27 +3693,44 @@ async function uploadFileToDrive(fileName, content, folderId) {
         parents: [folderId]
     };
     
-    const multipartRequestBody = 
-        delimiter +
-        'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
-        JSON.stringify(metadata) +
-        delimiter +
-        'Content-Type: ' + contentType + '\r\n\r\n' +
-        content +
-        closeDelimiter;
-    
-    const response = await gapi.client.request({
-        path: '/upload/drive/v3/files',
-        method: 'POST',
-        params: { uploadType: 'multipart' },
-        headers: { 'Content-Type': 'multipart/related; boundary="' + boundary + '"' },
-        body: multipartRequestBody
-    });
-    
-    return response.result;
+    // For binary files (images), we need to use a different approach
+    if (fileName.endsWith('.jpg')) {
+        // Use simple upload for binary files
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', bodyContent);
+        
+        const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+            method: 'POST',
+            headers: new Headers({ 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }),
+            body: form
+        });
+        
+        return await response.json();
+    } else {
+        // Use multipart upload for text files
+        const multipartRequestBody = 
+            delimiter +
+            'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+            JSON.stringify(metadata) +
+            delimiter +
+            'Content-Type: ' + contentType + '\r\n\r\n' +
+            bodyContent +
+            closeDelimiter;
+        
+        const response = await gapi.client.request({
+            path: '/upload/drive/v3/files',
+            method: 'POST',
+            params: { uploadType: 'multipart' },
+            headers: { 'Content-Type': 'multipart/related; boundary="' + boundary + '"' },
+            body: multipartRequestBody
+        });
+        
+        return response.result;
+    }
 }
 
-// Generate Condition.txt (based on your spec)
+// Generate Condition.txt
 function generateConditionFile(orderData) {
     let content = `[OutDevice]\n    DeviceName= SP-1500sRGB\n\n`;
     content += `[ImageList]\n    ImageCnt=${orderData.photos.length}\n`;
@@ -3700,7 +3745,7 @@ function generateConditionFile(orderData) {
         content += `    PrintCnt=${photo.quantity || 1}\n`;
         content += `    BackPrint=FILE\n`;
         content += `    BackPrintLine2=${orderData.orderId}\n`;
-        content += `    Resize=FITIN\n`;
+        content += `    Resize=${photo.resize || 'FITIN'}\n`;
         content += `    DSC_Chk=FALSE\n`;
     });
     
@@ -3719,6 +3764,76 @@ function generateEndFile(orderData) {
     `;
 }
 
+// Generate OrderReceipt.txt (with exact format requested)
+function generateReceiptFile(orderData) {
+    // Track filename duplicates
+    const filenameCount = {};
+    
+    let receipt = "=".repeat(60) + "\n";
+    receipt += "                    FOTOCENTER ORDER RECEIPT\n";
+    receipt += "=".repeat(60) + "\n\n";
+    receipt += `Order ID: ${orderData.orderId}\n`;
+    receipt += `Customer: ${orderData.username}\n`;
+    receipt += `Date: ${new Date().toLocaleString()}\n`;
+    receipt += `Order #: ${orderData.orderCount}\n\n`;
+    
+    receipt += "-".repeat(60) + "\n";
+    receipt += "Item                          Price    Size       Paper Type\n";
+    receipt += "-".repeat(60) + "\n";
+    
+    let totalAmount = 0;
+    
+    orderData.photos.forEach((photo, index) => {
+        // Handle duplicate filenames
+        let displayName = photo.originalName || `Photo_${index + 1}`;
+        if (filenameCount[displayName]) {
+            filenameCount[displayName]++;
+            const nameParts = displayName.split('.');
+            if (nameParts.length > 1) {
+                // Has extension: sunset.jpg → sunset_2.jpg
+                displayName = nameParts[0] + '_' + filenameCount[displayName] + '.' + nameParts[1];
+            } else {
+                displayName = displayName + '_' + filenameCount[displayName];
+            }
+        } else {
+            filenameCount[displayName] = 1;
+        }
+        
+        // Truncate long names
+        if (displayName.length > 25) {
+            displayName = displayName.substring(0, 22) + "...";
+        }
+        
+        // Format size display
+        let sizeDisplay = photo.size || '4x6';
+        if (photo.isCustom) {
+            sizeDisplay = `${photo.customWidth}x${photo.customHeight} ${photo.customUnit}`;
+        }
+        
+        // Get paper type
+        let paperType = photo.paperType || 'Standard';
+        if (paperType === 'glossy') paperType = 'Glossy';
+        if (paperType === 'matte') paperType = 'Matte';
+        
+        // Calculate price
+        const price = parseFloat(photo.price || 25) * (photo.quantity || 1);
+        totalAmount += price;
+        
+        // Format line with proper spacing
+        const line = `${displayName.padEnd(25)} ₱${price.toFixed(2).padStart(7)} ${sizeDisplay.padEnd(10)} ${paperType}`;
+        receipt += line + "\n";
+    });
+    
+    receipt += "-".repeat(60) + "\n";
+    receipt += `\nTotal Amount: ₱${totalAmount.toFixed(2)}\n`;
+    receipt += `Total Items: ${orderData.photos.length}\n\n`;
+    receipt += "=".repeat(60) + "\n";
+    receipt += "Thank you for choosing FOTOCENTER!\n";
+    receipt += "=".repeat(60) + "\n";
+    
+    return receipt;
+}
+
 // Get user's order count
 function getUserOrderCount(username) {
     const key = `orderCount_${username}`;
@@ -3733,21 +3848,44 @@ function generateOrderId() {
     return 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
 }
 
-// Collect edited photos from the editor
+// Collect edited photos from the editor (FIXED: now captures all photos correctly)
 function getEditedPhotos() {
     const photos = [];
     
     // Get all uploaded/edited images
     if (uploadedImages && uploadedImages.length > 0) {
         uploadedImages.forEach((img, index) => {
-            // Get the edited image data from canvas
+            // Get the edited image data from canvas (if available)
             if (canvas) {
+                // Get current image data for this specific image
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                const tempImg = new Image();
+                
+                // Use synchronous approach with Promise
                 const imageData = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+                
+                // Get paper type from checkboxes
+                let paperType = 'standard';
+                if (document.getElementById('paperGlossy')?.checked) paperType = 'glossy';
+                if (document.getElementById('paperMatte')?.checked) paperType = 'matte';
+                
+                // Check if custom size
+                const isCustom = document.querySelector('input[name="advancedPrintSize"]:checked')?.value === 'custom';
+                
                 photos.push({
-                    filename: `photo_${index + 1}.jpg`,
+                    originalName: img.name || `photo_${index + 1}.jpg`,
+                    filename: `${index + 1}.jpg`,
                     data: imageData,
                     size: document.querySelector('input[name="printSize"]:checked')?.value || '4x6',
-                    quantity: currentQuantity || 1
+                    quantity: currentQuantity || 1,
+                    price: getPriceForSize(document.querySelector('input[name="printSize"]:checked')?.value || '4x6'),
+                    paperType: paperType,
+                    isCustom: isCustom,
+                    customWidth: isCustom ? document.getElementById('customWidth')?.value : null,
+                    customHeight: isCustom ? document.getElementById('customHeight')?.value : null,
+                    customUnit: isCustom ? document.getElementById('customUnit')?.value : null,
+                    resize: document.querySelector('input[name="sizeMode"]:checked')?.value || 'FITIN'
                 });
             }
         });
@@ -3756,7 +3894,55 @@ function getEditedPhotos() {
     return photos;
 }
 
-// Main order processing function
+// Test Google Drive connection
+async function testGoogleDriveConnection() {
+    const btn = document.getElementById('testGoogleDriveBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Testing...';
+    btn.disabled = true;
+
+    try {
+        const response = await new Promise((resolve, reject) => {
+            tokenClient.callback = (resp) => {
+                if (resp.error !== undefined) {
+                    reject(resp);
+                }
+                resolve(resp);
+            };
+            tokenClient.requestAccessToken();
+        });
+
+        // Get or create orders folder
+        const ordersFolderId = await getOrCreateOrdersFolder();
+        
+        // Test creating a folder inside orders
+        const folderName = 'FOTOCENTER_TEST_' + Date.now();
+        const folder = await createDriveFolder(folderName, ordersFolderId);
+        
+        // Test uploading a file
+        const testContent = 'FOTOCENTER Connection Test\nDate: ' + new Date().toLocaleString();
+        const file = await uploadFileToDrive('test.txt', testContent, folder.id);
+        
+        btn.innerHTML = '✅ Connected!';
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 3000);
+        
+        alert(`✅ Google Drive connected successfully!\nTest folder created in: C8FOCENTER/orders/${folderName}`);
+        
+    } catch (error) {
+        console.error('Drive test failed:', error);
+        btn.innerHTML = '❌ Failed';
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 3000);
+        alert('❌ Google Drive connection failed. Check console for details.');
+    }
+}
+
+// Main order processing function (FIXED: now saves to correct folder, counts photos correctly, adds receipt)
 async function processOrder() {
     const btn = document.getElementById('completeOrderBtn');
     const originalText = btn.innerHTML;
@@ -3797,7 +3983,10 @@ async function processOrder() {
             tokenClient.requestAccessToken();
         });
         
-        // 4. Generate order data
+        // 4. Get or create the orders folder
+        const ordersFolderId = await getOrCreateOrdersFolder();
+        
+        // 5. Generate order data
         const orderData = {
             orderId: generateOrderId(),
             username: username,
@@ -3806,14 +3995,14 @@ async function processOrder() {
             timestamp: new Date().toISOString()
         };
         
-        // 5. Create main order folder
+        // 6. Create main order folder inside C8FOCENTER/orders/
         const folderName = `${username}_${orderData.orderCount}_${orderData.orderId}`;
-        const mainFolder = await createDriveFolder(folderName);
+        const mainFolder = await createDriveFolder(folderName, ordersFolderId);
         
-        // 6. Create Photos subfolder
+        // 7. Create Photos subfolder
         const photosFolder = await createDriveFolder('Photos', mainFolder.id);
         
-        // 7. Upload all photos
+        // 8. Upload all photos (as binary JPGs)
         for (let i = 0; i < orderData.photos.length; i++) {
             const photo = orderData.photos[i];
             await uploadFileToDrive(
@@ -3823,26 +4012,33 @@ async function processOrder() {
             );
         }
         
-        // 8. Upload Condition.txt
+        // 9. Upload Condition.txt
         await uploadFileToDrive(
             'Condition.txt',
             generateConditionFile(orderData),
             mainFolder.id
         );
         
-        // 9. Upload End.txt
+        // 10. Upload End.txt
         await uploadFileToDrive(
             'End.txt',
             generateEndFile(orderData),
             mainFolder.id
         );
         
-        // 10. Show success message
-        const message = `✅ Order submitted successfully!\n\nFolder: ${folderName}\nPhotos: ${photos.length}\n\nCheck your Google Drive in a few seconds.`;
+        // 11. Upload OrderReceipt.txt (NEW)
+        await uploadFileToDrive(
+            'OrderReceipt.txt',
+            generateReceiptFile(orderData),
+            mainFolder.id
+        );
+        
+        // 12. Show success message with order number (FIXED)
+        const message = `Hello ${username},\n\nThis is your Order Number: ${orderData.orderId}\nThank you for choosing FOTOCENTER!`;
         document.getElementById('orderSuccessMessage').textContent = message;
         document.getElementById('orderSuccessModal').style.display = 'flex';
         
-        // 11. Clear cart or reset if needed
+        // 13. Clear cart or reset if needed
         if (shoppingCart.length > 0) {
             clearCart();
         }
@@ -3874,4 +4070,3 @@ document.addEventListener('DOMContentLoaded', function() {
 window.processOrder = processOrder;
 window.testGoogleDriveConnection = testGoogleDriveConnection;
 window.initializeGoogleApi = initializeGoogleApi;
-
