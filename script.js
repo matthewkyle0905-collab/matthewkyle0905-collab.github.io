@@ -3553,8 +3553,8 @@ window.clearSearch = clearSearch;
 // ============== GOOGLE DRIVE ORDER PROCESSING ==============
 
 // Google Drive Configuration
-const CLIENT_ID = 'YOUR_CLIENT_ID'; // ← YOU NEED TO ADD THIS
-const API_KEY = 'YOUR_API_KEY';      // ← YOU NEED TO ADD THIS
+const CLIENT_ID = '758191937461-epcuq05oanl0cq8oedgj5pt32h79nojr.apps.googleusercontent.com'; // ← YOU NEED TO ADD THIS
+const API_KEY = 'AIzaSyA0_S5lH8BwyvekzmG2s5qxt0_MAmLKOiM';      // ← YOU NEED TO ADD THIS
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
@@ -3874,3 +3874,4 @@ document.addEventListener('DOMContentLoaded', function() {
 window.processOrder = processOrder;
 window.testGoogleDriveConnection = testGoogleDriveConnection;
 window.initializeGoogleApi = initializeGoogleApi;
+
