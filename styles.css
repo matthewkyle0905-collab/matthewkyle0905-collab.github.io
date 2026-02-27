@@ -3301,5 +3301,65 @@ body {
     }
 }
 
+/* ============== ORDER PROCESSING STYLES ============== */
+
+/* Order Complete Button */
+#completeOrderBtn {
+    background: linear-gradient(135deg, #28a745, #218838);
+    border: none;
+    color: white;
+    font-weight: bold;
+    transition: var(--transition);
+}
+
+#completeOrderBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+/* Test Drive Button */
+#testGoogleDriveBtn {
+    background: var(--primary);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+#testGoogleDriveBtn:hover {
+    background: var(--accent);
+    color: white;
+}
+
+/* Order Success Modal Specific */
+#orderSuccessMessage {
+    font-family: monospace;
+    background: var(--secondary);
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin: 1rem 0;
+    word-break: break-all;
+}
+
+/* Loading Spinner */
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Disabled state for buttons */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
 
 
