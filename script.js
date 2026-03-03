@@ -470,7 +470,7 @@ function loadChatHistory() {
 
 // Cart management functions
 function updateCartStorage() {
-    localStorage.setItem('focenterCart', JSON.stringify(shoppingCart));
+    localStorage.setItem('fotocenterCart', JSON.stringify(shoppingCart));
 }
 
 function addToCart(item) {
@@ -484,12 +484,14 @@ function addToCart(item) {
         shoppingCart[existingItemIndex].quantity += item.quantity || 1;
     } else {
         item.addedAt = new Date().toISOString();
+        item.selected = true; // Default to selected
         shoppingCart.push(item);
     }
 
     updateCartStorage();
     updateCartUI();
     showSuccessModal();
+    updateCartHover(); // Update hover dropdown
 
     return item;
 }
@@ -501,10 +503,13 @@ function updateCartUI() {
     const total = calculateCartTotal();
     const itemCount = shoppingCart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
-    cartBtn.innerHTML = `🛒 Cart (${itemCount}) - ₱ ${total.toFixed(2)}`;
+    cartBtn.innerHTML = `🛒 Cart <span id="cartCount" class="cart-badge">${itemCount}</span>`;
     const cartCountBadge = document.getElementById('cartCount');
     if (cartCountBadge) cartCountBadge.textContent = itemCount;
-    cartBtn.setAttribute('title', `${itemCount} items in cart`);
+    
+    // Also update nav cart count if exists
+    const navCartCount = document.getElementById('navCartCount');
+    if (navCartCount) navCartCount.textContent = itemCount;
 }
 
 function calculateCartTotal() {
@@ -518,54 +523,22 @@ function removeFromCart(index) {
     shoppingCart.splice(index, 1);
     updateCartStorage();
     updateCartUI();
+    updateCartHover();
+    if (document.getElementById('cart-page')?.classList.contains('active')) {
+        renderCartPage();
+    }
 }
 
 function clearCart() {
     shoppingCart = [];
     updateCartStorage();
     updateCartUI();
+    updateCartHover();
 }
 
 function viewCart() {
     closeModal();
-
-    let cartModal = document.getElementById('cartModal');
-    if (!cartModal) return;
-
-    const cartItemsList = document.getElementById('cartItemsList');
-    if (cartItemsList) {
-        if (shoppingCart.length === 0) {
-            cartItemsList.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
-        } else {
-            cartItemsList.innerHTML = shoppingCart.map((item, index) => `
-                <div class="cart-item">
-                    <div class="cart-item-image">
-                        <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100?text=Image'">
-                    </div>
-                    <div class="cart-item-details">
-                        <h4>${item.name}</h4>
-                        ${item.size ? `<p>Size: ${item.size}</p>` : ''}
-                        <p>Price: ${item.price}</p>
-                        <div class="cart-item-quantity">
-                            <button onclick="updateCartItemQuantity(${index}, -1)">-</button>
-                            <span>${item.quantity || 1}</span>
-                            <button onclick="updateCartItemQuantity(${index}, 1)">+</button>
-                        </div>
-                    </div>
-                    <div class="cart-item-actions">
-                        <button class="remove-btn" onclick="removeFromCart(${index})">Remove</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-    }
-
-    const cartTotal = document.getElementById('cartTotalAmount');
-    if (cartTotal) {
-        cartTotal.textContent = `₱ ${calculateCartTotal().toFixed(2)}`;
-    }
-
-    cartModal.style.display = 'flex';
+    navigateTo('cart-page');
 }
 
 function updateCartItemQuantity(index, change) {
@@ -578,7 +551,10 @@ function updateCartItemQuantity(index, change) {
         item.quantity = newQuantity;
         updateCartStorage();
         updateCartUI();
-        viewCart();
+        updateCartHover();
+        if (document.getElementById('cart-page')?.classList.contains('active')) {
+            renderCartPage();
+        }
     }
 }
 
@@ -603,24 +579,8 @@ function proceedToCheckout() {
         return;
     }
 
-    alert('Proceeding to checkout... This would connect to payment gateway.');
-
-    const orderId = 'ORD-' + Date.now();
-    const order = {
-        id: orderId,
-        items: shoppingCart,
-        total: calculateCartTotal(),
-        date: new Date().toISOString(),
-        status: 'pending'
-    };
-
-    const orders = JSON.parse(localStorage.getItem('fotocenterOrders')) || [];
-    orders.push(order);
-    localStorage.setItem('fotocenterOrders', JSON.stringify(orders));
-
-    clearCart();
+    navigateTo('cart-page');
     closeCartModal();
-    alert(`Order ${orderId} created successfully!`);
 }
 
 // Initialize on page load
@@ -640,7 +600,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const cartBtn = document.querySelector('.cart-btn');
     if (cartBtn) {
-        cartBtn.onclick = viewCart;
+        cartBtn.onclick = function(e) {
+            e.preventDefault();
+            navigateTo('cart-page');
+        };
     }
 
     renderShopProducts();
@@ -664,6 +627,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const orderBtn = document.getElementById('completeOrderBtn');
     if (testBtn) testBtn.disabled = true;
     if (orderBtn) orderBtn.disabled = true;
+    
+    // Initialize cart hover
+    initCartHover();
 });
 
 function updateCartBadgeOnLoad() {
@@ -957,7 +923,8 @@ function addToCartProduct(productId) {
         name: product.name,
         image: product.image,
         price: product.price,
-        quantity: quantity
+        quantity: quantity,
+        selected: true
     };
 
     addToCart(cartItem);
@@ -980,6 +947,12 @@ function navigateTo(pageId) {
         setTimeout(() => {
             switchPhotoMode('upload');
         }, 50);
+    }
+    
+    if (pageId === 'cart-page') {
+        setTimeout(() => {
+            renderCartPage();
+        }, 100);
     }
 
     window.scrollTo(0, 0);
@@ -2946,7 +2919,8 @@ function addCalendarProductToCart(productId) {
         image: product.image,
         price: product.price,
         productType: product.type,
-        quantity: 1
+        quantity: 1,
+        selected: true
     };
 
     addToCart(cartItem);
@@ -2982,7 +2956,8 @@ function addCustomCalendarToCart() {
             photoCount: calendarImages.length,
             quantity: quantity
         },
-        quantity: quantity
+        quantity: quantity,
+        selected: true
     };
 
     addToCart(cartItem);
@@ -3113,7 +3088,8 @@ function addCardsToCart() {
         image: 'https://via.placeholder.com/200x150?text=Photo+Card',
         price: `₱ ${price.toFixed(2)}`,
         size: size,
-        quantity: 1
+        quantity: 1,
+        selected: true
     };
 
     addToCart(cartItem);
@@ -3341,7 +3317,8 @@ window.addPhotoToCart = function() {
         isCustom: isCustom,
         customDimensions: isCustom ? { width: customWidth, height: customHeight, unit: customUnit } : null,
         originalName: uploadedImages[currentImageIndex]?.name || 'photo',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        selected: true
     };
     
     addToCart(cartItem);
@@ -4052,10 +4029,8 @@ document.getElementById('orderSuccessModal').style.display = 'flex';
     }
 }
 
-// Initialize on page load
+// Initialize Google API on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Your existing DOMContentLoaded code...
-    
     // Initialize Google API
     initializeGoogleApi();
     
@@ -4110,7 +4085,10 @@ function renderCartPage() {
                 <button onclick="navigateTo('shop')">Continue Shopping</button>
             </div>
         `;
-        document.getElementById('selectAllBar').style.display = 'none';
+        const selectAllBar = document.getElementById('selectAllBar');
+        const stickyBottom = document.getElementById('cartStickyBottom');
+        if (selectAllBar) selectAllBar.style.display = 'none';
+        if (stickyBottom) stickyBottom.style.display = 'none';
         document.getElementById('totalCount').textContent = '0';
         document.getElementById('selectedCount').textContent = '0';
         document.getElementById('selectedItemsCount').textContent = '0';
@@ -4118,7 +4096,10 @@ function renderCartPage() {
         return;
     }
     
-    document.getElementById('selectAllBar').style.display = 'flex';
+    const selectAllBar = document.getElementById('selectAllBar');
+    const stickyBottom = document.getElementById('cartStickyBottom');
+    if (selectAllBar) selectAllBar.style.display = 'flex';
+    if (stickyBottom) stickyBottom.style.display = 'flex';
     document.getElementById('totalCount').textContent = shoppingCart.length;
     
     let html = '';
@@ -4187,7 +4168,7 @@ function updateCartSelection() {
     
     // Calculate total for selected items
     let total = 0;
-    shoppingCart.forEach((item, index) => {
+    shoppingCart.forEach((item) => {
         if (item.selected) {
             const price = parseFloat(item.price.toString().replace('₱', '').replace(',', '')) || 0;
             total += price * (item.quantity || 1);
@@ -4349,6 +4330,16 @@ async function processOrderFromCart() {
 
 // ============== CART HOVER DROPDOWN FUNCTIONS ==============
 
+// Initialize cart hover
+function initCartHover() {
+    const cartWrapper = document.querySelector('.cart-hover-wrapper');
+    if (cartWrapper) {
+        cartWrapper.addEventListener('mouseenter', function() {
+            updateCartHover();
+        });
+    }
+}
+
 // Update cart hover dropdown
 function updateCartHover() {
     const dropdown = document.getElementById('cartHoverDropdown');
@@ -4397,100 +4388,6 @@ function updateCartHover() {
     dropdown.innerHTML = itemsHtml;
 }
 
-// Override existing cart functions to update hover
-const originalAddToCart = addToCart;
-addToCart = function(item) {
-    originalAddToCart(item);
-    updateCartHover();
-};
-
-const originalRemoveFromCart = removeFromCart;
-removeFromCart = function(index) {
-    originalRemoveFromCart(index);
-    updateCartHover();
-    if (document.getElementById('cart-page')?.classList.contains('active')) {
-        renderCartPage();
-    }
-};
-
-const originalUpdateCartItemQuantity = updateCartItemQuantity;
-updateCartItemQuantity = function(index, change) {
-    originalUpdateCartItemQuantity(index, change);
-    updateCartHover();
-    if (document.getElementById('cart-page')?.classList.contains('active')) {
-        renderCartPage();
-    }
-};
-
-// Initialize cart page
-document.addEventListener('DOMContentLoaded', function() {
-    // Add select all listener
-    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-    if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function() {
-            selectAllItems(this.checked);
-        });
-    }
-    
-    // Add delete selected listener
-    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
-    if (deleteSelectedBtn) {
-        deleteSelectedBtn.addEventListener('click', deleteSelectedItems);
-    }
-    
-    // Initial render if cart page is active
-    if (document.getElementById('cart-page')?.classList.contains('active')) {
-        renderCartPage();
-    }
-    
-    // Initial hover update
-    updateCartHover();
-});
-
-// Override navigateTo to render cart page when needed
-const originalNavigateTo = navigateTo;
-navigateTo = function(pageId) {
-    originalNavigateTo(pageId);
-    if (pageId === 'cart-page') {
-        setTimeout(renderCartPage, 100);
-    }
-};
-
-// Make functions globally available
-window.renderCartPage = renderCartPage;
-window.updateCartItemQuantityFromCart = updateCartItemQuantityFromCart;
-window.processOrderFromCart = processOrderFromCart;
-window.deleteSelectedItems = deleteSelectedItems;
-
-// ============== FIX: Initialize cart on page load ==============
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initializing cart system...');
-    
-    // Initialize cart data if not exists
-    if (!shoppingCart) {
-        shoppingCart = JSON.parse(localStorage.getItem('fotocenterCart')) || [];
-    }
-    
-    // Update cart UI
-    updateCartUI();
-    updateCartHover();
-    
-    // Check if cart page is active
-    if (document.getElementById('cart-page')?.classList.contains('active')) {
-        renderCartPage();
-    }
-    
-    // Add hover event listeners for mobile/touch devices
-    const cartWrapper = document.querySelector('.cart-hover-wrapper');
-    if (cartWrapper) {
-        cartWrapper.addEventListener('mouseenter', function() {
-            updateCartHover();
-        });
-    }
-    
-    console.log('Cart system initialized');
-});
-
 // Force update cart hover on any cart change
 function forceCartUpdate() {
     updateCartUI();
@@ -4500,21 +4397,10 @@ function forceCartUpdate() {
     }
 }
 
-// Override cart functions to force update
-const originalAddToCart = window.addToCart;
-window.addToCart = function(item) {
-    if (originalAddToCart) originalAddToCart(item);
-    setTimeout(forceCartUpdate, 100);
-};
-
-const originalRemoveFromCart = window.removeFromCart;
-window.removeFromCart = function(index) {
-    if (originalRemoveFromCart) originalRemoveFromCart(index);
-    setTimeout(forceCartUpdate, 100);
-};
-
-const originalUpdateCartItemQuantity = window.updateCartItemQuantity;
-window.updateCartItemQuantity = function(index, change) {
-    if (originalUpdateCartItemQuantity) originalUpdateCartItemQuantity(index, change);
-    setTimeout(forceCartUpdate, 100);
-};
+// Make functions globally available
+window.renderCartPage = renderCartPage;
+window.updateCartItemQuantityFromCart = updateCartItemQuantityFromCart;
+window.processOrderFromCart = processOrderFromCart;
+window.deleteSelectedItems = deleteSelectedItems;
+window.forceCartUpdate = forceCartUpdate;
+window.updateCartHover = updateCartHover;
