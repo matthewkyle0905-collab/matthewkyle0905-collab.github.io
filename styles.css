@@ -3913,5 +3913,46 @@ button:disabled {
         right: -50px;
     }
 }
+/* Fix for cart hover dropdown visibility */
+.cart-hover-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.cart-hover-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 380px;
+    max-height: 500px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    margin-top: 10px;
+    display: none;
+}
+
+.cart-hover-wrapper:hover .cart-hover-dropdown {
+    display: block;
+}
+
+/* Cart page visibility fix */
+#cart-page {
+    display: none;
+}
+
+#cart-page.active {
+    display: block;
+}
+
+/* Loading state */
+.cart-hover-loading {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-muted);
+}
 
 
