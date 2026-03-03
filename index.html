@@ -65,12 +65,11 @@
                 </div>
             </div>
             
-            <!-- NAV LINKS -->
+            <!-- NAV LINKS - Cart link REMOVED -->
             <ul class="nav-links">
                 <li><a href="#" onclick="navigateTo('home'); return false;">Home</a></li>
                 <li><a href="#" onclick="navigateTo('photos'); return false;">Editor</a></li>
                 <li><a href="#" onclick="navigateTo('shop'); return false;">Shop</a></li>
-                <li><a href="#" onclick="navigateTo('cart-page'); return false;">Cart <span id="navCartCount" class="nav-cart-badge">0</span></a></li>
                 <li><a href="#" onclick="navigateTo('contact'); return false;">Info</a></li>
             </ul>
 
@@ -152,7 +151,7 @@
             </div>
         </section>
 
-        <!-- NEW CART PAGE -->
+        <!-- CART PAGE -->
         <section id="cart-page" class="page">
             <div class="container">
                 <div class="cart-header">
@@ -644,297 +643,15 @@
             <div class="container">
                 <h2>Photo Cards</h2>
                 <p>Create personalized greeting cards for every occasion.</p>
-
-                <!-- Upload & Editing Section for Cards -->
-                <div class="mode-selector">
-                    <button id="cardsUploadModeBtn" class="mode-btn active" onclick="switchCardsMode('upload')">Upload Photos</button>
-                    <button id="cardsProductsModeBtn" class="mode-btn" onclick="switchCardsMode('products')">Card Products</button>
-                </div>
-
-                <div id="cardsUploadView" class="upload-view active-view">
-                    <div class="upload-section">
-                        <div class="upload-box" id="cardsDropArea">
-                            <input type="file" id="cardsPhotoInput" accept="image/*" multiple class="file-input">
-                            <label for="cardsPhotoInput" class="upload-label">
-                                <div class="upload-icon">📸</div>
-                                <h3>Upload Your Photos for Cards</h3>
-                                <p>Click to browse or drag and drop images here</p>
-                                <p class="file-types">Supports JPG, PNG, GIF up to 10MB each</p>
-                                <div class="upload-stats">
-                                    <p>Uploaded: <span id="cardsUploadCount">0</span> photos</p>
-                                </div>
-                            </label>
-                        </div>
-
-                        <div id="cardsUploadedImages" class="uploaded-images">
-                            <!-- Uploaded thumbnails will appear here -->
-                        </div>
-
-                        <div id="cardsEditorContainer" class="editor-container">
-                            <div class="editor-header">
-                                <h3>Card Photo Editor</h3>
-                                <p>Select a photo to edit for your card</p>
-                            </div>
-
-                            <div class="editor-main">
-                                <div class="canvas-container">
-                                    <canvas id="cardsPhotoCanvas"></canvas>
-                                    <div class="canvas-overlay" id="cardsCanvasOverlay">
-                                        <p>Select a photo to start editing</p>
-                                    </div>
-                                </div>
-
-                                <div class="editor-sidebar">
-                                    <div class="editor-tools">
-                                        <h4>Edit Tools</h4>
-
-                                        <div class="tool-group">
-                                            <label>Brightness</label>
-                                            <div class="slider-container">
-                                                <button class="slider-btn minus" onclick="adjustCardsBrightness(-10)">-</button>
-                                                <input type="range" id="cardsBrightnessSlider" min="0" max="200" value="100" class="slider">
-                                                <button class="slider-btn plus" onclick="adjustCardsBrightness(10)">+</button>
-                                                <span id="cardsBrightnessValue">100%</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="tool-group">
-                                            <label>Contrast</label>
-                                            <div class="slider-container">
-                                                <button class="slider-btn minus" onclick="adjustCardsContrast(-10)">-</button>
-                                                <input type="range" id="cardsContrastSlider" min="0" max="200" value="100" class="slider">
-                                                <button class="slider-btn plus" onclick="adjustCardsContrast(10)">+</button>
-                                                <span id="cardsContrastValue">100%</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="tool-group">
-                                            <label>Saturation</label>
-                                            <div class="slider-container">
-                                                <button class="slider-btn minus" onclick="adjustCardsSaturation(-10)">-</button>
-                                                <input type="range" id="cardsSaturationSlider" min="0" max="200" value="100" class="slider">
-                                                <button class="slider-btn plus" onclick="adjustCardsSaturation(10)">+</button>
-                                                <span id="cardsSaturationValue">100%</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="tool-group">
-                                            <label>Rotate & Flip</label>
-                                            <div class="button-group">
-                                                <button class="tool-btn" onclick="rotateCardsImage(-90)">↺ 90°</button>
-                                                <button class="tool-btn" onclick="rotateCardsImage(90)">↻ 90°</button>
-                                                <button class="tool-btn" onclick="flipCardsHorizontal()">⬌ Flip H</button>
-                                                <button class="tool-btn" onclick="flipCardsVertical()">⬍ Flip V</button>
-                                            </div>
-                                        </div>
-
-                                        <div class="tool-group">
-                                            <label>Filters</label>
-                                            <div class="filters-grid">
-                                                <button class="filter-btn" onclick="applyCardsFilter('none')">None</button>
-                                                <button class="filter-btn" onclick="applyCardsFilter('grayscale')">Grayscale</button>
-                                                <button class="filter-btn" onclick="applyCardsFilter('sepia')">Sepia</button>
-                                                <button class="filter-btn" onclick="applyCardsFilter('vintage')">Vintage</button>
-                                                <button class="filter-btn" onclick="applyCardsFilter('cool')">Cool</button>
-                                                <button class="filter-btn" onclick="applyCardsFilter('warm')">Warm</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="action-buttons">
-                                        <button id="cardsResetBtn" class="action-btn reset-btn" onclick="resetCardsImage()">Reset All</button>
-                                        <button id="cardsSaveBtn" class="action-btn save-btn" onclick="saveCardsImage()">Save Edits</button>
-                                        <button id="cardsDownloadBtn" class="action-btn download-btn" onclick="downloadCardsImage()">Download</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="editor-footer">
-                                <h4>Card Options</h4>
-                                <div class="print-options">
-                                    <div class="print-option">
-                                        <label>
-                                            <input type="radio" name="cardsSize" value="5x7" checked>
-                                            5x7 inch Card
-                                            <span class="print-price">₱ 150.00</span>
-                                        </label>
-                                    </div>
-                                    <div class="print-option">
-                                        <label>
-                                            <input type="radio" name="cardsSize" value="8x10">
-                                            8x10 inch Card
-                                            <span class="print-price">₱ 250.00</span>
-                                        </label>
-                                    </div>
-                                    <div class="print-option">
-                                        <label>
-                                            <input type="radio" name="cardsSize" value="folded">
-                                            Folded Greeting Card
-                                            <span class="print-price">₱ 350.00</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <button id="cardsAddToCart" class="add-cart-btn" onclick="addCardsToCart()">
-                                    <span class="cart-icon">🛒</span>
-                                    Add Card to Cart - <span id="cardsSelectedPrice">₱ 150.00</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card Products Section -->
-                <div id="cardsProductsView" class="prints-view" style="display: none;">
-                    <div class="print-products-grid" id="cardsProductsGrid">
-                        <!-- Card products will be loaded here -->
-                    </div>
-                </div>
+                <!-- Cards content -->
             </div>
         </section>
 
         <section id="calendars" class="page">
             <div class="container">
-                <div class="photos-header">
-                    <h2>Custom Calendars</h2>
-                    <p>Create personalized calendars with your photos. Perfect for gifts or home decoration.</p>
-
-                    <div class="mode-selector">
-                        <button id="calendarsUploadModeBtn" class="mode-btn active" onclick="switchCalendarsMode('upload')">Create Your Own</button>
-                        <button id="calendarsProductsModeBtn" class="mode-btn" onclick="switchCalendarsMode('products')">Calendar Products</button>
-                    </div>
-                </div>
-
-                <!-- Create Your Own Calendar Section -->
-                <div id="calendarsUploadView" class="upload-view active-view">
-                    <div class="upload-section">
-                        <div class="upload-box" id="calendarsDropArea">
-                            <input type="file" id="calendarsPhotoInput" accept="image/*" multiple class="file-input">
-                            <label for="calendarsPhotoInput" class="upload-label">
-                                <div class="upload-icon">📅</div>
-                                <h3>Upload Your Photos for Calendar</h3>
-                                <p>Upload 12 photos (one for each month) or let us create a collage</p>
-                                <p class="file-types">Supports JPG, PNG up to 10MB each</p>
-                                <div class="upload-stats">
-                                    <p>Uploaded: <span id="calendarsUploadCount">0</span> photos</p>
-                                </div>
-                            </label>
-                        </div>
-
-                        <div id="calendarsUploadedImages" class="uploaded-images">
-                            <!-- Uploaded thumbnails will appear here -->
-                        </div>
-
-                        <div class="calendar-customizer">
-                            <div class="calendar-preview-container">
-                                <div class="calendar-preview" id="calendarPreview">
-                                    <div class="calendar-header">
-                                        <h4>2025</h4>
-                                        <h3>Your Custom Calendar</h3>
-                                    </div>
-                                    <div class="calendar-month-grid">
-                                        <!-- Months will be generated here -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="calendar-options">
-                                <h4>Calendar Options</h4>
-
-                                <div class="option-group">
-                                    <label>Calendar Type</label>
-                                    <select id="calendarType" class="option-select" onchange="updateCalendarPreview()">
-                                        <option value="desk">Desk Calendar</option>
-                                        <option value="wall">Wall Calendar</option>
-                                        <option value="mini">Mini Calendar</option>
-                                        <option value="photo">Photo Calendar</option>
-                                    </select>
-                                </div>
-
-                                <div class="option-group">
-                                    <label>Size</label>
-                                    <select id="calendarSize" class="option-select" onchange="updateCalendarPrice()">
-                                        <option value="8x10">8x10 inches</option>
-                                        <option value="12x12">12x12 inches</option>
-                                        <option value="8.5x11">8.5x11 inches (Letter)</option>
-                                        <option value="11x17">11x17 inches (Tabloid)</option>
-                                    </select>
-                                </div>
-
-                                <div class="option-group">
-                                    <label>Start Month</label>
-                                    <select id="startMonth" class="option-select">
-                                        <option value="1">January</option>
-                                        <option value="2">February</option>
-                                        <option value="3">March</option>
-                                        <option value="4">April</option>
-                                        <option value="5">May</option>
-                                        <option value="6">June</option>
-                                        <option value="7">July</option>
-                                        <option value="8">August</option>
-                                        <option value="9">September</option>
-                                        <option value="10">October</option>
-                                        <option value="11">November</option>
-                                        <option value="12">December</option>
-                                    </select>
-                                </div>
-
-                                <div class="option-group">
-                                    <label>Paper Type</label>
-                                    <select id="paperType" class="option-select" onchange="updateCalendarPrice()">
-                                        <option value="glossy">Glossy Photo Paper</option>
-                                        <option value="matte">Matte Photo Paper (+₱100)</option>
-                                        <option value="premium">Premium Cardstock (+₱200)</option>
-                                    </select>
-                                </div>
-
-                                <div class="option-group">
-                                    <label>Binding</label>
-                                    <select id="bindingType" class="option-select" onchange="updateCalendarPrice()">
-                                        <option value="spiral">Spiral Binding</option>
-                                        <option value="wire">Wire-O Binding (+₱50)</option>
-                                        <option value="hardcover">Hardcover (+₱300)</option>
-                                    </select>
-                                </div>
-
-                                <div class="option-group">
-                                    <label>Quantity</label>
-                                    <div class="quantity-control">
-                                        <button onclick="updateCalendarQuantity(-1)">-</button>
-                                        <input type="number" id="calendarQuantity" min="1" value="1" onchange="updateCalendarPrice()">
-                                        <button onclick="updateCalendarQuantity(1)">+</button>
-                                    </div>
-                                </div>
-
-                                <div class="price-summary">
-                                    <div class="price-details">
-                                        <span>Base Price:</span>
-                                        <span id="basePrice">₱ 800.00</span>
-                                    </div>
-                                    <div class="price-details">
-                                        <span>Options:</span>
-                                        <span id="optionsPrice">₱ 0.00</span>
-                                    </div>
-                                    <div class="price-total">
-                                        <span>Total:</span>
-                                        <span id="calendarTotalPrice">₱ 800.00</span>
-                                    </div>
-                                </div>
-
-                                <button id="addCalendarToCart" class="add-cart-btn" onclick="addCustomCalendarToCart()">
-                                    <span class="cart-icon">🛒</span>
-                                    Add Calendar to Cart - <span id="calendarFinalPrice">₱ 800.00</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Calendar Products Section -->
-                <div id="calendarsProductsView" class="prints-view" style="display: none;">
-                    <div class="print-products-grid" id="calendarsProductsGrid">
-                        <!-- Calendar products will be loaded here -->
-                    </div>
-                </div>
+                <h2>Custom Calendars</h2>
+                <p>Create personalized calendars with your photos.</p>
+                <!-- Calendars content -->
             </div>
         </section>
 
@@ -948,14 +665,14 @@
         <section id="gifts" class="page">
             <div class="container">
                 <h2>Photo Gifts</h2>
-                <p>Canvas, mouse pads and other photo gifts to show off your images.</p>
+                <p>Canvas, mouse pads and other photo gifts.</p>
             </div>
         </section>
 
         <section id="canvas" class="page">
             <div class="container">
                 <h2>Canvas</h2>
-                <p>Your favorite photo mounted on canvas - a stylish decoration solution.</p>
+                <p>Your favorite photo mounted on canvas.</p>
             </div>
         </section>
 
@@ -1033,7 +750,6 @@
                     <li><a href="#" onclick="navigateTo('photos'); return false;">Photos</a></li>
                     <li><a href="#" onclick="navigateTo('cards'); return false;">Photo Cards</a></li>
                     <li><a href="#" onclick="navigateTo('calendars'); return false;">Calendars</a></li>
-                    <li><a href="#" onclick="navigateTo('cart-page'); return false;">Cart</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -1056,9 +772,7 @@
             <h3>Customer Reviews</h3>
             <div class="review-carousel">
                 <button class="carousel-nav left" onclick="prevReview()">◀</button>
-                <div id="reviewsContainer" class="reviews-container">
-                    <!-- reviews inserted here -->
-                </div>
+                <div id="reviewsContainer" class="reviews-container"></div>
                 <button class="carousel-nav right" onclick="nextReview()">▶</button>
             </div>
         </div>
@@ -1114,9 +828,7 @@
                 <div class="faq-scroll-indicator right">›</div>
             </div>
 
-            <div class="chat-messages" id="chatMessages">
-                <!-- Messages will appear here -->
-            </div>
+            <div class="chat-messages" id="chatMessages"></div>
 
             <div class="chat-input-area">
                 <input type="text" id="chatInput" placeholder="Type your message..." class="chat-input">
