@@ -4461,3 +4461,60 @@ window.renderCartPage = renderCartPage;
 window.updateCartItemQuantityFromCart = updateCartItemQuantityFromCart;
 window.processOrderFromCart = processOrderFromCart;
 window.deleteSelectedItems = deleteSelectedItems;
+
+// ============== FIX: Initialize cart on page load ==============
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing cart system...');
+    
+    // Initialize cart data if not exists
+    if (!shoppingCart) {
+        shoppingCart = JSON.parse(localStorage.getItem('fotocenterCart')) || [];
+    }
+    
+    // Update cart UI
+    updateCartUI();
+    updateCartHover();
+    
+    // Check if cart page is active
+    if (document.getElementById('cart-page')?.classList.contains('active')) {
+        renderCartPage();
+    }
+    
+    // Add hover event listeners for mobile/touch devices
+    const cartWrapper = document.querySelector('.cart-hover-wrapper');
+    if (cartWrapper) {
+        cartWrapper.addEventListener('mouseenter', function() {
+            updateCartHover();
+        });
+    }
+    
+    console.log('Cart system initialized');
+});
+
+// Force update cart hover on any cart change
+function forceCartUpdate() {
+    updateCartUI();
+    updateCartHover();
+    if (document.getElementById('cart-page')?.classList.contains('active')) {
+        renderCartPage();
+    }
+}
+
+// Override cart functions to force update
+const originalAddToCart = window.addToCart;
+window.addToCart = function(item) {
+    if (originalAddToCart) originalAddToCart(item);
+    setTimeout(forceCartUpdate, 100);
+};
+
+const originalRemoveFromCart = window.removeFromCart;
+window.removeFromCart = function(index) {
+    if (originalRemoveFromCart) originalRemoveFromCart(index);
+    setTimeout(forceCartUpdate, 100);
+};
+
+const originalUpdateCartItemQuantity = window.updateCartItemQuantity;
+window.updateCartItemQuantity = function(index, change) {
+    if (originalUpdateCartItemQuantity) originalUpdateCartItemQuantity(index, change);
+    setTimeout(forceCartUpdate, 100);
+};
