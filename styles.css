@@ -3955,4 +3955,71 @@ button:disabled {
     color: var(--text-muted);
 }
 
+/* ============== FIXED CART HOVER DROPDOWN ============== */
+
+/* Make dropdown stay visible when hovering */
+.cart-hover-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.cart-hover-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 380px;
+    max-height: 500px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    margin-top: 10px;
+    
+    /* Start hidden */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+
+/* Show dropdown when hovering wrapper OR when hovering dropdown itself */
+.cart-hover-wrapper:hover .cart-hover-dropdown,
+.cart-hover-dropdown:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+/* Ensure dropdown doesn't disappear when moving mouse into it */
+.cart-hover-dropdown {
+    pointer-events: none;
+}
+
+.cart-hover-dropdown:hover {
+    pointer-events: all;
+}
+
+/* Fix for interactive elements inside dropdown */
+.cart-hover-item,
+.cart-hover-view-cart,
+.cart-hover-checkout,
+.cart-hover-item-remove {
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+
+/* Add a invisible bridge between button and dropdown */
+.cart-hover-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 100%;
+    height: 10px;
+    background: transparent;
+}
 
