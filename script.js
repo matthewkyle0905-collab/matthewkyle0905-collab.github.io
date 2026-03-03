@@ -4033,10 +4033,10 @@ async function processOrder() {
             mainFolder.id
         );
         
-        // 12. Show success message with order number (FIXED)
-        const message = `Hello ${username},\n\nThis is your Order Number: ${orderData.orderId}\nThank you for choosing FOTOCENTER!`;
-        document.getElementById('orderSuccessMessage').textContent = message;
-        document.getElementById('orderSuccessModal').style.display = 'flex';
+       // 12. Show success message with order number and copy button
+const message = `Hello ${username},\n\nThis is your Order Number: ${orderData.orderId} <button class="copy-btn" onclick="copyOrderNumber()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:5px;" title="Copy order number">📋</button>\n\nPlease copy and save the Order Number\n\nThank you for choosing FOTOCENTER!`;
+document.getElementById('orderSuccessMessage').innerHTML = message;
+document.getElementById('orderSuccessModal').style.display = 'flex';
         
         // 13. Clear cart or reset if needed
         if (shoppingCart.length > 0) {
@@ -4070,3 +4070,28 @@ document.addEventListener('DOMContentLoaded', function() {
 window.processOrder = processOrder;
 window.testGoogleDriveConnection = testGoogleDriveConnection;
 window.initializeGoogleApi = initializeGoogleApi;
+
+// ============== COPY ORDER NUMBER FUNCTION ==============
+function copyOrderNumber() {
+    const orderMessage = document.getElementById('orderSuccessMessage').innerText;
+    // Extract order number from message (assuming format: "This is your Order Number: ORD-123-ABC")
+    const match = orderMessage.match(/Order Number: ([^\n]+)/);
+    if (match && match[1]) {
+        const orderNumber = match[1].trim();
+        navigator.clipboard.writeText(orderNumber).then(() => {
+            // Show temporary "Copied!" feedback
+            const copyBtn = document.querySelector('.copy-btn');
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '✅ Copied!';
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            alert('Press Ctrl+C to copy the order number');
+        });
+    }
+}
+
+// Make function globally available
+window.copyOrderNumber = copyOrderNumber;
