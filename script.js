@@ -506,10 +506,6 @@ function updateCartUI() {
     cartBtn.innerHTML = `🛒 Cart <span id="cartCount" class="cart-badge">${itemCount}</span>`;
     const cartCountBadge = document.getElementById('cartCount');
     if (cartCountBadge) cartCountBadge.textContent = itemCount;
-    
-    // Also update nav cart count if exists
-    const navCartCount = document.getElementById('navCartCount');
-    if (navCartCount) navCartCount.textContent = itemCount;
 }
 
 function calculateCartTotal() {
@@ -630,6 +626,9 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Initialize cart hover
     initCartHover();
+    
+    // Initialize select all checkbox
+    initSelectAll();
 });
 
 function updateCartBadgeOnLoad() {
@@ -4073,6 +4072,21 @@ window.copyOrderNumber = copyOrderNumber;
 
 // ============== CART PAGE FUNCTIONS ==============
 
+// Initialize select all checkbox
+function initSelectAll() {
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            // When select all is clicked, set all items to this.checked
+            shoppingCart.forEach(item => {
+                item.selected = this.checked;
+            });
+            updateCartSelection();
+            renderCartPage();
+        });
+    }
+}
+
 // Render cart page items
 function renderCartPage() {
     const container = document.getElementById('cartItemsContainer');
@@ -4104,6 +4118,14 @@ function renderCartPage() {
     
     let html = '';
     shoppingCart.forEach((item, index) => {
+        // Determine size mode display
+        let sizeModeDisplay = '';
+        if (item.sizeMode) {
+            sizeModeDisplay = item.sizeMode === 'fill' ? 'Fill' : 'Fit';
+        } else {
+            sizeModeDisplay = 'Fill'; // Default
+        }
+        
         html += `
             <div class="cart-item-card" data-index="${index}">
                 <div class="cart-item-checkbox">
@@ -4117,6 +4139,7 @@ function renderCartPage() {
                     <div class="cart-item-specs">
                         ${item.size ? `<span>Size: ${item.size}</span>` : ''}
                         ${item.paperType ? `<span>Paper: ${item.paperType}</span>` : ''}
+                        <span>Mode: ${sizeModeDisplay}</span>
                     </div>
                     <div class="cart-item-price">${item.price}</div>
                     <div class="cart-item-actions">
@@ -4125,7 +4148,7 @@ function renderCartPage() {
                             <span>${item.quantity || 1}</span>
                             <button onclick="updateCartItemQuantityFromCart(${index}, 1)">+</button>
                         </div>
-                        <button class="cart-item-remove" onclick="removeFromCart(${index})" title="Remove">🗑️</button>
+                        <!-- Individual trash icon REMOVED as requested -->
                     </div>
                 </div>
             </div>
@@ -4178,7 +4201,7 @@ function updateCartSelection() {
     document.getElementById('cartTotalSelected').textContent = `₱${total.toFixed(2)}`;
 }
 
-// Select all items
+// Select all items (called by initSelectAll now)
 function selectAllItems(checked) {
     shoppingCart.forEach(item => {
         item.selected = checked;
@@ -4234,7 +4257,7 @@ async function processOrderFromCart() {
         customWidth: item.customDimensions?.width || null,
         customHeight: item.customDimensions?.height || null,
         customUnit: item.customDimensions?.unit || 'inches',
-        resize: 'FITIN'
+        resize: item.sizeMode || 'FITIN'
     }));
     
     // Create order data
@@ -4363,6 +4386,7 @@ function updateCartHover() {
                     <div class="cart-hover-item-name">${item.name.substring(0, 30)}${item.name.length > 30 ? '...' : ''}</div>
                     <div class="cart-hover-item-price">${item.price}</div>
                 </div>
+                <!-- Remove button kept in hover for convenience -->
                 <button class="cart-hover-item-remove" onclick="removeFromCart(${index}); event.stopPropagation();">✕</button>
             </div>
         `;
@@ -4404,3 +4428,4 @@ window.processOrderFromCart = processOrderFromCart;
 window.deleteSelectedItems = deleteSelectedItems;
 window.forceCartUpdate = forceCartUpdate;
 window.updateCartHover = updateCartHover;
+window.selectAllItems = selectAllItems;
