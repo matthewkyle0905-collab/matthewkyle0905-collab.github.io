@@ -17,7 +17,7 @@
                 <p class="logo-sub">Philippines</p>
             </div>
 
-            <!-- CART MODAL -->
+            <!-- CART MODAL (keeping for backward compatibility) -->
             <div id="cartModal" class="modal">
                 <div class="modal-content cart-modal-content">
                     <span class="close-modal" onclick="closeCartModal()">&times;</span>
@@ -70,6 +70,7 @@
                 <li><a href="#" onclick="navigateTo('home'); return false;">Home</a></li>
                 <li><a href="#" onclick="navigateTo('photos'); return false;">Editor</a></li>
                 <li><a href="#" onclick="navigateTo('shop'); return false;">Shop</a></li>
+                <li><a href="#" onclick="navigateTo('cart-page'); return false;">Cart</a></li>
                 <li><a href="#" onclick="navigateTo('contact'); return false;">Info</a></li>
             </ul>
 
@@ -83,10 +84,18 @@
                        autocomplete="off">
             </div>
 
-            <!-- NAV ACTIONS -->
-            <div class="nav-actions">
+            <!-- NAV ACTIONS with CART HOVER -->
+            <div class="nav-actions" id="cartHoverContainer">
                 <a href="#" class="login-link" onclick="openLoginModal(); return false;">Log in</a>
-                <button class="cart-btn">🛒 Cart <span id="cartCount" class="cart-badge">0</span></button>
+                <div class="cart-hover-wrapper">
+                    <button class="cart-btn" id="cartHoverBtn" onclick="navigateTo('cart-page'); return false;">
+                        🛒 Cart <span id="cartCount" class="cart-badge">0</span>
+                    </button>
+                    <div class="cart-hover-dropdown" id="cartHoverDropdown">
+                        <!-- Will be populated by JavaScript -->
+                        <div class="cart-hover-loading">Loading cart...</div>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -141,6 +150,51 @@
                     <button id="clearSearchBtn" onclick="clearSearch()">✕ Clear</button>
                 </div>
                 <div id="shopProductsGrid" class="products-grid"></div>
+            </div>
+        </section>
+
+        <!-- NEW CART PAGE -->
+        <section id="cart-page" class="page">
+            <div class="container">
+                <div class="cart-header">
+                    <h2>🛒 SHOPPING CART</h2>
+                    <button class="continue-shopping-btn" onclick="navigateTo('shop')">← Continue Shopping</button>
+                </div>
+
+                <!-- Cart Tabs -->
+                <div class="cart-tabs">
+                    <button class="cart-tab active" data-tab="all">ALL</button>
+                    <button class="cart-tab" data-tab="printing">Printing</button>
+                    <button class="cart-tab" data-tab="toship">To Ship</button>
+                    <button class="cart-tab" data-tab="completed">Completed</button>
+                    <button class="cart-tab" data-tab="cancel">Cancel/Return</button>
+                </div>
+
+                <!-- Cart Items Container -->
+                <div id="cartItemsContainer" class="cart-items-container">
+                    <!-- Will be populated by JavaScript -->
+                    <div class="cart-loading">Loading cart items...</div>
+                </div>
+
+                <!-- Select All Bar -->
+                <div class="select-all-bar" id="selectAllBar">
+                    <label class="select-all-checkbox">
+                        <input type="checkbox" id="selectAllCheckbox">
+                        <span>Select All (<span id="selectedCount">0</span>/<span id="totalCount">0</span> items)</span>
+                    </label>
+                    <button class="delete-selected-btn" id="deleteSelectedBtn">🗑️ Delete Selected</button>
+                </div>
+
+                <!-- Sticky Bottom Bar -->
+                <div class="cart-sticky-bottom">
+                    <div class="cart-total-info">
+                        <span>Total (<span id="selectedItemsCount">0</span> selected items):</span>
+                        <span class="cart-total-amount" id="cartTotalSelected">₱0.00</span>
+                    </div>
+                    <button class="complete-order-btn" id="completeOrderBtn" onclick="processOrderFromCart()">
+                        ✅ COMPLETE ORDER
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -575,16 +629,8 @@
                                     Add to Cart - <span id="finalPrice">₱25.00</span>
                                 </button>
 
-                                <!-- ============== NEW ORDER BUTTONS ============== -->
-                                <div style="display: flex; gap: 1rem; margin-top: 1rem; padding: 1rem; background: var(--secondary); border-radius: var(--radius);">
-                                    <button id="completeOrderBtn" class="add-cart-btn" style="flex: 2;" onclick="processOrder()">
-                                        <span class="cart-icon">✅</span>
-                                        COMPLETE ORDER (Test Payment)
-                                    </button>
-                                    <button id="testGoogleDriveBtn" class="toggle-advanced-btn" style="flex: 1;" onclick="testGoogleDriveConnection()">
-                                        Test Drive
-                                    </button>
-                                </div>
+                                <!-- ============== REMOVED COMPLETE ORDER BUTTON FROM EDITOR ============== -->
+                                <!-- Now moved to cart page -->
                             </div>
                         </div>
                     </div>
@@ -939,12 +985,12 @@
             <p>Your edited photo has been successfully added to your shopping cart.</p>
             <div class="modal-actions">
                 <button class="modal-btn continue-btn" onclick="closeModal()">Continue Editing</button>
-                <button class="modal-btn cart-view-btn" onclick="viewCart()">View Cart</button>
+                <button class="modal-btn cart-view-btn" onclick="navigateTo('cart-page')">View Cart</button>
             </div>
         </div>
     </div>
 
-    <!-- Cart Modal -->
+    <!-- Cart Modal (keeping for backward compatibility) -->
     <div id="cartModal" class="modal">
         <div class="modal-content cart-modal">
             <span class="close-modal" onclick="closeCartModal()">&times;</span>
@@ -959,7 +1005,7 @@
                 </div>
                 <div class="cart-actions">
                     <button class="modal-btn continue-btn" onclick="closeCartModal()">Continue Shopping</button>
-                    <button class="modal-btn checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+                    <button class="modal-btn checkout-btn" onclick="navigateTo('cart-page'); closeCartModal();">View Cart Page</button>
                 </div>
             </div>
         </div>
@@ -992,6 +1038,7 @@
                     <li><a href="#" onclick="navigateTo('photos'); return false;">Photos</a></li>
                     <li><a href="#" onclick="navigateTo('cards'); return false;">Photo Cards</a></li>
                     <li><a href="#" onclick="navigateTo('calendars'); return false;">Calendars</a></li>
+                    <li><a href="#" onclick="navigateTo('cart-page'); return false;">Cart</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -1092,4 +1139,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
