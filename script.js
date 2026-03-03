@@ -4095,3 +4095,369 @@ function copyOrderNumber() {
 
 // Make function globally available
 window.copyOrderNumber = copyOrderNumber;
+
+// ============== CART PAGE FUNCTIONS ==============
+
+// Render cart page items
+function renderCartPage() {
+    const container = document.getElementById('cartItemsContainer');
+    if (!container) return;
+    
+    if (shoppingCart.length === 0) {
+        container.innerHTML = `
+            <div class="empty-cart-message">
+                <p>Your cart is empty</p>
+                <button onclick="navigateTo('shop')">Continue Shopping</button>
+            </div>
+        `;
+        document.getElementById('selectAllBar').style.display = 'none';
+        document.getElementById('totalCount').textContent = '0';
+        document.getElementById('selectedCount').textContent = '0';
+        document.getElementById('selectedItemsCount').textContent = '0';
+        document.getElementById('cartTotalSelected').textContent = '₱0.00';
+        return;
+    }
+    
+    document.getElementById('selectAllBar').style.display = 'flex';
+    document.getElementById('totalCount').textContent = shoppingCart.length;
+    
+    let html = '';
+    shoppingCart.forEach((item, index) => {
+        html += `
+            <div class="cart-item-card" data-index="${index}">
+                <div class="cart-item-checkbox">
+                    <input type="checkbox" class="item-checkbox" data-index="${index}" ${item.selected ? 'checked' : ''}>
+                </div>
+                <div class="cart-item-image">
+                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100?text=Image'">
+                </div>
+                <div class="cart-item-details">
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-specs">
+                        ${item.size ? `<span>Size: ${item.size}</span>` : ''}
+                        ${item.paperType ? `<span>Paper: ${item.paperType}</span>` : ''}
+                    </div>
+                    <div class="cart-item-price">${item.price}</div>
+                    <div class="cart-item-actions">
+                        <div class="cart-item-quantity">
+                            <button onclick="updateCartItemQuantityFromCart(${index}, -1)">−</button>
+                            <span>${item.quantity || 1}</span>
+                            <button onclick="updateCartItemQuantityFromCart(${index}, 1)">+</button>
+                        </div>
+                        <button class="cart-item-remove" onclick="removeFromCart(${index})" title="Remove">🗑️</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    
+    // Add event listeners to checkboxes
+    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const index = this.dataset.index;
+            shoppingCart[index].selected = this.checked;
+            updateCartSelection();
+        });
+    });
+    
+    // Initialize selection state
+    shoppingCart.forEach(item => {
+        if (item.selected === undefined) item.selected = true;
+    });
+    
+    updateCartSelection();
+}
+
+// Update cart selection UI
+function updateCartSelection() {
+    const selectAll = document.getElementById('selectAllCheckbox');
+    const selectedCount = shoppingCart.filter(item => item.selected).length;
+    const totalCount = shoppingCart.length;
+    
+    document.getElementById('selectedCount').textContent = selectedCount;
+    document.getElementById('selectedItemsCount').textContent = selectedCount;
+    
+    // Update select all checkbox
+    if (selectAll) {
+        selectAll.checked = selectedCount === totalCount && totalCount > 0;
+        selectAll.indeterminate = selectedCount > 0 && selectedCount < totalCount;
+    }
+    
+    // Calculate total for selected items
+    let total = 0;
+    shoppingCart.forEach((item, index) => {
+        if (item.selected) {
+            const price = parseFloat(item.price.toString().replace('₱', '').replace(',', '')) || 0;
+            total += price * (item.quantity || 1);
+        }
+    });
+    
+    document.getElementById('cartTotalSelected').textContent = `₱${total.toFixed(2)}`;
+}
+
+// Select all items
+function selectAllItems(checked) {
+    shoppingCart.forEach(item => {
+        item.selected = checked;
+    });
+    updateCartSelection();
+    renderCartPage();
+}
+
+// Update quantity from cart page
+function updateCartItemQuantityFromCart(index, change) {
+    updateCartItemQuantity(index, change);
+    renderCartPage();
+    updateCartHover();
+}
+
+// Delete selected items
+function deleteSelectedItems() {
+    shoppingCart = shoppingCart.filter(item => !item.selected);
+    updateCartStorage();
+    renderCartPage();
+    updateCartUI();
+    updateCartHover();
+}
+
+// Process order from cart
+async function processOrderFromCart() {
+    const selectedItems = shoppingCart.filter(item => item.selected);
+    
+    if (selectedItems.length === 0) {
+        alert('Please select at least one item to order.');
+        return;
+    }
+    
+    // Get user info
+    const username = localStorage.getItem('userName') || localStorage.getItem('userEmail')?.split('@')[0] || 'guest';
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    
+    if (!isLoggedIn) {
+        const proceed = confirm('You are not logged in. Continue as guest?');
+        if (!proceed) return;
+    }
+    
+    // Convert cart items to photo format for order processing
+    const photos = selectedItems.map((item, index) => ({
+        originalName: item.name,
+        filename: `${index + 1}.jpg`,
+        data: item.image.split(',')[1] || item.image,
+        size: item.size || '4x6',
+        quantity: item.quantity || 1,
+        price: parseFloat(item.price.toString().replace('₱', '').replace(',', '')) || 0,
+        paperType: item.paperType || 'standard',
+        isCustom: item.isCustom || false,
+        customWidth: item.customDimensions?.width || null,
+        customHeight: item.customDimensions?.height || null,
+        customUnit: item.customDimensions?.unit || 'inches',
+        resize: 'FITIN'
+    }));
+    
+    // Create order data
+    const orderData = {
+        orderId: generateOrderId(),
+        username: username,
+        orderCount: getUserOrderCount(username),
+        photos: photos,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Show loading
+    const btn = document.getElementById('completeOrderBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Processing Order...';
+    btn.disabled = true;
+    
+    try {
+        // Get Google Auth token
+        const token = await new Promise((resolve, reject) => {
+            tokenClient.callback = (resp) => {
+                if (resp.error !== undefined) {
+                    reject(resp);
+                }
+                resolve(resp);
+            };
+            tokenClient.requestAccessToken();
+        });
+        
+        // Get orders folder
+        const ordersFolderId = await getOrCreateOrdersFolder();
+        
+        // Create order folder
+        const folderName = `${username}_${orderData.orderCount}_${orderData.orderId}`;
+        const mainFolder = await createDriveFolder(folderName, ordersFolderId);
+        
+        // Create Photos subfolder
+        const photosFolder = await createDriveFolder('Photos', mainFolder.id);
+        
+        // Upload photos
+        for (let i = 0; i < orderData.photos.length; i++) {
+            const photo = orderData.photos[i];
+            await uploadFileToDrive(
+                `${i+1}.jpg`,
+                photo.data,
+                photosFolder.id
+            );
+        }
+        
+        // Upload Condition.txt
+        await uploadFileToDrive(
+            'Condition.txt',
+            generateConditionFile(orderData),
+            mainFolder.id
+        );
+        
+        // Upload End.txt
+        await uploadFileToDrive(
+            'End.txt',
+            generateEndFile(orderData),
+            mainFolder.id
+        );
+        
+        // Upload OrderReceipt.txt
+        await uploadFileToDrive(
+            'OrderReceipt.txt',
+            generateReceiptFile(orderData),
+            mainFolder.id
+        );
+        
+        // Remove ordered items from cart
+        shoppingCart = shoppingCart.filter(item => !item.selected);
+        updateCartStorage();
+        
+        // Show success message
+        const message = `Hello ${username},\n\nThis is your Order Number: ${orderData.orderId} <button class="copy-btn" onclick="copyOrderNumber()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:5px;" title="Copy order number">📋</button>\n\nPlease copy and save the Order Number\n\nThank you for choosing FOTOCENTER!`;
+        document.getElementById('orderSuccessMessage').innerHTML = message;
+        document.getElementById('orderSuccessModal').style.display = 'flex';
+        
+        // Update UI
+        renderCartPage();
+        updateCartUI();
+        updateCartHover();
+        
+    } catch (error) {
+        console.error('Order failed:', error);
+        alert('❌ Order failed: ' + (error.error || error.message || 'Unknown error'));
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+// ============== CART HOVER DROPDOWN FUNCTIONS ==============
+
+// Update cart hover dropdown
+function updateCartHover() {
+    const dropdown = document.getElementById('cartHoverDropdown');
+    if (!dropdown) return;
+    
+    if (shoppingCart.length === 0) {
+        dropdown.innerHTML = '<div class="cart-hover-empty">Your cart is empty</div>';
+        return;
+    }
+    
+    let itemsHtml = '<div class="cart-hover-header"><span>Shopping Cart</span><button class="cart-hover-view-cart" onclick="navigateTo(\'cart-page\')">VIEW CART</button></div>';
+    itemsHtml += '<div class="cart-hover-items">';
+    
+    shoppingCart.slice(0, 3).forEach((item, index) => {
+        itemsHtml += `
+            <div class="cart-hover-item">
+                <div class="cart-hover-item-image">
+                    <img src="${item.image}" alt="${item.name}">
+                </div>
+                <div class="cart-hover-item-details">
+                    <div class="cart-hover-item-name">${item.name.substring(0, 30)}${item.name.length > 30 ? '...' : ''}</div>
+                    <div class="cart-hover-item-price">${item.price}</div>
+                </div>
+                <button class="cart-hover-item-remove" onclick="removeFromCart(${index}); event.stopPropagation();">✕</button>
+            </div>
+        `;
+    });
+    
+    if (shoppingCart.length > 3) {
+        itemsHtml += `<div style="padding: 0.5rem 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">and ${shoppingCart.length - 3} more items</div>`;
+    }
+    
+    itemsHtml += '</div>';
+    
+    const subtotal = calculateCartTotal();
+    itemsHtml += `
+        <div class="cart-hover-footer">
+            <div class="cart-hover-subtotal">
+                <span>Subtotal:</span>
+                <span>₱${subtotal.toFixed(2)}</span>
+            </div>
+            <button class="cart-hover-checkout" onclick="navigateTo('cart-page')">VIEW CART</button>
+        </div>
+    `;
+    
+    dropdown.innerHTML = itemsHtml;
+}
+
+// Override existing cart functions to update hover
+const originalAddToCart = addToCart;
+addToCart = function(item) {
+    originalAddToCart(item);
+    updateCartHover();
+};
+
+const originalRemoveFromCart = removeFromCart;
+removeFromCart = function(index) {
+    originalRemoveFromCart(index);
+    updateCartHover();
+    if (document.getElementById('cart-page')?.classList.contains('active')) {
+        renderCartPage();
+    }
+};
+
+const originalUpdateCartItemQuantity = updateCartItemQuantity;
+updateCartItemQuantity = function(index, change) {
+    originalUpdateCartItemQuantity(index, change);
+    updateCartHover();
+    if (document.getElementById('cart-page')?.classList.contains('active')) {
+        renderCartPage();
+    }
+};
+
+// Initialize cart page
+document.addEventListener('DOMContentLoaded', function() {
+    // Add select all listener
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            selectAllItems(this.checked);
+        });
+    }
+    
+    // Add delete selected listener
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    if (deleteSelectedBtn) {
+        deleteSelectedBtn.addEventListener('click', deleteSelectedItems);
+    }
+    
+    // Initial render if cart page is active
+    if (document.getElementById('cart-page')?.classList.contains('active')) {
+        renderCartPage();
+    }
+    
+    // Initial hover update
+    updateCartHover();
+});
+
+// Override navigateTo to render cart page when needed
+const originalNavigateTo = navigateTo;
+navigateTo = function(pageId) {
+    originalNavigateTo(pageId);
+    if (pageId === 'cart-page') {
+        setTimeout(renderCartPage, 100);
+    }
+};
+
+// Make functions globally available
+window.renderCartPage = renderCartPage;
+window.updateCartItemQuantityFromCart = updateCartItemQuantityFromCart;
+window.processOrderFromCart = processOrderFromCart;
+window.deleteSelectedItems = deleteSelectedItems;
