@@ -965,15 +965,15 @@
         </div>
     </div>
 
-    <!-- Order Success Modal - ADDED NEW -->
-    <div id="orderSuccessModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="document.getElementById('orderSuccessModal').style.display='none'">&times;</span>
-            <div class="modal-icon">📁</div>
-            <h3>Order Submitted to Google Drive!</h3>
-            <p id="orderSuccessMessage"></p>
-            <div class="modal-actions">
-                <button class="modal-btn continue-btn" onclick="document.getElementById('orderSuccessModal').style.display='none'">OK</button>
+   <!-- Order Success Modal - UPDATED with new message and copy button -->
+<div id="orderSuccessModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('orderSuccessModal').style.display='none'">&times;</span>
+        <div class="modal-icon">📁</div>
+        <h3>Order Submitted Successfully!</h3>
+        <div id="orderSuccessMessage" style="text-align: left; margin: 1.5rem 0; line-height: 1.8; white-space: pre-line;"></div>
+        <div class="modal-actions">
+            <button class="modal-btn continue-btn" onclick="document.getElementById('orderSuccessModal').style.display='none'">OK</button>
             </div>
         </div>
     </div>
@@ -1092,3 +1092,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
