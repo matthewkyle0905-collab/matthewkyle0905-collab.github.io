@@ -17,7 +17,7 @@
                 <p class="logo-sub">Philippines</p>
             </div>
 
-            <!-- CART MODAL (keeping for backward compatibility) -->
+            <!-- CART MODAL -->
             <div id="cartModal" class="modal">
                 <div class="modal-content cart-modal-content">
                     <span class="close-modal" onclick="closeCartModal()">&times;</span>
@@ -70,7 +70,7 @@
                 <li><a href="#" onclick="navigateTo('home'); return false;">Home</a></li>
                 <li><a href="#" onclick="navigateTo('photos'); return false;">Editor</a></li>
                 <li><a href="#" onclick="navigateTo('shop'); return false;">Shop</a></li>
-                <li><a href="#" onclick="navigateTo('cart-page'); return false;">Cart</a></li>
+                <li><a href="#" onclick="navigateTo('cart-page'); return false;">Cart <span id="navCartCount" class="nav-cart-badge">0</span></a></li>
                 <li><a href="#" onclick="navigateTo('contact'); return false;">Info</a></li>
             </ul>
 
@@ -85,18 +85,17 @@
             </div>
 
             <!-- NAV ACTIONS with CART HOVER -->
-<div class="nav-actions" id="cartHoverContainer">
-    <a href="#" class="login-link" onclick="openLoginModal(); return false;">Log in</a>
-    <div class="cart-hover-wrapper">
-        <button class="cart-btn" id="cartHoverBtn" onclick="navigateTo('cart-page'); return false;">
-            🛒 Cart <span id="cartCount" class="cart-badge">0</span>
-        </button>
-        <div class="cart-hover-dropdown" id="cartHoverDropdown">
-            <!-- Will be populated by JavaScript -->
-            <div class="cart-hover-loading">Loading cart...</div>
-        </div>
-    </div>
-</div>
+            <div class="nav-actions" id="cartHoverContainer">
+                <a href="#" class="login-link" onclick="openLoginModal(); return false;">Log in</a>
+                <div class="cart-hover-wrapper">
+                    <button class="cart-btn" id="cartHoverBtn" onclick="navigateTo('cart-page'); return false;">
+                        🛒 Cart <span id="cartCount" class="cart-badge">0</span>
+                    </button>
+                    <div class="cart-hover-dropdown" id="cartHoverDropdown">
+                        <div class="cart-hover-loading">Loading cart...</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -172,7 +171,6 @@
 
                 <!-- Cart Items Container -->
                 <div id="cartItemsContainer" class="cart-items-container">
-                    <!-- Will be populated by JavaScript -->
                     <div class="cart-loading">Loading cart items...</div>
                 </div>
 
@@ -542,7 +540,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Standard Sizes - Button Style (CUSTOM SIZE INPUTS REMOVED FROM HERE) -->
+                                    <!-- Standard Sizes - Button Style -->
                                     <div class="advanced-section">
                                         <h5>Size</h5>
                                         <div class="advanced-sizes-grid">
@@ -577,7 +575,7 @@
                                             </label>
                                         </div>
                                         
-                                        <!-- CUSTOM SIZE INPUTS - Hidden by default, appears when Custom is selected -->
+                                        <!-- CUSTOM SIZE INPUTS -->
                                         <div id="customSizeContainer" style="display: none; margin-top: 1rem;">
                                             <div class="custom-size-row">
                                                 <input type="number" id="customWidth" class="custom-size-input" min="1" max="100" value="8" placeholder="W">
@@ -628,9 +626,6 @@
                                     <span class="cart-icon">🛒</span>
                                     Add to Cart - <span id="finalPrice">₱25.00</span>
                                 </button>
-
-                                <!-- ============== REMOVED COMPLETE ORDER BUTTON FROM EDITOR ============== -->
-                                <!-- Now moved to cart page -->
                             </div>
                         </div>
                     </div>
@@ -990,7 +985,7 @@
         </div>
     </div>
 
-    <!-- Cart Modal (keeping for backward compatibility) -->
+    <!-- Cart Modal -->
     <div id="cartModal" class="modal">
         <div class="modal-content cart-modal">
             <span class="close-modal" onclick="closeCartModal()">&times;</span>
@@ -1011,15 +1006,15 @@
         </div>
     </div>
 
-   <!-- Order Success Modal - UPDATED with new message and copy button -->
-<div id="orderSuccessModal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="document.getElementById('orderSuccessModal').style.display='none'">&times;</span>
-        <div class="modal-icon">📁</div>
-        <h3>Order Submitted Successfully!</h3>
-        <div id="orderSuccessMessage" style="text-align: left; margin: 1.5rem 0; line-height: 1.8; white-space: pre-line;"></div>
-        <div class="modal-actions">
-            <button class="modal-btn continue-btn" onclick="document.getElementById('orderSuccessModal').style.display='none'">OK</button>
+    <!-- Order Success Modal -->
+    <div id="orderSuccessModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="document.getElementById('orderSuccessModal').style.display='none'">&times;</span>
+            <div class="modal-icon">📁</div>
+            <h3>Order Submitted Successfully!</h3>
+            <div id="orderSuccessMessage" style="text-align: left; margin: 1.5rem 0; line-height: 1.8; white-space: pre-line;"></div>
+            <div class="modal-actions">
+                <button class="modal-btn continue-btn" onclick="document.getElementById('orderSuccessModal').style.display='none'">OK</button>
             </div>
         </div>
     </div>
@@ -1139,4 +1134,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
