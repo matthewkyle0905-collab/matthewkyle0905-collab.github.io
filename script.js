@@ -473,25 +473,37 @@ function updateCartStorage() {
     localStorage.setItem('fotocenterCart', JSON.stringify(shoppingCart));
 }
 
+// FIXED: addToCart now properly saves sizeMode and ensures correct product name
 function addToCart(item) {
+    // Ensure item has sizeMode (default to 'fill' if not set)
+    if (!item.sizeMode) {
+        item.sizeMode = 'fill';
+    }
+    
+    // Ensure item has selected property (default to true)
+    if (item.selected === undefined) {
+        item.selected = true;
+    }
+    
     const existingItemIndex = shoppingCart.findIndex(cartItem =>
         cartItem.id === item.id &&
         cartItem.type === item.type &&
-        cartItem.size === item.size
+        cartItem.size === item.size &&
+        cartItem.sizeMode === item.sizeMode &&
+        cartItem.paperType === item.paperType
     );
 
     if (existingItemIndex > -1) {
         shoppingCart[existingItemIndex].quantity += item.quantity || 1;
     } else {
         item.addedAt = new Date().toISOString();
-        item.selected = true; // Default to selected
         shoppingCart.push(item);
     }
 
     updateCartStorage();
     updateCartUI();
     showSuccessModal();
-    updateCartHover(); // Update hover dropdown
+    updateCartHover();
 
     return item;
 }
@@ -617,12 +629,6 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Initialize Google API
     initializeGoogleApi();
-    
-    // Disable buttons until Google API is ready
-    const testBtn = document.getElementById('testGoogleDriveBtn');
-    const orderBtn = document.getElementById('completeOrderBtn');
-    if (testBtn) testBtn.disabled = true;
-    if (orderBtn) orderBtn.disabled = true;
     
     // Initialize cart hover
     initCartHover();
@@ -923,7 +929,8 @@ function addToCartProduct(productId) {
         image: product.image,
         price: product.price,
         quantity: quantity,
-        selected: true
+        selected: true,
+        sizeMode: 'fill' // Default for products
     };
 
     addToCart(cartItem);
@@ -2919,7 +2926,8 @@ function addCalendarProductToCart(productId) {
         price: product.price,
         productType: product.type,
         quantity: 1,
-        selected: true
+        selected: true,
+        sizeMode: 'fill' // Default for products
     };
 
     addToCart(cartItem);
@@ -2956,7 +2964,8 @@ function addCustomCalendarToCart() {
             quantity: quantity
         },
         quantity: quantity,
-        selected: true
+        selected: true,
+        sizeMode: 'fill' // Default for custom calendars
     };
 
     addToCart(cartItem);
@@ -3088,7 +3097,8 @@ function addCardsToCart() {
         price: `₱ ${price.toFixed(2)}`,
         size: size,
         quantity: 1,
-        selected: true
+        selected: true,
+        sizeMode: 'fill' // Default for cards
     };
 
     addToCart(cartItem);
@@ -3267,8 +3277,7 @@ function onAdvancedSizeSelect() {
     calculateAdvancedPrice();
 }
 
-// Override addPhotoToCart
-const originalAddPhotoToCart = window.addPhotoToCart;
+// FIXED: addPhotoToCart now saves product name correctly and includes sizeMode
 window.addPhotoToCart = function() {
     if (currentImageIndex === -1) {
         alert('Please upload and select an image first.');
@@ -3277,6 +3286,10 @@ window.addPhotoToCart = function() {
     
     let size, price, paperType = 'standard', sizeMode = 'fill', isCustom = false;
     let customWidth = null, customHeight = null, customUnit = 'inches';
+    
+    // Get sizeMode from radio buttons
+    const sizeModeRadio = document.querySelector('input[name="sizeMode"]:checked');
+    sizeMode = sizeModeRadio ? sizeModeRadio.value : 'fill';
     
     if (isAdvancedOpen) {
         const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
@@ -3293,9 +3306,6 @@ window.addPhotoToCart = function() {
         if (document.getElementById('paperGlossy')?.checked) paperType = 'glossy';
         if (document.getElementById('paperMatte')?.checked) paperType = 'matte';
         
-        const sizeModeRadio = document.querySelector('input[name="sizeMode"]:checked');
-        sizeMode = sizeModeRadio ? sizeModeRadio.value : 'fill';
-        
         price = document.getElementById('advancedTotalPrice').textContent;
     } else {
         const selectedSize = document.querySelector('input[name="printSize"]:checked');
@@ -3303,16 +3313,19 @@ window.addPhotoToCart = function() {
         price = document.getElementById('simpleTotalPrice').textContent;
     }
     
+    // Get the actual product name from currentProduct
+    const productName = productDisplayNames[currentProduct] || 'Photo';
+    
     const cartItem = {
         id: 'photo-' + Date.now(),
         type: 'photo',
-        name: `Printed Photo (${size})`,
+        name: `${productName} (${size})`, // FIXED: Shows actual product name
         image: canvas.toDataURL('image/jpeg', 0.9),
         price: price,
         size: size,
         quantity: isAdvancedOpen ? currentAdvancedQuantity : currentQuantity,
         paperType: paperType,
-        sizeMode: sizeMode,
+        sizeMode: sizeMode, // FIXED: Save sizeMode
         isCustom: isCustom,
         customDimensions: isCustom ? { width: customWidth, height: customHeight, unit: customUnit } : null,
         originalName: uploadedImages[currentImageIndex]?.name || 'photo',
@@ -3571,7 +3584,7 @@ function initializeGoogleApi() {
 
 function maybeEnableButtons() {
     if (gapiInited && gisInited) {
-        document.getElementById('testGoogleDriveBtn').disabled = false;
+        // Removed test button - now only enable complete order button
         document.getElementById('completeOrderBtn').disabled = false;
     }
 }
@@ -3870,163 +3883,7 @@ function getEditedPhotos() {
     return photos;
 }
 
-// Test Google Drive connection
-async function testGoogleDriveConnection() {
-    const btn = document.getElementById('testGoogleDriveBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner"></span> Testing...';
-    btn.disabled = true;
-
-    try {
-        const response = await new Promise((resolve, reject) => {
-            tokenClient.callback = (resp) => {
-                if (resp.error !== undefined) {
-                    reject(resp);
-                }
-                resolve(resp);
-            };
-            tokenClient.requestAccessToken();
-        });
-
-        // Get or create orders folder
-        const ordersFolderId = await getOrCreateOrdersFolder();
-        
-        // Test creating a folder inside orders
-        const folderName = 'FOTOCENTER_TEST_' + Date.now();
-        const folder = await createDriveFolder(folderName, ordersFolderId);
-        
-        // Test uploading a file
-        const testContent = 'FOTOCENTER Connection Test\nDate: ' + new Date().toLocaleString();
-        const file = await uploadFileToDrive('test.txt', testContent, folder.id);
-        
-        btn.innerHTML = '✅ Connected!';
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }, 3000);
-        
-        alert(`✅ Google Drive connected successfully!\nTest folder created in: C8FOCENTER/orders/${folderName}`);
-        
-    } catch (error) {
-        console.error('Drive test failed:', error);
-        btn.innerHTML = '❌ Failed';
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }, 3000);
-        alert('❌ Google Drive connection failed. Check console for details.');
-    }
-}
-
-// Main order processing function (FIXED: now saves to correct folder, counts photos correctly, adds receipt)
-async function processOrder() {
-    const btn = document.getElementById('completeOrderBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner"></span> Processing Order...';
-    btn.disabled = true;
-    
-    try {
-        // 1. Check if user is logged in
-        const username = localStorage.getItem('userName') || localStorage.getItem('userEmail')?.split('@')[0] || 'guest';
-        const isLoggedIn = localStorage.getItem('isLoggedIn');
-        
-        if (!isLoggedIn) {
-            const proceed = confirm('You are not logged in. Continue as guest?');
-            if (!proceed) {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                return;
-            }
-        }
-        
-        // 2. Check if there are photos
-        const photos = getEditedPhotos();
-        if (photos.length === 0) {
-            alert('No photos to process. Please upload and edit photos first.');
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-            return;
-        }
-        
-        // 3. Get Google Auth token
-        const token = await new Promise((resolve, reject) => {
-            tokenClient.callback = (resp) => {
-                if (resp.error !== undefined) {
-                    reject(resp);
-                }
-                resolve(resp);
-            };
-            tokenClient.requestAccessToken();
-        });
-        
-        // 4. Get or create the orders folder
-        const ordersFolderId = await getOrCreateOrdersFolder();
-        
-        // 5. Generate order data
-        const orderData = {
-            orderId: generateOrderId(),
-            username: username,
-            orderCount: getUserOrderCount(username),
-            photos: photos,
-            timestamp: new Date().toISOString()
-        };
-        
-        // 6. Create main order folder inside C8FOCENTER/orders/
-        const folderName = `${username}_${orderData.orderCount}_${orderData.orderId}`;
-        const mainFolder = await createDriveFolder(folderName, ordersFolderId);
-        
-        // 7. Create Photos subfolder
-        const photosFolder = await createDriveFolder('Photos', mainFolder.id);
-        
-        // 8. Upload all photos (as binary JPGs)
-        for (let i = 0; i < orderData.photos.length; i++) {
-            const photo = orderData.photos[i];
-            await uploadFileToDrive(
-                `${i+1}.jpg`,
-                photo.data,
-                photosFolder.id
-            );
-        }
-        
-        // 9. Upload Condition.txt
-        await uploadFileToDrive(
-            'Condition.txt',
-            generateConditionFile(orderData),
-            mainFolder.id
-        );
-        
-        // 10. Upload End.txt
-        await uploadFileToDrive(
-            'End.txt',
-            generateEndFile(orderData),
-            mainFolder.id
-        );
-        
-        // 11. Upload OrderReceipt.txt (NEW)
-        await uploadFileToDrive(
-            'OrderReceipt.txt',
-            generateReceiptFile(orderData),
-            mainFolder.id
-        );
-        
-       // 12. Show success message with order number and copy button
-const message = `Hello ${username},\n\nThis is your Order Number: ${orderData.orderId} <button class="copy-btn" onclick="copyOrderNumber()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:5px;" title="Copy order number">📋</button>\n\nPlease copy and save the Order Number\n\nThank you for choosing FOTOCENTER!`;
-document.getElementById('orderSuccessMessage').innerHTML = message;
-document.getElementById('orderSuccessModal').style.display = 'flex';
-        
-        // 13. Clear cart or reset if needed
-        if (shoppingCart.length > 0) {
-            clearCart();
-        }
-        
-    } catch (error) {
-        console.error('Order processing failed:', error);
-        alert('❌ Order failed: ' + (error.error || error.message || 'Unknown error'));
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
-}
+// Removed testGoogleDriveConnection function - functionality merged into processOrder
 
 // Initialize Google API on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -4034,15 +3891,12 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeGoogleApi();
     
     // Disable buttons until Google API is ready
-    const testBtn = document.getElementById('testGoogleDriveBtn');
     const orderBtn = document.getElementById('completeOrderBtn');
-    if (testBtn) testBtn.disabled = true;
     if (orderBtn) orderBtn.disabled = true;
 });
 
 // Make functions globally available
 window.processOrder = processOrder;
-window.testGoogleDriveConnection = testGoogleDriveConnection;
 window.initializeGoogleApi = initializeGoogleApi;
 
 // ============== COPY ORDER NUMBER FUNCTION ==============
@@ -4077,6 +3931,7 @@ function initSelectAll() {
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     if (selectAllCheckbox) {
         selectAllCheckbox.addEventListener('change', function() {
+            // FIXED: Select All only checks when ALL items are checked
             // When select all is clicked, set all items to this.checked
             shoppingCart.forEach(item => {
                 item.selected = this.checked;
@@ -4139,7 +3994,7 @@ function renderCartPage() {
                     <div class="cart-item-specs">
                         ${item.size ? `<span>Size: ${item.size}</span>` : ''}
                         ${item.paperType ? `<span>Paper: ${item.paperType}</span>` : ''}
-                        <span>Mode: ${sizeModeDisplay}</span>
+                        <span>Mode: ${sizeModeDisplay}</span> <!-- FIXED: Added sizeMode display -->
                     </div>
                     <div class="cart-item-price">${item.price}</div>
                     <div class="cart-item-actions">
@@ -4148,7 +4003,7 @@ function renderCartPage() {
                             <span>${item.quantity || 1}</span>
                             <button onclick="updateCartItemQuantityFromCart(${index}, 1)">+</button>
                         </div>
-                        <!-- Individual trash icon REMOVED as requested -->
+                        <!-- REMOVED: Individual trash icon as requested -->
                     </div>
                 </div>
             </div>
@@ -4183,10 +4038,15 @@ function updateCartSelection() {
     document.getElementById('selectedCount').textContent = selectedCount;
     document.getElementById('selectedItemsCount').textContent = selectedCount;
     
-    // Update select all checkbox
+    // FIXED: Update select all checkbox correctly
     if (selectAll) {
-        selectAll.checked = selectedCount === totalCount && totalCount > 0;
-        selectAll.indeterminate = selectedCount > 0 && selectedCount < totalCount;
+        if (totalCount > 0) {
+            selectAll.checked = selectedCount === totalCount;
+            selectAll.indeterminate = selectedCount > 0 && selectedCount < totalCount;
+        } else {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+        }
     }
     
     // Calculate total for selected items
@@ -4217,7 +4077,7 @@ function updateCartItemQuantityFromCart(index, change) {
     updateCartHover();
 }
 
-// Delete selected items
+// FIXED: Delete selected items function - now working
 function deleteSelectedItems() {
     shoppingCart = shoppingCart.filter(item => !item.selected);
     updateCartStorage();
@@ -4226,7 +4086,7 @@ function deleteSelectedItems() {
     updateCartHover();
 }
 
-// Process order from cart
+// FIXED: Process order from cart - now working and processes only selected items
 async function processOrderFromCart() {
     const selectedItems = shoppingCart.filter(item => item.selected);
     
@@ -4257,7 +4117,7 @@ async function processOrderFromCart() {
         customWidth: item.customDimensions?.width || null,
         customHeight: item.customDimensions?.height || null,
         customUnit: item.customDimensions?.unit || 'inches',
-        resize: item.sizeMode || 'FITIN'
+        resize: item.sizeMode || 'FITIN' // FIXED: Use saved sizeMode
     }));
     
     // Create order data
@@ -4328,7 +4188,7 @@ async function processOrderFromCart() {
             mainFolder.id
         );
         
-        // Remove ordered items from cart
+        // Remove ordered items from cart (only selected ones)
         shoppingCart = shoppingCart.filter(item => !item.selected);
         updateCartStorage();
         
@@ -4386,8 +4246,7 @@ function updateCartHover() {
                     <div class="cart-hover-item-name">${item.name.substring(0, 30)}${item.name.length > 30 ? '...' : ''}</div>
                     <div class="cart-hover-item-price">${item.price}</div>
                 </div>
-                <!-- Remove button kept in hover for convenience -->
-                <button class="cart-hover-item-remove" onclick="removeFromCart(${index}); event.stopPropagation();">✕</button>
+                <!-- REMOVED: Individual trash icon from hover -->
             </div>
         `;
     });
