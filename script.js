@@ -4307,52 +4307,46 @@ async function processOrderFromCart() {
     // Multi-photo product types
     const multiPhotoTypes = ['calendar', 'photobook', 'doublecards'];
     
-    // Convert cart items to photo format for order processing
     const photos = [];
-    let photoCounter = 1;
+let photoCounter = 1;
+
+selectedItems.forEach((item, itemIndex) => {
+    const productType = item.productType || item.type;
+    const isMultiPhoto = multiPhotoTypes.includes(productType);
     
-    selectedItems.forEach((item, itemIndex) => {
-        const productType = item.productType || item.type;
-        const isMultiPhoto = multiPhotoTypes.includes(productType);
+    if (isMultiPhoto && item.photos && item.photos.length > 0) {
+        // MULTI-PHOTO PRODUCT
+        console.log(`📸 Processing ${item.productName} with ${item.photos.length} photos`);
         
-        if (isMultiPhoto && item.photos && item.photos.length > 0) {
-    item.photos.forEach((photo, photoIndex) => {
-        // Get image data from thumbnail
-        let imageData = photo.thumbnail || '';
-        if (imageData && imageData.includes(',')) {
-            imageData = imageData.split(',')[1];
-        }
-        
-        photos.push({
-            originalName: photo.name || `Photo_${photoIndex + 1}.jpg`,
-            filename: `${photoCounter}.jpg`,
-            data: imageData,  // ✅ Using thumbnail data
-            size: item.size || '4x6',
-            quantity: 1,
-            price: item.basePrice || parseFloat(item.price.toString().replace('₱', '')) / item.photos.length,
-            paperType: item.paperType || 'standard',
-            isCustom: item.isCustom || false,
-            customWidth: item.customDimensions?.width || null,
-            customHeight: item.customDimensions?.height || null,
-            customUnit: item.customDimensions?.unit || 'inches',
-            resize: item.sizeMode || 'FITIN',
-            productType: productType,
-            productName: item.productName
-        });
-        photoCounter++;
-    });
-}
-        } else {
-            // ❌ SINGLE PHOTO PRODUCT: Upload just one
-            console.log(`🖼️ Processing ${item.name} as single photo product`);
+        item.photos.forEach((photo, photoIndex) => {
+            // Handle BOTH old and new formats
+            let imageData = '';
+            
+            // Check if photo has data field (old format)
+            if (photo.data) {
+                imageData = photo.data;
+            } 
+            // Check if photo has thumbnail field (new format)
+            else if (photo.thumbnail) {
+                imageData = photo.thumbnail;
+            }
+            // Check if photo is directly a string
+            else if (typeof photo === 'string') {
+                imageData = photo;
+            }
+            
+            // Extract base64 if needed (split at comma)
+            if (imageData && imageData.includes(',')) {
+                imageData = imageData.split(',')[1];
+            }
             
             photos.push({
-                originalName: item.originalName || item.name || `item_${itemIndex + 1}.jpg`,
+                originalName: photo.name || `Photo_${photoIndex + 1}.jpg`,
                 filename: `${photoCounter}.jpg`,
-                data: (item.displayImage || item.image).split(',')[1] || item.image,
+                data: imageData,
                 size: item.size || '4x6',
-                quantity: item.quantity || 1,
-                price: parseFloat(item.price.toString().replace('₱', '').replace(',', '')) / (item.quantity || 1),
+                quantity: 1,
+                price: item.basePrice || parseFloat(item.price.toString().replace('₱', '')) / item.photos.length,
                 paperType: item.paperType || 'standard',
                 isCustom: item.isCustom || false,
                 customWidth: item.customDimensions?.width || null,
@@ -4360,11 +4354,56 @@ async function processOrderFromCart() {
                 customUnit: item.customDimensions?.unit || 'inches',
                 resize: item.sizeMode || 'FITIN',
                 productType: productType,
-                productName: item.productName || item.name
+                productName: item.productName
             });
             photoCounter++;
+        });
+    } else {
+        // SINGLE PHOTO PRODUCT
+        console.log(`🖼️ Processing ${item.name} as single photo product`);
+        
+        // Handle BOTH old and new formats for single items
+        let imageSource = '';
+        
+        if (item.displayImage) {
+            imageSource = item.displayImage;
+        } else if (item.image) {
+            imageSource = item.image;
+        } else if (item.photos && item.photos[0]) {
+            // Maybe it's a multi-photo item with one photo
+            const firstPhoto = item.photos[0];
+            imageSource = firstPhoto.data || firstPhoto.thumbnail || firstPhoto;
         }
-    });
+        
+        // Extract base64 if needed
+        let imageData = '';
+        if (imageSource && typeof imageSource === 'string') {
+            if (imageSource.includes(',')) {
+                imageData = imageSource.split(',')[1];
+            } else {
+                imageData = imageSource;
+            }
+        }
+        
+        photos.push({
+            originalName: item.originalName || item.name || `item_${itemIndex + 1}.jpg`,
+            filename: `${photoCounter}.jpg`,
+            data: imageData,
+            size: item.size || '4x6',
+            quantity: item.quantity || 1,
+            price: parseFloat(item.price.toString().replace('₱', '').replace(',', '')) / (item.quantity || 1),
+            paperType: item.paperType || 'standard',
+            isCustom: item.isCustom || false,
+            customWidth: item.customDimensions?.width || null,
+            customHeight: item.customDimensions?.height || null,
+            customUnit: item.customDimensions?.unit || 'inches',
+            resize: item.sizeMode || 'FITIN',
+            productType: productType,
+            productName: item.productName || item.name
+        });
+        photoCounter++;
+    }
+});
     
     console.log(`📦 Total photos to upload: ${photos.length}`);
     
@@ -4541,5 +4580,6 @@ window.closePhotoPreview = closePhotoPreview;
 window.prevPreviewPhoto = prevPreviewPhoto;
 window.nextPreviewPhoto = nextPreviewPhoto;
 window.jumpToPreviewPhoto = jumpToPreviewPhoto;
+
 
 
