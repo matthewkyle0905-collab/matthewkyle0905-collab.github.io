@@ -193,7 +193,7 @@ const printOptionsConfig = {
 let currentProduct = 'photocards'; // Default product
 let templateImage = null;
 const templates = {
-    calendar: null,  // REMOVED template - now works like other products
+    calendar: null,
     photocards: null,
     photobook: null,
     canvas: null,
@@ -941,12 +941,16 @@ function addToCartProduct(productId) {
     const cartItem = {
         id: productId,
         type: 'product',
+        productType: product.name.toLowerCase().replace(' ', ''),
+        productName: product.name,
         name: product.name,
         image: product.image,
         price: product.price,
         quantity: quantity,
         selected: true,
-        sizeMode: 'fill' // Default for products
+        sizeMode: 'fill',
+        photoCount: 1,
+        photos: [{ data: product.image, name: product.name }]
     };
 
     addToCart(cartItem);
@@ -1643,7 +1647,7 @@ function drawImage() {
             ctx.restore();
         }
 
-        drawWatermark();
+        // WATERMARK REMOVED
 
         if (cropTool.active) {
             console.log('✂️ Crop active, updating handles');
@@ -1654,23 +1658,6 @@ function drawImage() {
     };
 
     img.src = image.original;
-}
-
-// Add watermark function
-function drawWatermark() {
-    try {
-        ctx.save();
-        const text = 'FOTOCENTER';
-        const fontSize = Math.max(12, Math.round(canvas.width / 40));
-        ctx.font = `${fontSize}px Arial`;
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.textBaseline = 'bottom';
-        ctx.textAlign = 'right';
-        ctx.fillText(text, canvas.width - 10, canvas.height - 10);
-        ctx.restore();
-    } catch (e) {
-        // ignore watermark errors
-    }
 }
 
 // ============== DROPDOWN MENU FUNCTIONS ==============
@@ -2937,13 +2924,17 @@ function addCalendarProductToCart(productId) {
     const cartItem = {
         id: productId,
         type: 'calendar',
+        productType: 'calendar',
+        productName: product.name,
         name: product.name,
         image: product.image,
         price: product.price,
         productType: product.type,
         quantity: 1,
         selected: true,
-        sizeMode: 'fill' // Default for products
+        sizeMode: 'fill',
+        photoCount: 1,
+        photos: [{ data: product.image, name: product.name }]
     };
 
     addToCart(cartItem);
@@ -2967,21 +2958,21 @@ function addCustomCalendarToCart() {
     const cartItem = {
         id: 'custom-calendar-' + Date.now(),
         type: 'custom-calendar',
+        productType: 'calendar',
+        productName: `Custom ${getCalendarTypeName(calendarType)}`,
         name: `Custom ${getCalendarTypeName(calendarType)} (${size})`,
-        image: calendarImages.length > 0 ? calendarImages[0].src : 'https://via.placeholder.com/300x200?text=Custom+Calendar',
+        displayImage: calendarImages[0]?.src,
         price: `₱ ${totalPrice.toFixed(2)}`,
-        details: {
-            type: calendarType,
-            size: size,
-            paper: paperType,
-            binding: bindingType,
-            startMonth: startMonth,
-            photoCount: calendarImages.length,
-            quantity: quantity
-        },
+        size: size,
+        paperType: paperType,
+        sizeMode: 'fill',
+        photoCount: calendarImages.length,
+        photos: calendarImages.map(img => ({
+            data: img.src,
+            name: img.name
+        })),
         quantity: quantity,
-        selected: true,
-        sizeMode: 'fill' // Default for custom calendars
+        selected: true
     };
 
     addToCart(cartItem);
@@ -3108,13 +3099,17 @@ function addCardsToCart() {
     const cartItem = {
         id: 'card-' + Date.now(),
         type: 'card',
+        productType: 'photocards',
+        productName: 'Photo Card',
         name: `Photo Card (${size})`,
         image: 'https://via.placeholder.com/200x150?text=Photo+Card',
         price: `₱ ${price.toFixed(2)}`,
         size: size,
         quantity: 1,
         selected: true,
-        sizeMode: 'fill' // Default for cards
+        sizeMode: 'fill',
+        photoCount: 1,
+        photos: [{ data: 'https://via.placeholder.com/200x150?text=Photo+Card', name: 'Photo Card' }]
     };
 
     addToCart(cartItem);
@@ -3293,13 +3288,14 @@ function onAdvancedSizeSelect() {
     calculateAdvancedPrice();
 }
 
-// FIXED: addPhotoToCart now saves product name correctly and includes sizeMode
+// FIXED: addPhotoToCart now saves ALL uploaded photos and resets editor
 window.addPhotoToCart = function() {
-    if (currentImageIndex === -1) {
-        alert('Please upload and select an image first.');
+    if (uploadedImages.length === 0) {
+        alert('Please upload at least one photo first.');
         return;
     }
     
+    // Get print options
     let size, price, paperType = 'standard', sizeMode = 'fill', isCustom = false;
     let customWidth = null, customHeight = null, customUnit = 'inches';
     
@@ -3332,24 +3328,78 @@ window.addPhotoToCart = function() {
     // Get the actual product name from currentProduct
     const productName = productDisplayNames[currentProduct] || 'Photo';
     
+    // Prepare ALL photos data
+    const photosData = uploadedImages.map(img => ({
+        data: img.original,
+        name: img.name,
+        adjustments: img.adjustments,
+        filter: img.filter,
+        thumbnail: img.src
+    }));
+    
+    // Calculate total price (base price × photo count)
+    const basePrice = parseFloat(price.toString().replace('₱', '')) || 0;
+    const totalPrice = basePrice * uploadedImages.length;
+    
+    // Create cart item with ALL photos
     const cartItem = {
         id: 'photo-' + Date.now(),
         type: 'photo',
-        name: `${productName} (${size})`, // FIXED: Shows actual product name
-        image: canvas.toDataURL('image/jpeg', 0.9),
-        price: price,
+        productType: currentProduct,
+        productName: productName,
+        name: `${productName} (${size}) - ${uploadedImages.length} photos`,
         size: size,
-        quantity: isAdvancedOpen ? currentAdvancedQuantity : currentQuantity,
+        
+        // Store ALL photos
+        photos: photosData,
+        photoCount: uploadedImages.length,
+        
+        // Display image (first photo with badge)
+        displayImage: uploadedImages[0]?.original || null,
+        
+        price: `₱${totalPrice.toFixed(2)}`,
+        basePrice: basePrice,
+        quantity: 1,
         paperType: paperType,
-        sizeMode: sizeMode, // FIXED: Save sizeMode
+        sizeMode: sizeMode,
         isCustom: isCustom,
         customDimensions: isCustom ? { width: customWidth, height: customHeight, unit: customUnit } : null,
-        originalName: uploadedImages[currentImageIndex]?.name || 'photo',
+        originalName: uploadedImages[0]?.name || 'photo',
         timestamp: new Date().toISOString(),
         selected: true
     };
     
+    // Add to cart
     addToCart(cartItem);
+    
+    // ============== RESET EDITOR ==============
+    // Clear all uploaded images
+    uploadedImages = [];
+    currentImageIndex = -1;
+    
+    // Clear gallery
+    updateImageGallery();
+    
+    // Reset canvas
+    const canvas = document.getElementById('photoCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Show upload overlay
+    const overlay = document.getElementById('canvasOverlay');
+    if (overlay) overlay.style.display = 'block';
+    
+    // Reset upload count
+    document.getElementById('uploadCount').textContent = '0';
+    
+    // Reset print options to default
+    currentQuantity = 1;
+    currentAdvancedQuantity = 1;
+    document.getElementById('quantityDisplay').textContent = '1';
+    document.getElementById('advancedQuantityDisplay').textContent = '1';
+    updateSimpleTotal();
+    
+    console.log('✨ Editor reset complete! Ready for next order');
 };
 
 // Initialize print options
@@ -3958,7 +4008,7 @@ function initSelectAll() {
     }
 }
 
-// Render cart page items
+// Render cart page items with photo count badge and clickable preview
 function renderCartPage() {
     const container = document.getElementById('cartItemsContainer');
     if (!container) return;
@@ -3997,20 +4047,31 @@ function renderCartPage() {
             sizeModeDisplay = 'Fill'; // Default
         }
         
+        // Check if this is a multi-photo item
+        const photoCount = item.photoCount || 1;
+        const hasMultiplePhotos = photoCount > 1;
+        const additionalPhotos = photoCount - 1;
+        
         html += `
             <div class="cart-item-card" data-index="${index}">
                 <div class="cart-item-checkbox">
                     <input type="checkbox" class="item-checkbox" data-index="${index}" ${item.selected ? 'checked' : ''}>
                 </div>
-                <div class="cart-item-image">
-                    <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100?text=Image'">
+                <div class="cart-item-image" onclick="showPhotoPreview(${index})" style="cursor: pointer; position: relative;">
+                    <img src="${item.displayImage || item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100?text=Image'">
+                    ${hasMultiplePhotos ? `
+                        <div style="position: absolute; bottom: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; padding: 2px 6px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                            +${additionalPhotos} more
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="cart-item-details">
-                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-name">${item.productName || item.name}</div>
                     <div class="cart-item-specs">
                         ${item.size ? `<span>Size: ${item.size}</span>` : ''}
                         ${item.paperType ? `<span>Paper: ${item.paperType}</span>` : ''}
-                        <span>Mode: ${sizeModeDisplay}</span> <!-- FIXED: Added sizeMode display -->
+                        <span>Mode: ${sizeModeDisplay}</span>
+                        ${hasMultiplePhotos ? `<span>📸 ${photoCount} photos</span>` : ''}
                     </div>
                     <div class="cart-item-price">${item.price}</div>
                     <div class="cart-item-actions">
@@ -4043,6 +4104,126 @@ function renderCartPage() {
     });
     
     updateCartSelection();
+}
+
+// ============== PHOTO PREVIEW MODAL ==============
+
+// Show photo preview modal for a cart item
+function showPhotoPreview(itemIndex) {
+    const item = shoppingCart[itemIndex];
+    
+    if (!item || !item.photos || item.photos.length === 0) {
+        alert('No photos to preview');
+        return;
+    }
+    
+    // Create modal if it doesn't exist
+    let previewModal = document.getElementById('photoPreviewModal');
+    if (!previewModal) {
+        previewModal = document.createElement('div');
+        previewModal.id = 'photoPreviewModal';
+        previewModal.className = 'modal';
+        previewModal.innerHTML = `
+            <div class="modal-content" style="max-width: 800px; width: 90%; background: white; border-radius: 12px; padding: 20px;">
+                <span class="close-modal" onclick="closePhotoPreview()">&times;</span>
+                <h3 style="margin-bottom: 20px; text-align: center;" id="previewModalTitle">Photo Preview</h3>
+                
+                <div style="position: relative; min-height: 400px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 8px; margin-bottom: 20px;">
+                    <button onclick="prevPreviewPhoto()" style="position: absolute; left: 10px; background: rgba(0,0,0,0.5); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; z-index: 10;">◀</button>
+                    
+                    <img id="previewMainImage" src="" alt="Preview" style="max-width: 100%; max-height: 500px; object-fit: contain; border-radius: 4px;">
+                    
+                    <button onclick="nextPreviewPhoto()" style="position: absolute; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; z-index: 10;">▶</button>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <span id="previewCounter" style="font-weight: 600; color: var(--accent);">1 / 1</span>
+                    <button onclick="closePhotoPreview()" style="background: var(--accent); color: white; border: none; padding: 8px 24px; border-radius: 4px; cursor: pointer; font-weight: 600;">Close</button>
+                </div>
+                
+                <div id="previewThumbnails" style="display: flex; gap: 10px; overflow-x: auto; padding: 10px 0;">
+                    <!-- Thumbnails will be added here -->
+                </div>
+            </div>
+        `;
+        document.body.appendChild(previewModal);
+    }
+    
+    // Store current preview state
+    window.currentPreviewItemIndex = itemIndex;
+    window.currentPreviewPhotoIndex = 0;
+    window.currentPreviewPhotos = item.photos;
+    
+    // Update modal title
+    document.getElementById('previewModalTitle').textContent = 
+        `${item.productName || 'Photo'} - ${item.photos.length} photos`;
+    
+    // Show first photo
+    updatePreviewMainImage();
+    
+    // Generate thumbnails
+    const thumbnailsContainer = document.getElementById('previewThumbnails');
+    thumbnailsContainer.innerHTML = item.photos.map((photo, idx) => `
+        <div onclick="jumpToPreviewPhoto(${idx})" style="cursor: pointer; border: ${idx === 0 ? '3px solid var(--accent)' : '2px solid transparent'}; border-radius: 4px; overflow: hidden; width: 60px; height: 60px; flex-shrink: 0;">
+            <img src="${photo.data || photo}" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+    `).join('');
+    
+    // Show modal
+    previewModal.style.display = 'flex';
+}
+
+// Update main preview image
+function updatePreviewMainImage() {
+    const photos = window.currentPreviewPhotos;
+    const index = window.currentPreviewPhotoIndex;
+    
+    if (!photos || photos.length === 0) return;
+    
+    const mainImage = document.getElementById('previewMainImage');
+    mainImage.src = photos[index].data || photos[index];
+    
+    // Update counter
+    document.getElementById('previewCounter').textContent = 
+        `${index + 1} / ${photos.length}`;
+    
+    // Update thumbnail borders
+    const thumbnails = document.querySelectorAll('#previewThumbnails div');
+    thumbnails.forEach((thumb, idx) => {
+        thumb.style.border = idx === index ? '3px solid var(--accent)' : '2px solid transparent';
+    });
+}
+
+// Navigate to previous photo
+function prevPreviewPhoto() {
+    if (window.currentPreviewPhotoIndex > 0) {
+        window.currentPreviewPhotoIndex--;
+        updatePreviewMainImage();
+    }
+}
+
+// Navigate to next photo
+function nextPreviewPhoto() {
+    if (window.currentPreviewPhotoIndex < window.currentPreviewPhotos.length - 1) {
+        window.currentPreviewPhotoIndex++;
+        updatePreviewMainImage();
+    }
+}
+
+// Jump to specific photo
+function jumpToPreviewPhoto(index) {
+    if (index >= 0 && index < window.currentPreviewPhotos.length) {
+        window.currentPreviewPhotoIndex = index;
+        updatePreviewMainImage();
+    }
+}
+
+// Close preview modal
+function closePhotoPreview() {
+    const modal = document.getElementById('photoPreviewModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 // Update cart selection UI
@@ -4107,7 +4288,7 @@ function deleteSelectedItems() {
     updateCartHover();
 }
 
-// FIXED: Process order from cart - now working and processes only selected items
+// FIXED: Process order from cart - handles multi-photo products
 async function processOrderFromCart() {
     const selectedItems = shoppingCart.filter(item => item.selected);
     
@@ -4125,21 +4306,65 @@ async function processOrderFromCart() {
         if (!proceed) return;
     }
     
+    // Multi-photo product types
+    const multiPhotoTypes = ['calendar', 'photobook', 'doublecards'];
+    
     // Convert cart items to photo format for order processing
-    const photos = selectedItems.map((item, index) => ({
-        originalName: item.name,
-        filename: `${index + 1}.jpg`,
-        data: item.image.split(',')[1] || item.image,
-        size: item.size || '4x6',
-        quantity: item.quantity || 1,
-        price: parseFloat(item.price.toString().replace('₱', '').replace(',', '')) || 0,
-        paperType: item.paperType || 'standard',
-        isCustom: item.isCustom || false,
-        customWidth: item.customDimensions?.width || null,
-        customHeight: item.customDimensions?.height || null,
-        customUnit: item.customDimensions?.unit || 'inches',
-        resize: item.sizeMode || 'FITIN' // FIXED: Use saved sizeMode
-    }));
+    const photos = [];
+    let photoCounter = 1;
+    
+    selectedItems.forEach((item, itemIndex) => {
+        const productType = item.productType || item.type;
+        const isMultiPhoto = multiPhotoTypes.includes(productType);
+        
+        if (isMultiPhoto && item.photos && item.photos.length > 0) {
+            // ✅ MULTI-PHOTO PRODUCT: Upload ALL photos
+            console.log(`📸 Processing ${item.productName} with ${item.photos.length} photos`);
+            
+            item.photos.forEach((photo, photoIndex) => {
+                photos.push({
+                    originalName: photo.name || `Photo_${photoIndex + 1}.jpg`,
+                    filename: `${photoCounter}.jpg`,
+                    data: photo.data.split(',')[1] || photo.data,
+                    size: item.size || '4x6',
+                    quantity: 1, // Each photo is one print
+                    price: item.basePrice || parseFloat(item.price.toString().replace('₱', '')) / item.photos.length,
+                    paperType: item.paperType || 'standard',
+                    isCustom: item.isCustom || false,
+                    customWidth: item.customDimensions?.width || null,
+                    customHeight: item.customDimensions?.height || null,
+                    customUnit: item.customDimensions?.unit || 'inches',
+                    resize: item.sizeMode || 'FITIN',
+                    productType: productType,
+                    productName: item.productName
+                });
+                photoCounter++;
+            });
+        } else {
+            // ❌ SINGLE PHOTO PRODUCT: Upload just one
+            console.log(`🖼️ Processing ${item.name} as single photo product`);
+            
+            photos.push({
+                originalName: item.originalName || item.name || `item_${itemIndex + 1}.jpg`,
+                filename: `${photoCounter}.jpg`,
+                data: (item.displayImage || item.image).split(',')[1] || item.image,
+                size: item.size || '4x6',
+                quantity: item.quantity || 1,
+                price: parseFloat(item.price.toString().replace('₱', '').replace(',', '')) / (item.quantity || 1),
+                paperType: item.paperType || 'standard',
+                isCustom: item.isCustom || false,
+                customWidth: item.customDimensions?.width || null,
+                customHeight: item.customDimensions?.height || null,
+                customUnit: item.customDimensions?.unit || 'inches',
+                resize: item.sizeMode || 'FITIN',
+                productType: productType,
+                productName: item.productName || item.name
+            });
+            photoCounter++;
+        }
+    });
+    
+    console.log(`📦 Total photos to upload: ${photos.length}`);
     
     // Create order data
     const orderData = {
@@ -4213,8 +4438,8 @@ async function processOrderFromCart() {
         shoppingCart = shoppingCart.filter(item => !item.selected);
         updateCartStorage();
         
-        // Show success message
-        const message = `Hello ${username},\n\nThis is your Order Number: ${orderData.orderId} <button class="copy-btn" onclick="copyOrderNumber()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:5px;" title="Copy order number">📋</button>\n\nPlease copy and save the Order Number\n\nThank you for choosing FOTOCENTER!`;
+        // Show success message with photo count
+        const message = `Hello ${username},\n\nThis is your Order Number: ${orderData.orderId} <button class="copy-btn" onclick="copyOrderNumber()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:5px;" title="Copy order number">📋</button>\n\nTotal Photos: ${photos.length}\n\nPlease copy and save the Order Number\n\nThank you for choosing FOTOCENTER!`;
         document.getElementById('orderSuccessMessage').innerHTML = message;
         document.getElementById('orderSuccessModal').style.display = 'flex';
         
@@ -4261,10 +4486,10 @@ function updateCartHover() {
         itemsHtml += `
             <div class="cart-hover-item">
                 <div class="cart-hover-item-image">
-                    <img src="${item.image}" alt="${item.name}">
+                    <img src="${item.displayImage || item.image}" alt="${item.name}">
                 </div>
                 <div class="cart-hover-item-details">
-                    <div class="cart-hover-item-name">${item.name.substring(0, 30)}${item.name.length > 30 ? '...' : ''}</div>
+                    <div class="cart-hover-item-name">${item.productName || item.name} ${item.photoCount > 1 ? `(${item.photoCount} photos)` : ''}</div>
                     <div class="cart-hover-item-price">${item.price}</div>
                 </div>
                 <!-- REMOVED: Individual trash icon from hover -->
@@ -4309,3 +4534,8 @@ window.deleteSelectedItems = deleteSelectedItems;
 window.forceCartUpdate = forceCartUpdate;
 window.updateCartHover = updateCartHover;
 window.selectAllItems = selectAllItems;
+window.showPhotoPreview = showPhotoPreview;
+window.closePhotoPreview = closePhotoPreview;
+window.prevPreviewPhoto = prevPreviewPhoto;
+window.nextPreviewPhoto = nextPreviewPhoto;
+window.jumpToPreviewPhoto = jumpToPreviewPhoto;
