@@ -3288,7 +3288,7 @@ function onAdvancedSizeSelect() {
     calculateAdvancedPrice();
 }
 
-// FIXED: addPhotoToCart now saves ALL uploaded photos and resets editor
+// FIXED: addPhotoToCart now saves ONLY THUMBNAILS to localStorage
 window.addPhotoToCart = function() {
     if (uploadedImages.length === 0) {
         alert('Please upload at least one photo first.');
@@ -3328,20 +3328,18 @@ window.addPhotoToCart = function() {
     // Get the actual product name from currentProduct
     const productName = productDisplayNames[currentProduct] || 'Photo';
     
-    // Prepare ALL photos data
+    // ✅ FIX: Store ONLY thumbnails (already small from gallery)
     const photosData = uploadedImages.map(img => ({
-        data: img.original,
         name: img.name,
-        adjustments: img.adjustments,
-        filter: img.filter,
-        thumbnail: img.src
+        thumbnail: img.src, // This is the small 100x100 thumbnail!
+        // NO full image data stored!
     }));
     
     // Calculate total price (base price × photo count)
     const basePrice = parseFloat(price.toString().replace('₱', '')) || 0;
     const totalPrice = basePrice * uploadedImages.length;
     
-    // Create cart item with ALL photos
+    // Create cart item with ONLY thumbnail data
     const cartItem = {
         id: 'photo-' + Date.now(),
         type: 'photo',
@@ -3350,12 +3348,12 @@ window.addPhotoToCart = function() {
         name: `${productName} (${size}) - ${uploadedImages.length} photos`,
         size: size,
         
-        // Store ALL photos
+        // Store ONLY thumbnails (tiny!)
         photos: photosData,
         photoCount: uploadedImages.length,
         
-        // Display image (first photo with badge)
-        displayImage: uploadedImages[0]?.original || null,
+        // Display image (first photo thumbnail)
+        displayImage: uploadedImages[0]?.src || null,
         
         price: `₱${totalPrice.toFixed(2)}`,
         basePrice: basePrice,
@@ -3399,7 +3397,7 @@ window.addPhotoToCart = function() {
     document.getElementById('advancedQuantityDisplay').textContent = '1';
     updateSimpleTotal();
     
-    console.log('✨ Editor reset complete! Ready for next order');
+    console.log('✨ Editor reset complete! Cart has thumbnails only');
 };
 
 // Initialize print options
@@ -4539,3 +4537,4 @@ window.closePhotoPreview = closePhotoPreview;
 window.prevPreviewPhoto = prevPreviewPhoto;
 window.nextPreviewPhoto = nextPreviewPhoto;
 window.jumpToPreviewPhoto = jumpToPreviewPhoto;
+
