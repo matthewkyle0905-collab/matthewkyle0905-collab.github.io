@@ -4316,28 +4316,32 @@ async function processOrderFromCart() {
         const isMultiPhoto = multiPhotoTypes.includes(productType);
         
         if (isMultiPhoto && item.photos && item.photos.length > 0) {
-            // ✅ MULTI-PHOTO PRODUCT: Upload ALL photos
-            console.log(`📸 Processing ${item.productName} with ${item.photos.length} photos`);
-            
-            item.photos.forEach((photo, photoIndex) => {
-                photos.push({
-                    originalName: photo.name || `Photo_${photoIndex + 1}.jpg`,
-                    filename: `${photoCounter}.jpg`,
-                    data: photo.data.split(',')[1] || photo.data,
-                    size: item.size || '4x6',
-                    quantity: 1, // Each photo is one print
-                    price: item.basePrice || parseFloat(item.price.toString().replace('₱', '')) / item.photos.length,
-                    paperType: item.paperType || 'standard',
-                    isCustom: item.isCustom || false,
-                    customWidth: item.customDimensions?.width || null,
-                    customHeight: item.customDimensions?.height || null,
-                    customUnit: item.customDimensions?.unit || 'inches',
-                    resize: item.sizeMode || 'FITIN',
-                    productType: productType,
-                    productName: item.productName
-                });
-                photoCounter++;
-            });
+    item.photos.forEach((photo, photoIndex) => {
+        // Get image data from thumbnail
+        let imageData = photo.thumbnail || '';
+        if (imageData && imageData.includes(',')) {
+            imageData = imageData.split(',')[1];
+        }
+        
+        photos.push({
+            originalName: photo.name || `Photo_${photoIndex + 1}.jpg`,
+            filename: `${photoCounter}.jpg`,
+            data: imageData,  // ✅ Using thumbnail data
+            size: item.size || '4x6',
+            quantity: 1,
+            price: item.basePrice || parseFloat(item.price.toString().replace('₱', '')) / item.photos.length,
+            paperType: item.paperType || 'standard',
+            isCustom: item.isCustom || false,
+            customWidth: item.customDimensions?.width || null,
+            customHeight: item.customDimensions?.height || null,
+            customUnit: item.customDimensions?.unit || 'inches',
+            resize: item.sizeMode || 'FITIN',
+            productType: productType,
+            productName: item.productName
+        });
+        photoCounter++;
+    });
+}
         } else {
             // ❌ SINGLE PHOTO PRODUCT: Upload just one
             console.log(`🖼️ Processing ${item.name} as single photo product`);
@@ -4537,4 +4541,5 @@ window.closePhotoPreview = closePhotoPreview;
 window.prevPreviewPhoto = prevPreviewPhoto;
 window.nextPreviewPhoto = nextPreviewPhoto;
 window.jumpToPreviewPhoto = jumpToPreviewPhoto;
+
 
