@@ -635,6 +635,22 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Initialize select all checkbox
     initSelectAll();
+    
+    // ============== FIX: FORCE ATTACH DELETE SELECTED BUTTON LISTENER ==============
+    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    if (deleteBtn) {
+        // Remove any existing listeners and add our own
+        deleteBtn.onclick = null;
+        deleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🗑️ Delete Selected button clicked');
+            deleteSelectedItems();
+        });
+        console.log('✅ Delete button listener attached');
+    } else {
+        console.warn('⚠️ Delete Selected button not found');
+    }
+    // ============== END FIX ==============
 });
 
 function updateCartBadgeOnLoad() {
@@ -4079,7 +4095,12 @@ function updateCartItemQuantityFromCart(index, change) {
 
 // FIXED: Delete selected items function - now working
 function deleteSelectedItems() {
+    console.log('🗑️ DeleteSelectedItems called');
+    const beforeCount = shoppingCart.length;
     shoppingCart = shoppingCart.filter(item => !item.selected);
+    const afterCount = shoppingCart.length;
+    console.log(`Removed ${beforeCount - afterCount} items`);
+    
     updateCartStorage();
     renderCartPage();
     updateCartUI();
