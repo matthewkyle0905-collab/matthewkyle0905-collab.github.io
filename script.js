@@ -1827,10 +1827,17 @@ function onSizeSelect() {
 
 // Update print options based on selected product
 function updatePrintOptions(productType) {
+    console.log('Updating print options for:', productType);
     const container = document.getElementById('sizeOptionsContainer');
-    if (!container) return;
+    console.log('Container found:', container);
+    
+    if (!container) {
+        console.error('Size options container not found!');
+        return;
+    }
     
     const options = printOptionsConfig[productType] || printOptionsConfig.photocards;
+    console.log('Options:', options);
     
     let html = '';
     options.forEach(opt => {
@@ -1852,6 +1859,7 @@ function updatePrintOptions(productType) {
     `;
     
     container.innerHTML = html;
+    console.log('Container updated with:', html);
     
     // Select first option by default
     const firstRadio = container.querySelector('input[type="radio"]');
@@ -4318,3 +4326,4 @@ window.jumpToPreviewPhoto = jumpToPreviewPhoto;
 window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
+
