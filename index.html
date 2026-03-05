@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600&family=Nunito:wght@400&display=swap" rel="stylesheet">
-    <!-- Add some inline CSS to ensure unit selector shows -->
+    <!-- Add CSS for unit selector -->
     <style>
         .unit-selector {
             margin-bottom: 1rem;
@@ -28,6 +28,13 @@
             width: 16px;
             height: 16px;
             accent-color: var(--accent);
+        }
+        /* Style for converted size display */
+        .converted-size {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.1rem;
         }
     </style>
 </head>
@@ -518,11 +525,11 @@
                                         </div>
                                     </div>
 
-                                    <!-- Size Section with Unit Selector -->
+                                    <!-- Size Section with Unit Selector (ONLY ONE) -->
                                     <div class="advanced-section">
                                         <h5>Size</h5>
                                         
-                                        <!-- Unit Selector - Fixed with proper styling -->
+                                        <!-- Unit Selector - Only here, below Size header -->
                                         <div class="unit-selector">
                                             <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                                                 <span style="font-weight: 600; color: var(--text);">Size Unit:</span>
@@ -545,7 +552,7 @@
                                             <!-- Sizes will be dynamically populated by JavaScript -->
                                         </div>
                                         
-                                        <!-- CUSTOM SIZE INPUTS -->
+                                        <!-- CUSTOM SIZE INPUTS - Updated with ML option -->
                                         <div id="customSizeContainer" style="display: none; margin-top: 1rem;">
                                             <div class="custom-size-row">
                                                 <input type="number" id="customWidth" class="custom-size-input" min="1" max="100" value="8" placeholder="W">
@@ -554,6 +561,7 @@
                                                 <select id="customUnit" class="custom-unit-select">
                                                     <option value="inches">in</option>
                                                     <option value="cm">cm</option>
+                                                    <option value="ml">mm</option>
                                                 </select>
                                             </div>
                                             <p class="size-note">Price calculated by area (₱0.50 per sq inch)</p>
