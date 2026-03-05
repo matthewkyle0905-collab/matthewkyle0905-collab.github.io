@@ -4163,7 +4163,7 @@ function showPhotoPreview(itemIndex) {
     const thumbnailsContainer = document.getElementById('previewThumbnails');
     thumbnailsContainer.innerHTML = item.photos.map((photo, idx) => `
         <div onclick="jumpToPreviewPhoto(${idx})" style="cursor: pointer; border: ${idx === 0 ? '3px solid var(--accent)' : '2px solid transparent'}; border-radius: 4px; overflow: hidden; width: 60px; height: 60px; flex-shrink: 0;">
-            <img src="${photo.data || photo}" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
+            <img src="${photo.thumbnail || photo}" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
     `).join('');
     
@@ -4580,6 +4580,7 @@ window.closePhotoPreview = closePhotoPreview;
 window.prevPreviewPhoto = prevPreviewPhoto;
 window.nextPreviewPhoto = nextPreviewPhoto;
 window.jumpToPreviewPhoto = jumpToPreviewPhoto;
+
 
 
 
