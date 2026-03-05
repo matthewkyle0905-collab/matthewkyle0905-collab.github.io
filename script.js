@@ -201,6 +201,134 @@ const templates = {
     doublecards: null
 };
 
+// ============== UNIT CONVERSION ==============
+let currentUnit = 'inches'; // Default unit (always inches first)
+
+// Conversion functions
+function convertSize(sizeInInches, targetUnit) {
+    if (!sizeInInches) return '';
+    
+    // Parse the size string (e.g., "4x6")
+    const parts = sizeInInches.split('x');
+    if (parts.length !== 2) return sizeInInches;
+    
+    const width = parseFloat(parts[0]);
+    const height = parseFloat(parts[1]);
+    
+    if (isNaN(width) || isNaN(height)) return sizeInInches;
+    
+    switch(targetUnit) {
+        case 'cm':
+            return `${(width * 2.54).toFixed(1)}x${(height * 2.54).toFixed(1)}`;
+        case 'ml':
+            return `${Math.round(width * 25.4)}x${Math.round(height * 25.4)}`;
+        case 'inches':
+        default:
+            return sizeInInches;
+    }
+}
+
+function getUnitSymbol(unit) {
+    switch(unit) {
+        case 'cm': return 'cm';
+        case 'ml': return 'mm';
+        default: return '"';
+    }
+}
+
+// Update unit display
+function updateUnitDisplay() {
+    const container = document.getElementById('sizeOptionsContainer');
+    if (!container) return;
+    
+    const sizeLabels = container.querySelectorAll('.size-label');
+    const sizePriceSpans = container.querySelectorAll('.size-price');
+    
+    // Get all size values from the radio inputs
+    const radioInputs = container.querySelectorAll('input[name="advancedPrintSize"]');
+    
+    radioInputs.forEach((radio, index) => {
+        if (radio.value === 'custom') return;
+        
+        const sizeValue = radio.value;
+        const sizeLabel = sizeLabels[index];
+        const sizePrice = sizePriceSpans[index];
+        
+        if (sizeLabel) {
+            // Main label stays in inches
+            sizeLabel.innerHTML = sizeValue + '"';
+            
+            // Add converted size below if unit is not inches
+            if (currentUnit !== 'inches') {
+                const convertedSize = convertSize(sizeValue, currentUnit);
+                const unitSymbol = getUnitSymbol(currentUnit);
+                
+                // Check if converted size already exists
+                let convertedSpan = sizeLabel.parentElement.querySelector('.converted-size');
+                if (!convertedSpan) {
+                    convertedSpan = document.createElement('span');
+                    convertedSpan.className = 'converted-size';
+                    convertedSpan.style.display = 'block';
+                    convertedSpan.style.fontSize = '0.7rem';
+                    convertedSpan.style.color = 'var(--text-muted)';
+                    sizeLabel.parentElement.appendChild(convertedSpan);
+                }
+                convertedSpan.textContent = `${convertedSize}${unitSymbol}`;
+            } else {
+                // Remove converted size if inches is selected
+                const convertedSpan = sizeLabel.parentElement.querySelector('.converted-size');
+                if (convertedSpan) {
+                    convertedSpan.remove();
+                }
+            }
+        }
+    });
+    
+    // Update custom size inputs
+    updateCustomSizeUnit();
+}
+
+// Update custom size inputs based on selected unit
+function updateCustomSizeUnit() {
+    const widthInput = document.getElementById('customWidth');
+    const heightInput = document.getElementById('customHeight');
+    const unitSelect = document.getElementById('customUnit');
+    
+    if (!widthInput || !heightInput || !unitSelect) return;
+    
+    // Store current values in inches for conversion
+    const currentWidthInInches = parseFloat(widthInput.getAttribute('data-inches') || widthInput.value);
+    const currentHeightInInches = parseFloat(heightInput.getAttribute('data-inches') || heightInput.value);
+    
+    if (currentUnit === 'inches') {
+        // Show inches
+        widthInput.value = currentWidthInInches;
+        heightInput.value = currentHeightInInches;
+        unitSelect.value = 'inches';
+    } else if (currentUnit === 'cm') {
+        // Convert to cm
+        widthInput.value = (currentWidthInInches * 2.54).toFixed(1);
+        heightInput.value = (currentHeightInInches * 2.54).toFixed(1);
+        unitSelect.value = 'cm';
+    } else if (currentUnit === 'ml') {
+        // Convert to mm
+        widthInput.value = Math.round(currentWidthInInches * 25.4);
+        heightInput.value = Math.round(currentHeightInInches * 25.4);
+        unitSelect.value = 'cm'; // Keep as cm in select but values are in mm
+    }
+    
+    // Store inches value for future conversions
+    widthInput.setAttribute('data-inches', currentWidthInInches);
+    heightInput.setAttribute('data-inches', currentHeightInInches);
+}
+
+// Handle unit change
+function changeUnit(unit) {
+    currentUnit = unit;
+    updateUnitDisplay();
+    calculatePrice(); // Recalculate price if needed
+}
+
 function getEventClient(e) {
     if (e.touches && e.touches[0]) return e.touches[0];
     return e;
@@ -632,6 +760,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize select all checkbox
     initSelectAll();
     
+    // Add unit selector to the page
+    addUnitSelector();
+    
     // ============== FIX: FORCE ATTACH DELETE SELECTED BUTTON LISTENER ==============
     const deleteBtn = document.getElementById('deleteSelectedBtn');
     if (deleteBtn) {
@@ -647,6 +778,41 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     // ============== END FIX ==============
 });
+
+// Add unit selector to the page
+function addUnitSelector() {
+    const sizeSection = document.querySelector('.advanced-section h5');
+    if (!sizeSection) return;
+    
+    const sizeContainer = sizeSection.parentElement;
+    
+    // Create unit selector div
+    const unitSelector = document.createElement('div');
+    unitSelector.className = 'unit-selector';
+    unitSelector.style.marginBottom = '1rem';
+    unitSelector.style.padding = '0.5rem';
+    unitSelector.style.backgroundColor = 'var(--secondary)';
+    unitSelector.style.borderRadius = 'var(--radius)';
+    unitSelector.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <span style="font-weight: 600; color: var(--text);">Size Unit:</span>
+            <span style="font-weight: 500; color: var(--accent);">Inches (default)</span>
+            <div style="display: flex; gap: 1rem;">
+                <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                    <input type="radio" name="unitSelector" value="cm" onchange="changeUnit('cm')">
+                    <span>cm</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
+                    <input type="radio" name="unitSelector" value="ml" onchange="changeUnit('ml')">
+                    <span>ml</span>
+                </label>
+            </div>
+        </div>
+    `;
+    
+    // Insert after the h5
+    sizeContainer.insertBefore(unitSelector, sizeSection.nextSibling);
+}
 
 function updateCartBadgeOnLoad() {
     const badge = document.getElementById('cartCount');
@@ -1815,6 +1981,9 @@ function onSizeSelect() {
         document.getElementById('customWidth').disabled = false;
         document.getElementById('customHeight').disabled = false;
         document.getElementById('customUnit').disabled = false;
+        
+        // Update custom size with current unit
+        updateCustomSizeUnit();
     } else {
         customSizeContainer.style.display = 'none';
         document.getElementById('customWidth').disabled = true;
@@ -1844,7 +2013,7 @@ function updatePrintOptions(productType) {
         html += `
             <label class="print-size-btn small">
                 <input type="radio" name="advancedPrintSize" value="${opt.value}" onchange="onSizeSelect()">
-                <span class="size-label">${opt.label}</span>
+                <span class="size-label">${opt.value}"</span>
                 <span class="size-price">₱${opt.price}</span>
             </label>
         `;
@@ -1867,6 +2036,8 @@ function updatePrintOptions(productType) {
         firstRadio.checked = true;
     }
     
+    // Update unit display
+    updateUnitDisplay();
     calculatePrice();
 }
 
@@ -1877,7 +2048,13 @@ function initPrintOptions() {
     advancedInputs.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
-            element.addEventListener('input', calculatePrice);
+            element.addEventListener('input', function() {
+                // Store inches value when manually changed
+                if (currentUnit === 'inches') {
+                    this.setAttribute('data-inches', this.value);
+                }
+                calculatePrice();
+            });
         }
     });
     
@@ -1915,9 +2092,24 @@ window.addPhotoToCart = function() {
     
     if (size === 'custom') {
         isCustom = true;
-        customWidth = document.getElementById('customWidth').value;
-        customHeight = document.getElementById('customHeight').value;
-        customUnit = document.getElementById('customUnit').value;
+        // Always store in inches
+        const widthInput = document.getElementById('customWidth');
+        const heightInput = document.getElementById('customHeight');
+        const unitSelect = document.getElementById('customUnit');
+        
+        // Convert to inches if needed
+        if (currentUnit === 'cm') {
+            customWidth = (parseFloat(widthInput.value) / 2.54).toFixed(2);
+            customHeight = (parseFloat(heightInput.value) / 2.54).toFixed(2);
+        } else if (currentUnit === 'ml') {
+            customWidth = (parseFloat(widthInput.value) / 25.4).toFixed(2);
+            customHeight = (parseFloat(heightInput.value) / 25.4).toFixed(2);
+        } else {
+            customWidth = widthInput.value;
+            customHeight = heightInput.value;
+        }
+        
+        customUnit = 'inches';
         size = `${customWidth} x ${customHeight} ${customUnit}`;
     }
     
@@ -4326,4 +4518,4 @@ window.jumpToPreviewPhoto = jumpToPreviewPhoto;
 window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
-
+window.changeUnit = changeUnit;
