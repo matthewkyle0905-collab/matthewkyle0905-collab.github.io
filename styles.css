@@ -4023,3 +4023,29 @@ button:disabled {
     background: transparent;
 }
 
+.unit-selector {
+     margin-bottom: 1rem;
+     padding: 0.75rem;
+     background-color: var(--secondary);
+     border-radius: var(--radius);
+     border: 1px solid var(--border);
+}
+.unit-selector label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+    margin-right: 1rem;
+}
+.unit-selector input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+}
+/* Style for converted size display */
+.converted-size {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.1rem;
+}
