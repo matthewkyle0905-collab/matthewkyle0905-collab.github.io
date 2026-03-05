@@ -540,8 +540,8 @@
                                                         <span>cm</span>
                                                     </label>
                                                     <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
-                                                        <input type="radio" name="unitSelector" value="ml" onchange="changeUnit('ml')">
-                                                        <span>ml</span>
+                                                        <input type="radio" name="unitSelector" value="mm" onchange="changeUnit('mm')">
+                                                        <span>mm</span>
                                                     </label>
                                                 </div>
                                             </div>
@@ -552,7 +552,7 @@
                                             <!-- Sizes will be dynamically populated by JavaScript -->
                                         </div>
                                         
-                                        <!-- CUSTOM SIZE INPUTS - Updated with ML option -->
+                                        <!-- CUSTOM SIZE INPUTS - Fixed with mm -->
                                         <div id="customSizeContainer" style="display: none; margin-top: 1rem;">
                                             <div class="custom-size-row">
                                                 <input type="number" id="customWidth" class="custom-size-input" min="1" max="100" value="8" placeholder="W">
@@ -561,7 +561,7 @@
                                                 <select id="customUnit" class="custom-unit-select">
                                                     <option value="inches">in</option>
                                                     <option value="cm">cm</option>
-                                                    <option value="ml">mm</option>
+                                                    <option value="mm">mm</option>
                                                 </select>
                                             </div>
                                             <p class="size-note">Price calculated by area (₱0.50 per sq inch)</p>
