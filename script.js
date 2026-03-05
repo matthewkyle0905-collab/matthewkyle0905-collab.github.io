@@ -760,9 +760,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize select all checkbox
     initSelectAll();
     
-    // Add unit selector to the page
-    addUnitSelector();
-    
     // ============== FIX: FORCE ATTACH DELETE SELECTED BUTTON LISTENER ==============
     const deleteBtn = document.getElementById('deleteSelectedBtn');
     if (deleteBtn) {
@@ -778,41 +775,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     // ============== END FIX ==============
 });
-
-// Add unit selector to the page
-function addUnitSelector() {
-    const sizeSection = document.querySelector('.advanced-section h5');
-    if (!sizeSection) return;
-    
-    const sizeContainer = sizeSection.parentElement;
-    
-    // Create unit selector div
-    const unitSelector = document.createElement('div');
-    unitSelector.className = 'unit-selector';
-    unitSelector.style.marginBottom = '1rem';
-    unitSelector.style.padding = '0.5rem';
-    unitSelector.style.backgroundColor = 'var(--secondary)';
-    unitSelector.style.borderRadius = 'var(--radius)';
-    unitSelector.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-            <span style="font-weight: 600; color: var(--text);">Size Unit:</span>
-            <span style="font-weight: 500; color: var(--accent);">Inches (default)</span>
-            <div style="display: flex; gap: 1rem;">
-                <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
-                    <input type="radio" name="unitSelector" value="cm" onchange="changeUnit('cm')">
-                    <span>cm</span>
-                </label>
-                <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
-                    <input type="radio" name="unitSelector" value="ml" onchange="changeUnit('ml')">
-                    <span>ml</span>
-                </label>
-            </div>
-        </div>
-    `;
-    
-    // Insert after the h5
-    sizeContainer.insertBefore(unitSelector, sizeSection.nextSibling);
-}
 
 function updateCartBadgeOnLoad() {
     const badge = document.getElementById('cartCount');
@@ -4519,3 +4481,4 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
