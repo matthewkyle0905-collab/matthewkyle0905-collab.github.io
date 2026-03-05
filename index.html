@@ -8,6 +8,28 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600&family=Nunito:wght@400&display=swap" rel="stylesheet">
+    <!-- Add some inline CSS to ensure unit selector shows -->
+    <style>
+        .unit-selector {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background-color: var(--secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+        .unit-selector label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+        .unit-selector input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -500,8 +522,8 @@
                                     <div class="advanced-section">
                                         <h5>Size</h5>
                                         
-                                        <!-- Unit Selector - Added Here -->
-                                        <div class="unit-selector" style="margin-bottom: 1rem; padding: 0.5rem; background-color: var(--secondary); border-radius: var(--radius);">
+                                        <!-- Unit Selector - Fixed with proper styling -->
+                                        <div class="unit-selector">
                                             <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                                                 <span style="font-weight: 600; color: var(--text);">Size Unit:</span>
                                                 <span style="font-weight: 500; color: var(--accent);">Inches (default)</span>
