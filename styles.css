@@ -1543,28 +1543,6 @@ body {
     position: relative;
 }
 
-    .google-icon::before {
-        content: '';
-        position: absolute;
-        width: 16px;
-        height: 16px;
-        background: white;
-        border-radius: 50%;
-        top: 2px;
-        left: 2px;
-    }
-
-    .google-icon::after {
-        content: '';
-        position: absolute;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #4285f4;
-        top: 7px;
-        left: 7px;
-    }
-
 /* Chat Widget */
 .chat-widget {
     position: fixed;
@@ -4049,4 +4027,5 @@ button:disabled {
     color: var(--text-muted);
     margin-top: 0.1rem;
 }
+
 
