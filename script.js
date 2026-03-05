@@ -220,7 +220,7 @@ function convertSize(sizeInInches, targetUnit) {
     switch(targetUnit) {
         case 'cm':
             return `${(width * 2.54).toFixed(1)}x${(height * 2.54).toFixed(1)}`;
-        case 'ml':
+        case 'mm':
             return `${Math.round(width * 25.4)}x${Math.round(height * 25.4)}`;
         case 'inches':
         default:
@@ -231,7 +231,7 @@ function convertSize(sizeInInches, targetUnit) {
 function getUnitSymbol(unit) {
     switch(unit) {
         case 'cm': return 'cm';
-        case 'ml': return 'mm';
+        case 'mm': return 'mm';
         default: return '"';
     }
 }
@@ -310,7 +310,7 @@ function updateCustomSizeUnit() {
         widthInput.value = (currentWidthInInches * 2.54).toFixed(1);
         heightInput.value = (currentHeightInInches * 2.54).toFixed(1);
         unitSelect.value = 'cm';
-    } else if (currentUnit === 'ml') {
+    } else if (currentUnit === 'mm') {
         // Convert to mm
         widthInput.value = Math.round(currentWidthInInches * 25.4);
         heightInput.value = Math.round(currentHeightInInches * 25.4);
@@ -4481,4 +4481,5 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
