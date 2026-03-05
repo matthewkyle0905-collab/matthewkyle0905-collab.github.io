@@ -161,31 +161,31 @@ const calendarProducts = [
 // ============== PRINT OPTIONS CONFIGURATION ==============
 const printOptionsConfig = {
     photocards: [
-        { value: "4x6", label: "4x6 inches", price: "25.00" },
-        { value: "5x7", label: "5x7 inches", price: "35.00" },
-        { value: "8x10", label: "8x10 inches", price: "50.00" }
+        { value: "4x6", label: "4x6", price: "25.00" },
+        { value: "5x7", label: "5x7", price: "35.00" },
+        { value: "8x10", label: "8x10", price: "50.00" }
     ],
     calendar: [
-        { value: "8x10", label: "8x10 inches", price: "60.00" },
-        { value: "12x12", label: "12x12 inches", price: "85.00" },
-        { value: "8.5x11", label: "8.5x11 inches", price: "70.00" },
-        { value: "11x17", label: "11x17 inches", price: "100.00" }
+        { value: "8x10", label: "8x10", price: "60.00" },
+        { value: "12x12", label: "12x12", price: "85.00" },
+        { value: "8.5x11", label: "8.5x11", price: "70.00" },
+        { value: "11x17", label: "11x17", price: "100.00" }
     ],
     photobook: [
-        { value: "8x8", label: "8x8 inches", price: "120.00" },
-        { value: "11x8.5", label: "11x8.5 inches", price: "150.00" }
+        { value: "8x8", label: "8x8", price: "120.00" },
+        { value: "11x8.5", label: "11x8.5", price: "150.00" }
     ],
     canvas: [
-        { value: "8x10", label: "8x10 inches", price: "200.00" },
-        { value: "16x20", label: "16x20 inches", price: "350.00" }
+        { value: "8x10", label: "8x10", price: "200.00" },
+        { value: "16x20", label: "16x20", price: "350.00" }
     ],
     mousepads: [
-        { value: "7x9", label: "7x9 inches", price: "45.00" },
-        { value: "9x11", label: "9x11 inches", price: "60.00" }
+        { value: "7x9", label: "7x9", price: "45.00" },
+        { value: "9x11", label: "9x11", price: "60.00" }
     ],
     doublecards: [
-        { value: "5x7", label: "5x7 inches", price: "70.00" },
-        { value: "8x10", label: "8x10 inches", price: "95.00" }
+        { value: "5x7", label: "5x7", price: "70.00" },
+        { value: "8x10", label: "8x10", price: "95.00" }
     ]
 };
 
@@ -473,14 +473,11 @@ function updateCartStorage() {
     localStorage.setItem('fotocenterCart', JSON.stringify(shoppingCart));
 }
 
-// FIXED: addToCart now properly saves sizeMode and ensures correct product name
 function addToCart(item) {
-    // Ensure item has sizeMode (default to 'fill' if not set)
     if (!item.sizeMode) {
         item.sizeMode = 'fill';
     }
     
-    // Ensure item has selected property (default to true)
     if (item.selected === undefined) {
         item.selected = true;
     }
@@ -598,7 +595,6 @@ document.addEventListener('DOMContentLoaded', function () {
     setupNavHighlight();
     setupDragAndDrop();
     setupEventListeners();
-    updatePriceDisplay();
     initPhotoMode();
     updateLoginStatus();
     updateCartUI();
@@ -639,7 +635,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // ============== FIX: FORCE ATTACH DELETE SELECTED BUTTON LISTENER ==============
     const deleteBtn = document.getElementById('deleteSelectedBtn');
     if (deleteBtn) {
-        // Remove any existing listeners and add our own
         deleteBtn.onclick = null;
         deleteBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -950,7 +945,7 @@ function addToCartProduct(productId) {
         selected: true,
         sizeMode: 'fill',
         photoCount: 1,
-        photos: [{ data: product.image, name: product.name }]
+        photos: [{ thumbnail: product.image, name: product.name }]
     };
 
     addToCart(cartItem);
@@ -1303,7 +1298,6 @@ function selectImage(index) {
     if (overlay) overlay.style.display = 'none';
 
     drawImage();
-    updatePriceDisplay();
 }
 
 function updateSliderValues() {
@@ -1723,7 +1717,7 @@ function updateProductBadge(productType) {
     }
 }
 
-// ============== PRODUCT SELECTION FUNCTION ==============
+// ============== UPDATED PRODUCT SELECTION FUNCTION ==============
 function selectProduct(type) {
     currentProduct = type;
 
@@ -1732,7 +1726,8 @@ function selectProduct(type) {
     });
 
     updateProductBadge(type);
-
+    
+    // Update print options based on selected product
     updatePrintOptions(type);
 
     if (templates[type]) {
@@ -1747,25 +1742,241 @@ function selectProduct(type) {
     }
 }
 
-// ============== UPDATE PRINT OPTIONS ==============
-function updatePrintOptions(productType) {
-    const printOptionsContainer = document.querySelector('.print-options');
-    if (!printOptionsContainer) return;
+// ============== NEW PRINT OPTIONS FUNCTIONS ==============
 
-    const options = printOptionsConfig[productType] || printOptionsConfig.photocards;
+// Global variables for print options
+let currentQuantity = 1;
+let basePricePerUnit = 25;
 
-    printOptionsContainer.innerHTML = options.map(opt => `
-        <div class="print-option">
-            <label>
-                <input type="radio" name="printSize" value="${opt.value}" ${opt.value === options[0].value ? 'checked' : ''}>
-                ${opt.label}
-                <span class="print-price">₱ ${opt.price}</span>
-            </label>
-        </div>
-    `).join('');
-
-    updatePriceDisplay();
+// Update quantity
+function updateQuantity(change) {
+    currentQuantity = Math.max(1, currentQuantity + change);
+    document.getElementById('quantityDisplay').textContent = currentQuantity;
+    calculatePrice();
 }
+
+// Calculate price based on all options
+function calculatePrice() {
+    // Get selected size
+    const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
+    let basePrice = 25;
+    
+    if (selectedSize) {
+        const sizeValue = selectedSize.value;
+        if (sizeValue === 'custom') {
+            const width = parseFloat(document.getElementById('customWidth').value) || 8;
+            const height = parseFloat(document.getElementById('customHeight').value) || 10;
+            const area = width * height;
+            basePrice = Math.max(25, Math.round(area * 0.5));
+        } else {
+            // Get price from config based on current product
+            const productType = currentProduct || 'photocards';
+            const options = printOptionsConfig[productType] || printOptionsConfig.photocards;
+            const option = options.find(opt => opt.value === sizeValue);
+            basePrice = option ? parseFloat(option.price) : 25;
+        }
+    }
+    
+    // Get paper type price
+    let paperUpgrade = 0;
+    const selectedPaper = document.querySelector('input[name="paperType"]:checked');
+    if (selectedPaper) {
+        const paperValue = selectedPaper.value;
+        switch(paperValue) {
+            case 'glossy': paperUpgrade = 10; break;
+            case 'matte': paperUpgrade = 15; break;
+            case 'premium': paperUpgrade = 25; break;
+            default: paperUpgrade = 0;
+        }
+    }
+    
+    const priceBeforeQuantity = basePrice + paperUpgrade;
+    const totalPrice = priceBeforeQuantity * currentQuantity;
+    
+    // Update display
+    document.getElementById('basePrice').textContent = `₱${basePrice.toFixed(2)}`;
+    document.getElementById('paperUpgradePrice').textContent = `₱${paperUpgrade.toFixed(2)}`;
+    document.getElementById('quantityMultiplier').textContent = `₱${(priceBeforeQuantity * currentQuantity).toFixed(2)}`;
+    document.getElementById('advancedTotalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
+    document.getElementById('finalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
+    
+    basePricePerUnit = basePrice;
+}
+
+// Handle when size is selected
+function onSizeSelect() {
+    const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
+    if (!selectedSize) return;
+    
+    const customSizeContainer = document.getElementById('customSizeContainer');
+    
+    if (selectedSize.value === 'custom') {
+        customSizeContainer.style.display = 'block';
+        document.getElementById('customWidth').disabled = false;
+        document.getElementById('customHeight').disabled = false;
+        document.getElementById('customUnit').disabled = false;
+    } else {
+        customSizeContainer.style.display = 'none';
+        document.getElementById('customWidth').disabled = true;
+        document.getElementById('customHeight').disabled = true;
+        document.getElementById('customUnit').disabled = true;
+    }
+    
+    calculatePrice();
+}
+
+// Update print options based on selected product
+function updatePrintOptions(productType) {
+    const container = document.getElementById('sizeOptionsContainer');
+    if (!container) return;
+    
+    const options = printOptionsConfig[productType] || printOptionsConfig.photocards;
+    
+    let html = '';
+    options.forEach(opt => {
+        html += `
+            <label class="print-size-btn small">
+                <input type="radio" name="advancedPrintSize" value="${opt.value}" onchange="onSizeSelect()">
+                <span class="size-label">${opt.label}</span>
+                <span class="size-price">₱${opt.price}</span>
+            </label>
+        `;
+    });
+    
+    // Add custom option
+    html += `
+        <label class="print-size-btn small custom">
+            <input type="radio" name="advancedPrintSize" value="custom" onchange="onSizeSelect()">
+            <span class="size-label">Custom</span>
+        </label>
+    `;
+    
+    container.innerHTML = html;
+    
+    // Select first option by default
+    const firstRadio = container.querySelector('input[type="radio"]');
+    if (firstRadio) {
+        firstRadio.checked = true;
+    }
+    
+    calculatePrice();
+}
+
+// Initialize print options
+function initPrintOptions() {
+    // Set up listeners for custom size inputs
+    const advancedInputs = ['customWidth', 'customHeight', 'customUnit'];
+    advancedInputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', calculatePrice);
+        }
+    });
+    
+    // Set up paper type listeners
+    document.querySelectorAll('input[name="paperType"]').forEach(radio => {
+        radio.addEventListener('change', calculatePrice);
+    });
+    
+    // Initial update
+    updatePrintOptions(currentProduct || 'photocards');
+}
+
+// ============== UPDATED ADD TO CART FUNCTION ==============
+window.addPhotoToCart = function() {
+    if (uploadedImages.length === 0) {
+        alert('Please upload at least one photo first.');
+        return;
+    }
+    
+    // Get print options
+    let size, price, paperType = 'standard', sizeMode = 'fill', isCustom = false;
+    let customWidth = null, customHeight = null, customUnit = 'inches';
+    
+    // Get sizeMode from radio buttons
+    const sizeModeRadio = document.querySelector('input[name="sizeMode"]:checked');
+    sizeMode = sizeModeRadio ? sizeModeRadio.value : 'fill';
+    
+    // Get paper type from radio buttons
+    const paperTypeRadio = document.querySelector('input[name="paperType"]:checked');
+    paperType = paperTypeRadio ? paperTypeRadio.value : 'standard';
+    
+    // Get selected size
+    const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
+    size = selectedSize ? selectedSize.value : '4x6';
+    
+    if (size === 'custom') {
+        isCustom = true;
+        customWidth = document.getElementById('customWidth').value;
+        customHeight = document.getElementById('customHeight').value;
+        customUnit = document.getElementById('customUnit').value;
+        size = `${customWidth} x ${customHeight} ${customUnit}`;
+    }
+    
+    price = document.getElementById('advancedTotalPrice').textContent;
+    
+    // Get the actual product name from currentProduct
+    const productName = productDisplayNames[currentProduct] || 'Photo';
+    
+    // Store ONLY thumbnails
+    const photosData = uploadedImages.map(img => ({
+        name: img.name,
+        thumbnail: img.src,
+    }));
+    
+    // Calculate total price (base price × photo count)
+    const basePrice = parseFloat(price.toString().replace('₱', '')) || 0;
+    const totalPrice = basePrice * uploadedImages.length;
+    
+    // Create cart item with ONLY thumbnail data
+    const cartItem = {
+        id: 'photo-' + Date.now(),
+        type: 'photo',
+        productType: currentProduct,
+        productName: productName,
+        name: `${productName} (${size}) - ${uploadedImages.length} photos`,
+        size: size,
+        
+        photos: photosData,
+        photoCount: uploadedImages.length,
+        
+        displayImage: uploadedImages[0]?.src || null,
+        
+        price: `₱${totalPrice.toFixed(2)}`,
+        basePrice: basePrice,
+        quantity: 1,
+        paperType: paperType,
+        sizeMode: sizeMode,
+        isCustom: isCustom,
+        customDimensions: isCustom ? { width: customWidth, height: customHeight, unit: customUnit } : null,
+        originalName: uploadedImages[0]?.name || 'photo',
+        timestamp: new Date().toISOString(),
+        selected: true
+    };
+    
+    // Add to cart
+    addToCart(cartItem);
+    
+    // Reset editor
+    uploadedImages = [];
+    currentImageIndex = -1;
+    updateImageGallery();
+    
+    const canvas = document.getElementById('photoCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const overlay = document.getElementById('canvasOverlay');
+    if (overlay) overlay.style.display = 'block';
+    
+    document.getElementById('uploadCount').textContent = '0';
+    
+    currentQuantity = 1;
+    document.getElementById('quantityDisplay').textContent = '1';
+    calculatePrice();
+    
+    console.log('✨ Editor reset complete! Cart has thumbnails only');
+};
 
 // ============== CROP TOOL FUNCTIONS ==============
 function setupCropHandles() {
@@ -2384,54 +2595,6 @@ function downloadImage() {
     link.click();
 }
 
-// ============== UPDATED GET PRICE FOR SIZE ==============
-function getPriceForSize(size) {
-    const productType = currentProduct || 'photocards';
-    const options = printOptionsConfig[productType] || printOptionsConfig.photocards;
-    const option = options.find(opt => opt.value === size);
-    return option ? parseFloat(option.price) : 25.00;
-}
-
-function updatePriceDisplay() {
-    const priceElements = document.querySelectorAll('.print-price');
-    const selectedPrice = document.getElementById('selectedPrice');
-    const radioButtons = document.querySelectorAll('input[name="printSize"]');
-
-    radioButtons.forEach(radio => {
-        radio.addEventListener('change', function () {
-            if (this.checked) {
-                const price = getPriceForSize(this.value);
-                if (selectedPrice) {
-                    selectedPrice.textContent = `₱ ${price.toFixed(2)}`;
-                }
-            }
-        });
-    });
-
-    const checkedRadio = document.querySelector('input[name="printSize"]:checked');
-    if (checkedRadio && selectedPrice) {
-        const initialPrice = getPriceForSize(checkedRadio.value);
-        selectedPrice.textContent = `₱ ${initialPrice.toFixed(2)}`;
-    }
-
-    function updatePrintSelection() {
-        document.querySelectorAll('.print-option').forEach(el => el.querySelector('label').classList.remove('selected'));
-        const checked = document.querySelector('input[name="printSize"]:checked');
-        if (checked) {
-            const lbl = checked.closest('label');
-            if (lbl) lbl.classList.add('selected');
-        }
-    }
-
-    radioButtons.forEach(radio => {
-        radio.addEventListener('change', function () {
-            updatePrintSelection();
-        });
-    });
-
-    updatePrintSelection();
-}
-
 // Modal Functions
 function showSuccessModal() {
     const modal = document.getElementById('successModal');
@@ -2934,7 +3097,7 @@ function addCalendarProductToCart(productId) {
         selected: true,
         sizeMode: 'fill',
         photoCount: 1,
-        photos: [{ data: product.image, name: product.name }]
+        photos: [{ thumbnail: product.image, name: product.name }]
     };
 
     addToCart(cartItem);
@@ -2968,7 +3131,7 @@ function addCustomCalendarToCart() {
         sizeMode: 'fill',
         photoCount: calendarImages.length,
         photos: calendarImages.map(img => ({
-            data: img.src,
+            thumbnail: img.src,
             name: img.name
         })),
         quantity: quantity,
@@ -3109,7 +3272,7 @@ function addCardsToCart() {
         selected: true,
         sizeMode: 'fill',
         photoCount: 1,
-        photos: [{ data: 'https://via.placeholder.com/200x150?text=Photo+Card', name: 'Photo Card' }]
+        photos: [{ thumbnail: 'https://via.placeholder.com/200x150?text=Photo+Card', name: 'Photo Card' }]
     };
 
     addToCart(cartItem);
@@ -3124,322 +3287,6 @@ function getCardPriceForSize(size) {
     return prices[size] || 150.00;
 }
 
-// ============== REDESIGNED PRINT OPTIONS FUNCTIONS ==============
-
-// Global variables for print options
-let currentQuantity = 1;
-let currentAdvancedQuantity = 1;
-let isAdvancedOpen = false;
-let basePricePerUnit = 25;
-
-// Toggle advanced options - FIXED to show only ONE button at a time
-function toggleAdvancedOptions() {
-    const advancedDiv = document.getElementById('advancedPrintOptions');
-    const toggleBtn = document.getElementById('toggleAdvancedBtn');
-
-    if (!advancedDiv || !toggleBtn) return;
-
-    isAdvancedOpen = !isAdvancedOpen;
-
-    if (isAdvancedOpen) {
-        advancedDiv.style.display = 'block';
-        toggleBtn.textContent = '− Less Options';
-        // Sync simple quantity to advanced
-        document.getElementById('advancedQuantityDisplay').textContent = currentQuantity;
-        currentAdvancedQuantity = currentQuantity;
-        calculateAdvancedPrice();
-    } else {
-        advancedDiv.style.display = 'none';
-        toggleBtn.textContent = '+ More Options';
-        // Sync advanced quantity back to simple
-        currentQuantity = currentAdvancedQuantity;
-        document.getElementById('quantityDisplay').textContent = currentQuantity;
-        updateSimpleTotal();
-    }
-}
-
-// Update quantity in simple view
-function updateQuantity(change) {
-    currentQuantity = Math.max(1, currentQuantity + change);
-    document.getElementById('quantityDisplay').textContent = currentQuantity;
-    
-    updateSimpleTotal();
-    
-    if (isAdvancedOpen) {
-        currentAdvancedQuantity = currentQuantity;
-        document.getElementById('advancedQuantityDisplay').textContent = currentQuantity;
-        calculateAdvancedPrice();
-    }
-}
-
-// Update quantity in advanced view
-function updateAdvancedQuantity(change) {
-    currentAdvancedQuantity = Math.max(1, currentAdvancedQuantity + change);
-    document.getElementById('advancedQuantityDisplay').textContent = currentAdvancedQuantity;
-    document.getElementById('breakdownQuantity').textContent = currentAdvancedQuantity;
-    
-    currentQuantity = currentAdvancedQuantity;
-    document.getElementById('quantityDisplay').textContent = currentQuantity;
-    
-    calculateAdvancedPrice();
-}
-
-// Update simple view total
-function updateSimpleTotal() {
-    const selectedSize = document.querySelector('input[name="printSize"]:checked');
-    let pricePerUnit = 25;
-    
-    if (selectedSize) {
-        const sizeValue = selectedSize.value;
-        switch(sizeValue) {
-            case '4x6': pricePerUnit = 25; break;
-            case '5x7': pricePerUnit = 35; break;
-            case '8x10': pricePerUnit = 50; break;
-            case '11x14': pricePerUnit = 80; break;
-            default: pricePerUnit = 25;
-        }
-    }
-    
-    basePricePerUnit = pricePerUnit;
-    const total = pricePerUnit * currentQuantity;
-    document.getElementById('simpleTotalPrice').textContent = `₱${total.toFixed(2)}`;
-    document.getElementById('finalPrice').textContent = `₱${total.toFixed(2)}`;
-}
-
-// Calculate advanced view price
-function calculateAdvancedPrice() {
-    let basePrice = 25;
-    const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
-    
-    if (selectedSize) {
-        const sizeValue = selectedSize.value;
-        if (sizeValue === 'custom') {
-            const width = parseFloat(document.getElementById('customWidth').value) || 8;
-            const height = parseFloat(document.getElementById('customHeight').value) || 10;
-            const area = width * height;
-            basePrice = Math.max(25, Math.round(area * 0.5));
-        } else {
-            switch(sizeValue) {
-                case '4x6': basePrice = 25; break;
-                case '5x7': basePrice = 35; break;
-                case '8x10': basePrice = 50; break;
-                case '11x14': basePrice = 80; break;
-                case '16x20': basePrice = 150; break;
-                default: basePrice = 25;
-            }
-        }
-    }
-    
-    let paperUpgrade = 0;
-    const glossyChecked = document.getElementById('paperGlossy')?.checked || false;
-    const matteChecked = document.getElementById('paperMatte')?.checked || false;
-    
-    if (glossyChecked) paperUpgrade += 10;
-    if (matteChecked) paperUpgrade += 15;
-    
-    const priceBeforeQuantity = basePrice + paperUpgrade;
-    const totalPrice = priceBeforeQuantity * currentAdvancedQuantity;
-    
-    document.getElementById('basePrice').textContent = `₱${basePrice.toFixed(2)}`;
-    document.getElementById('paperUpgradePrice').textContent = `₱${paperUpgrade.toFixed(2)}`;
-    document.getElementById('quantityMultiplier').textContent = `₱${(priceBeforeQuantity * currentAdvancedQuantity).toFixed(2)}`;
-    document.getElementById('advancedTotalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
-    document.getElementById('finalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
-    
-    basePricePerUnit = basePrice;
-    document.getElementById('simpleTotalPrice').textContent = `₱${(basePrice * currentQuantity).toFixed(2)}`;
-}
-
-// Handle when advanced size is selected - NEW with custom size toggle
-function onAdvancedSizeSelect() {
-    const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
-    if (!selectedSize) return;
-    
-    const customSizeContainer = document.getElementById('customSizeContainer');
-    
-    if (selectedSize.value === 'custom') {
-        // Show custom size inputs
-        if (customSizeContainer) {
-            customSizeContainer.style.display = 'block';
-        }
-        
-        // Enable inputs
-        document.getElementById('customWidth').disabled = false;
-        document.getElementById('customHeight').disabled = false;
-        document.getElementById('customUnit').disabled = false;
-    } else {
-        // Hide custom size inputs
-        if (customSizeContainer) {
-            customSizeContainer.style.display = 'none';
-        }
-        
-        // Disable inputs
-        document.getElementById('customWidth').disabled = true;
-        document.getElementById('customHeight').disabled = true;
-        document.getElementById('customUnit').disabled = true;
-        
-        // Sync with simple view radio
-        const simpleRadio = document.querySelector(`input[name="printSize"][value="${selectedSize.value}"]`);
-        if (simpleRadio) {
-            simpleRadio.checked = true;
-        }
-    }
-    
-    calculateAdvancedPrice();
-}
-
-// FIXED: addPhotoToCart now saves ONLY THUMBNAILS to localStorage
-window.addPhotoToCart = function() {
-    if (uploadedImages.length === 0) {
-        alert('Please upload at least one photo first.');
-        return;
-    }
-    
-    // Get print options
-    let size, price, paperType = 'standard', sizeMode = 'fill', isCustom = false;
-    let customWidth = null, customHeight = null, customUnit = 'inches';
-    
-    // Get sizeMode from radio buttons
-    const sizeModeRadio = document.querySelector('input[name="sizeMode"]:checked');
-    sizeMode = sizeModeRadio ? sizeModeRadio.value : 'fill';
-    
-    if (isAdvancedOpen) {
-        const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
-        size = selectedSize ? selectedSize.value : '4x6';
-        
-        if (size === 'custom') {
-            isCustom = true;
-            customWidth = document.getElementById('customWidth').value;
-            customHeight = document.getElementById('customHeight').value;
-            customUnit = document.getElementById('customUnit').value;
-            size = `${customWidth} x ${customHeight} ${customUnit}`;
-        }
-        
-        if (document.getElementById('paperGlossy')?.checked) paperType = 'glossy';
-        if (document.getElementById('paperMatte')?.checked) paperType = 'matte';
-        
-        price = document.getElementById('advancedTotalPrice').textContent;
-    } else {
-        const selectedSize = document.querySelector('input[name="printSize"]:checked');
-        size = selectedSize ? selectedSize.value : '4x6';
-        price = document.getElementById('simpleTotalPrice').textContent;
-    }
-    
-    // Get the actual product name from currentProduct
-    const productName = productDisplayNames[currentProduct] || 'Photo';
-    
-    // ✅ FIX: Store ONLY thumbnails (already small from gallery)
-    const photosData = uploadedImages.map(img => ({
-        name: img.name,
-        thumbnail: img.src, // This is the small 100x100 thumbnail!
-        // NO full image data stored!
-    }));
-    
-    // Calculate total price (base price × photo count)
-    const basePrice = parseFloat(price.toString().replace('₱', '')) || 0;
-    const totalPrice = basePrice * uploadedImages.length;
-    
-    // Create cart item with ONLY thumbnail data
-    const cartItem = {
-        id: 'photo-' + Date.now(),
-        type: 'photo',
-        productType: currentProduct,
-        productName: productName,
-        name: `${productName} (${size}) - ${uploadedImages.length} photos`,
-        size: size,
-        
-        // Store ONLY thumbnails (tiny!)
-        photos: photosData,
-        photoCount: uploadedImages.length,
-        
-        // Display image (first photo thumbnail)
-        displayImage: uploadedImages[0]?.src || null,
-        
-        price: `₱${totalPrice.toFixed(2)}`,
-        basePrice: basePrice,
-        quantity: 1,
-        paperType: paperType,
-        sizeMode: sizeMode,
-        isCustom: isCustom,
-        customDimensions: isCustom ? { width: customWidth, height: customHeight, unit: customUnit } : null,
-        originalName: uploadedImages[0]?.name || 'photo',
-        timestamp: new Date().toISOString(),
-        selected: true
-    };
-    
-    // Add to cart
-    addToCart(cartItem);
-    
-    // ============== RESET EDITOR ==============
-    // Clear all uploaded images
-    uploadedImages = [];
-    currentImageIndex = -1;
-    
-    // Clear gallery
-    updateImageGallery();
-    
-    // Reset canvas
-    const canvas = document.getElementById('photoCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Show upload overlay
-    const overlay = document.getElementById('canvasOverlay');
-    if (overlay) overlay.style.display = 'block';
-    
-    // Reset upload count
-    document.getElementById('uploadCount').textContent = '0';
-    
-    // Reset print options to default
-    currentQuantity = 1;
-    currentAdvancedQuantity = 1;
-    document.getElementById('quantityDisplay').textContent = '1';
-    document.getElementById('advancedQuantityDisplay').textContent = '1';
-    updateSimpleTotal();
-    
-    console.log('✨ Editor reset complete! Cart has thumbnails only');
-};
-
-// Initialize print options
-function initPrintOptions() {
-    // Set up radio listeners for simple view
-    document.querySelectorAll('input[name="printSize"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            updateSimpleTotal();
-            if (isAdvancedOpen) {
-                const advancedRadio = document.querySelector(`input[name="advancedPrintSize"][value="${this.value}"]`);
-                if (advancedRadio) {
-                    advancedRadio.checked = true;
-                    calculateAdvancedPrice();
-                }
-            }
-        });
-    });
-    
-    // Set up listeners for advanced inputs
-    const advancedInputs = ['customWidth', 'customHeight', 'customUnit'];
-    advancedInputs.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('input', calculateAdvancedPrice);
-        }
-    });
-    
-    // Initial update
-    updateSimpleTotal();
-    
-    // Hide advanced view initially
-    const advancedDiv = document.getElementById('advancedPrintOptions');
-    if (advancedDiv) {
-        advancedDiv.style.display = 'none';
-    }
-    
-    // Hide custom size container initially
-    const customSizeContainer = document.getElementById('customSizeContainer');
-    if (customSizeContainer) {
-        customSizeContainer.style.display = 'none';
-    }
-}
 // ============== SEARCH BAR FUNCTIONS ==============
 
 // Store last search query
@@ -3624,7 +3471,7 @@ const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 let tokenClient;
 let gapiInited = false;
 let gisInited = false;
-let rootFolderId = null; // Will store the C8FOCENTER/orders folder ID
+let rootFolderId = null;
 
 // Initialize Google API
 function initializeGoogleApi() {
@@ -3640,7 +3487,7 @@ function initializeGoogleApi() {
     tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
-        callback: '', // defined later
+        callback: '',
     });
     gisInited = true;
     maybeEnableButtons();
@@ -3648,7 +3495,6 @@ function initializeGoogleApi() {
 
 function maybeEnableButtons() {
     if (gapiInited && gisInited) {
-        // Removed test button - now only enable complete order button
         document.getElementById('completeOrderBtn').disabled = false;
     }
 }
@@ -3667,7 +3513,6 @@ function base64ToBlob(base64, mimeType) {
 // Find or create the C8FOCENTER/orders folder structure
 async function getOrCreateOrdersFolder() {
     try {
-        // Search for existing C8FOCENTER folder
         const response = await gapi.client.drive.files.list({
             q: "name='C8FOCENTER' and mimeType='application/vnd.google-apps.folder' and trashed=false",
             fields: 'files(id, name)',
@@ -3678,11 +3523,9 @@ async function getOrCreateOrdersFolder() {
         if (response.result.files.length > 0) {
             c8Folder = response.result.files[0];
         } else {
-            // Create C8FOCENTER folder
             c8Folder = await createDriveFolder('C8FOCENTER');
         }
         
-        // Search for orders folder inside C8FOCENTER
         const ordersResponse = await gapi.client.drive.files.list({
             q: `name='orders' and '${c8Folder.id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
             fields: 'files(id, name)',
@@ -3692,7 +3535,6 @@ async function getOrCreateOrdersFolder() {
         if (ordersResponse.result.files.length > 0) {
             return ordersResponse.result.files[0].id;
         } else {
-            // Create orders folder inside C8FOCENTER
             const ordersFolder = await createDriveFolder('orders', c8Folder.id);
             return ordersFolder.id;
         }
@@ -3720,19 +3562,17 @@ async function createDriveFolder(folderName, parentId = null) {
     return response.result;
 }
 
-// Upload file to Google Drive (FIXED: now handles binary images correctly)
+// Upload file to Google Drive
 async function uploadFileToDrive(fileName, content, folderId) {
     const boundary = '-------' + Date.now();
     const delimiter = '\r\n--' + boundary + '\r\n';
     const closeDelimiter = '\r\n--' + boundary + '--';
     
-    // Determine content type and prepare content
     let contentType;
     let bodyContent;
     
     if (fileName.endsWith('.jpg')) {
         contentType = 'image/jpeg';
-        // Convert base64 to binary blob
         const blob = base64ToBlob(content, 'image/jpeg');
         bodyContent = blob;
     } else {
@@ -3746,9 +3586,7 @@ async function uploadFileToDrive(fileName, content, folderId) {
         parents: [folderId]
     };
     
-    // For binary files (images), we need to use a different approach
     if (fileName.endsWith('.jpg')) {
-        // Use simple upload for binary files
         const form = new FormData();
         form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
         form.append('file', bodyContent);
@@ -3761,7 +3599,6 @@ async function uploadFileToDrive(fileName, content, folderId) {
         
         return await response.json();
     } else {
-        // Use multipart upload for text files
         const multipartRequestBody = 
             delimiter +
             'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
@@ -3817,9 +3654,8 @@ function generateEndFile(orderData) {
     `;
 }
 
-// Generate OrderReceipt.txt (with exact format requested)
+// Generate OrderReceipt.txt
 function generateReceiptFile(orderData) {
-    // Track filename duplicates
     const filenameCount = {};
     
     let receipt = "=".repeat(60) + "\n";
@@ -3837,13 +3673,11 @@ function generateReceiptFile(orderData) {
     let totalAmount = 0;
     
     orderData.photos.forEach((photo, index) => {
-        // Handle duplicate filenames
         let displayName = photo.originalName || `Photo_${index + 1}`;
         if (filenameCount[displayName]) {
             filenameCount[displayName]++;
             const nameParts = displayName.split('.');
             if (nameParts.length > 1) {
-                // Has extension: sunset.jpg → sunset_2.jpg
                 displayName = nameParts[0] + '_' + filenameCount[displayName] + '.' + nameParts[1];
             } else {
                 displayName = displayName + '_' + filenameCount[displayName];
@@ -3852,27 +3686,22 @@ function generateReceiptFile(orderData) {
             filenameCount[displayName] = 1;
         }
         
-        // Truncate long names
         if (displayName.length > 25) {
             displayName = displayName.substring(0, 22) + "...";
         }
         
-        // Format size display
         let sizeDisplay = photo.size || '4x6';
         if (photo.isCustom) {
             sizeDisplay = `${photo.customWidth}x${photo.customHeight} ${photo.customUnit}`;
         }
         
-        // Get paper type
         let paperType = photo.paperType || 'Standard';
         if (paperType === 'glossy') paperType = 'Glossy';
         if (paperType === 'matte') paperType = 'Matte';
         
-        // Calculate price
         const price = parseFloat(photo.price || 25) * (photo.quantity || 1);
         totalAmount += price;
         
-        // Format line with proper spacing
         const line = `${displayName.padEnd(25)} ₱${price.toFixed(2).padStart(7)} ${sizeDisplay.padEnd(10)} ${paperType}`;
         receipt += line + "\n";
     });
@@ -3901,77 +3730,24 @@ function generateOrderId() {
     return 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
 }
 
-// Collect edited photos from the editor (FIXED: now captures all photos correctly)
-function getEditedPhotos() {
-    const photos = [];
-    
-    // Get all uploaded/edited images
-    if (uploadedImages && uploadedImages.length > 0) {
-        uploadedImages.forEach((img, index) => {
-            // Get the edited image data from canvas (if available)
-            if (canvas) {
-                // Get current image data for this specific image
-                const tempCanvas = document.createElement('canvas');
-                const tempCtx = tempCanvas.getContext('2d');
-                const tempImg = new Image();
-                
-                // Use synchronous approach with Promise
-                const imageData = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
-                
-                // Get paper type from checkboxes
-                let paperType = 'standard';
-                if (document.getElementById('paperGlossy')?.checked) paperType = 'glossy';
-                if (document.getElementById('paperMatte')?.checked) paperType = 'matte';
-                
-                // Check if custom size
-                const isCustom = document.querySelector('input[name="advancedPrintSize"]:checked')?.value === 'custom';
-                
-                photos.push({
-                    originalName: img.name || `photo_${index + 1}.jpg`,
-                    filename: `${index + 1}.jpg`,
-                    data: imageData,
-                    size: document.querySelector('input[name="printSize"]:checked')?.value || '4x6',
-                    quantity: currentQuantity || 1,
-                    price: getPriceForSize(document.querySelector('input[name="printSize"]:checked')?.value || '4x6'),
-                    paperType: paperType,
-                    isCustom: isCustom,
-                    customWidth: isCustom ? document.getElementById('customWidth')?.value : null,
-                    customHeight: isCustom ? document.getElementById('customHeight')?.value : null,
-                    customUnit: isCustom ? document.getElementById('customUnit')?.value : null,
-                    resize: document.querySelector('input[name="sizeMode"]:checked')?.value || 'FITIN'
-                });
-            }
-        });
-    }
-    
-    return photos;
-}
-
-// Removed testGoogleDriveConnection function - functionality merged into processOrder
-
 // Initialize Google API on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Google API
     initializeGoogleApi();
     
-    // Disable buttons until Google API is ready
     const orderBtn = document.getElementById('completeOrderBtn');
     if (orderBtn) orderBtn.disabled = true;
 });
 
 // Make functions globally available
-window.processOrder = processOrder;
 window.initializeGoogleApi = initializeGoogleApi;
 
 // ============== COPY ORDER NUMBER FUNCTION ==============
 function copyOrderNumber() {
     const orderMessage = document.getElementById('orderSuccessMessage').innerText;
-    // Extract order number from message (assuming format: "This is your Order Number: ORD-123-ABC")
     const match = orderMessage.match(/Order Number: ([^\n]+)/);
     if (match && match[1]) {
         const orderNumber = match[1].trim();
         navigator.clipboard.writeText(orderNumber).then(() => {
-            // Show temporary "Copied!" feedback
             const copyBtn = document.querySelector('.copy-btn');
             const originalText = copyBtn.innerHTML;
             copyBtn.innerHTML = '✅ Copied!';
@@ -3995,8 +3771,6 @@ function initSelectAll() {
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     if (selectAllCheckbox) {
         selectAllCheckbox.addEventListener('change', function() {
-            // FIXED: Select All only checks when ALL items are checked
-            // When select all is clicked, set all items to this.checked
             shoppingCart.forEach(item => {
                 item.selected = this.checked;
             });
@@ -4037,15 +3811,13 @@ function renderCartPage() {
     
     let html = '';
     shoppingCart.forEach((item, index) => {
-        // Determine size mode display
         let sizeModeDisplay = '';
         if (item.sizeMode) {
             sizeModeDisplay = item.sizeMode === 'fill' ? 'Fill' : 'Fit';
         } else {
-            sizeModeDisplay = 'Fill'; // Default
+            sizeModeDisplay = 'Fill';
         }
         
-        // Check if this is a multi-photo item
         const photoCount = item.photoCount || 1;
         const hasMultiplePhotos = photoCount > 1;
         const additionalPhotos = photoCount - 1;
@@ -4078,7 +3850,6 @@ function renderCartPage() {
                             <span>${item.quantity || 1}</span>
                             <button onclick="updateCartItemQuantityFromCart(${index}, 1)">+</button>
                         </div>
-                        <!-- REMOVED: Individual trash icon as requested -->
                     </div>
                 </div>
             </div>
@@ -4087,7 +3858,6 @@ function renderCartPage() {
     
     container.innerHTML = html;
     
-    // Add event listeners to checkboxes
     document.querySelectorAll('.item-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const index = this.dataset.index;
@@ -4096,7 +3866,6 @@ function renderCartPage() {
         });
     });
     
-    // Initialize selection state
     shoppingCart.forEach(item => {
         if (item.selected === undefined) item.selected = true;
     });
@@ -4115,7 +3884,6 @@ function showPhotoPreview(itemIndex) {
         return;
     }
     
-    // Create modal if it doesn't exist
     let previewModal = document.getElementById('photoPreviewModal');
     if (!previewModal) {
         previewModal = document.createElement('div');
@@ -4140,34 +3908,31 @@ function showPhotoPreview(itemIndex) {
                 </div>
                 
                 <div id="previewThumbnails" style="display: flex; gap: 10px; overflow-x: auto; padding: 10px 0;">
-                    <!-- Thumbnails will be added here -->
                 </div>
             </div>
         `;
         document.body.appendChild(previewModal);
     }
     
-    // Store current preview state
     window.currentPreviewItemIndex = itemIndex;
     window.currentPreviewPhotoIndex = 0;
     window.currentPreviewPhotos = item.photos;
     
-    // Update modal title
     document.getElementById('previewModalTitle').textContent = 
         `${item.productName || 'Photo'} - ${item.photos.length} photos`;
     
-    // Show first photo
     updatePreviewMainImage();
     
-    // Generate thumbnails
     const thumbnailsContainer = document.getElementById('previewThumbnails');
-    thumbnailsContainer.innerHTML = item.photos.map((photo, idx) => `
-        <div onclick="jumpToPreviewPhoto(${idx})" style="cursor: pointer; border: ${idx === 0 ? '3px solid var(--accent)' : '2px solid transparent'}; border-radius: 4px; overflow: hidden; width: 60px; height: 60px; flex-shrink: 0;">
-            <img src="${photo.thumbnail || photo}" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
-        </div>
-    `).join('');
+    thumbnailsContainer.innerHTML = item.photos.map((photo, idx) => {
+        let imgSrc = photo.thumbnail || photo;
+        return `
+            <div onclick="jumpToPreviewPhoto(${idx})" style="cursor: pointer; border: ${idx === 0 ? '3px solid var(--accent)' : '2px solid transparent'}; border-radius: 4px; overflow: hidden; width: 60px; height: 60px; flex-shrink: 0;">
+                <img src="${imgSrc}" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        `;
+    }).join('');
     
-    // Show modal
     previewModal.style.display = 'flex';
 }
 
@@ -4179,13 +3944,13 @@ function updatePreviewMainImage() {
     if (!photos || photos.length === 0) return;
     
     const mainImage = document.getElementById('previewMainImage');
-    mainImage.src = photos[index].data || photos[index];
+    const photo = photos[index];
+    let imgSrc = photo.thumbnail || photo;
+    mainImage.src = imgSrc;
     
-    // Update counter
     document.getElementById('previewCounter').textContent = 
         `${index + 1} / ${photos.length}`;
     
-    // Update thumbnail borders
     const thumbnails = document.querySelectorAll('#previewThumbnails div');
     thumbnails.forEach((thumb, idx) => {
         thumb.style.border = idx === index ? '3px solid var(--accent)' : '2px solid transparent';
@@ -4233,7 +3998,6 @@ function updateCartSelection() {
     document.getElementById('selectedCount').textContent = selectedCount;
     document.getElementById('selectedItemsCount').textContent = selectedCount;
     
-    // FIXED: Update select all checkbox correctly
     if (selectAll) {
         if (totalCount > 0) {
             selectAll.checked = selectedCount === totalCount;
@@ -4244,7 +4008,6 @@ function updateCartSelection() {
         }
     }
     
-    // Calculate total for selected items
     let total = 0;
     shoppingCart.forEach((item) => {
         if (item.selected) {
@@ -4256,7 +4019,7 @@ function updateCartSelection() {
     document.getElementById('cartTotalSelected').textContent = `₱${total.toFixed(2)}`;
 }
 
-// Select all items (called by initSelectAll now)
+// Select all items
 function selectAllItems(checked) {
     shoppingCart.forEach(item => {
         item.selected = checked;
@@ -4272,7 +4035,7 @@ function updateCartItemQuantityFromCart(index, change) {
     updateCartHover();
 }
 
-// FIXED: Delete selected items function - now working
+// Delete selected items function
 function deleteSelectedItems() {
     console.log('🗑️ DeleteSelectedItems called');
     const beforeCount = shoppingCart.length;
@@ -4295,7 +4058,6 @@ async function processOrderFromCart() {
         return;
     }
     
-    // Get user info
     const username = localStorage.getItem('userName') || localStorage.getItem('userEmail')?.split('@')[0] || 'guest';
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     
@@ -4304,49 +4066,81 @@ async function processOrderFromCart() {
         if (!proceed) return;
     }
     
-    // Multi-photo product types
     const multiPhotoTypes = ['calendar', 'photobook', 'doublecards'];
     
     const photos = [];
-let photoCounter = 1;
+    let photoCounter = 1;
 
-selectedItems.forEach((item, itemIndex) => {
-    const productType = item.productType || item.type;
-    const isMultiPhoto = multiPhotoTypes.includes(productType);
-    
-    if (isMultiPhoto && item.photos && item.photos.length > 0) {
-        // MULTI-PHOTO PRODUCT
-        console.log(`📸 Processing ${item.productName} with ${item.photos.length} photos`);
+    selectedItems.forEach((item, itemIndex) => {
+        const productType = item.productType || item.type;
+        const isMultiPhoto = multiPhotoTypes.includes(productType);
         
-        item.photos.forEach((photo, photoIndex) => {
-            // Handle BOTH old and new formats
+        if (isMultiPhoto && item.photos && item.photos.length > 0) {
+            console.log(`📸 Processing ${item.productName} with ${item.photos.length} photos`);
+            
+            item.photos.forEach((photo, photoIndex) => {
+                let imageData = '';
+                
+                if (photo.data) {
+                    imageData = photo.data;
+                } else if (photo.thumbnail) {
+                    imageData = photo.thumbnail;
+                } else if (typeof photo === 'string') {
+                    imageData = photo;
+                }
+                
+                if (imageData && imageData.includes(',')) {
+                    imageData = imageData.split(',')[1];
+                }
+                
+                photos.push({
+                    originalName: photo.name || `Photo_${photoIndex + 1}.jpg`,
+                    filename: `${photoCounter}.jpg`,
+                    data: imageData,
+                    size: item.size || '4x6',
+                    quantity: 1,
+                    price: item.basePrice || parseFloat(item.price.toString().replace('₱', '')) / item.photos.length,
+                    paperType: item.paperType || 'standard',
+                    isCustom: item.isCustom || false,
+                    customWidth: item.customDimensions?.width || null,
+                    customHeight: item.customDimensions?.height || null,
+                    customUnit: item.customDimensions?.unit || 'inches',
+                    resize: item.sizeMode || 'FITIN',
+                    productType: productType,
+                    productName: item.productName
+                });
+                photoCounter++;
+            });
+        } else {
+            console.log(`🖼️ Processing ${item.name} as single photo product`);
+            
+            let imageSource = '';
+            
+            if (item.displayImage) {
+                imageSource = item.displayImage;
+            } else if (item.image) {
+                imageSource = item.image;
+            } else if (item.photos && item.photos[0]) {
+                const firstPhoto = item.photos[0];
+                imageSource = firstPhoto.data || firstPhoto.thumbnail || firstPhoto;
+            }
+            
             let imageData = '';
-            
-            // Check if photo has data field (old format)
-            if (photo.data) {
-                imageData = photo.data;
-            } 
-            // Check if photo has thumbnail field (new format)
-            else if (photo.thumbnail) {
-                imageData = photo.thumbnail;
-            }
-            // Check if photo is directly a string
-            else if (typeof photo === 'string') {
-                imageData = photo;
-            }
-            
-            // Extract base64 if needed (split at comma)
-            if (imageData && imageData.includes(',')) {
-                imageData = imageData.split(',')[1];
+            if (imageSource && typeof imageSource === 'string') {
+                if (imageSource.includes(',')) {
+                    imageData = imageSource.split(',')[1];
+                } else {
+                    imageData = imageSource;
+                }
             }
             
             photos.push({
-                originalName: photo.name || `Photo_${photoIndex + 1}.jpg`,
+                originalName: item.originalName || item.name || `item_${itemIndex + 1}.jpg`,
                 filename: `${photoCounter}.jpg`,
                 data: imageData,
                 size: item.size || '4x6',
-                quantity: 1,
-                price: item.basePrice || parseFloat(item.price.toString().replace('₱', '')) / item.photos.length,
+                quantity: item.quantity || 1,
+                price: parseFloat(item.price.toString().replace('₱', '').replace(',', '')) / (item.quantity || 1),
                 paperType: item.paperType || 'standard',
                 isCustom: item.isCustom || false,
                 customWidth: item.customDimensions?.width || null,
@@ -4354,60 +4148,14 @@ selectedItems.forEach((item, itemIndex) => {
                 customUnit: item.customDimensions?.unit || 'inches',
                 resize: item.sizeMode || 'FITIN',
                 productType: productType,
-                productName: item.productName
+                productName: item.productName || item.name
             });
             photoCounter++;
-        });
-    } else {
-        // SINGLE PHOTO PRODUCT
-        console.log(`🖼️ Processing ${item.name} as single photo product`);
-        
-        // Handle BOTH old and new formats for single items
-        let imageSource = '';
-        
-        if (item.displayImage) {
-            imageSource = item.displayImage;
-        } else if (item.image) {
-            imageSource = item.image;
-        } else if (item.photos && item.photos[0]) {
-            // Maybe it's a multi-photo item with one photo
-            const firstPhoto = item.photos[0];
-            imageSource = firstPhoto.data || firstPhoto.thumbnail || firstPhoto;
         }
-        
-        // Extract base64 if needed
-        let imageData = '';
-        if (imageSource && typeof imageSource === 'string') {
-            if (imageSource.includes(',')) {
-                imageData = imageSource.split(',')[1];
-            } else {
-                imageData = imageSource;
-            }
-        }
-        
-        photos.push({
-            originalName: item.originalName || item.name || `item_${itemIndex + 1}.jpg`,
-            filename: `${photoCounter}.jpg`,
-            data: imageData,
-            size: item.size || '4x6',
-            quantity: item.quantity || 1,
-            price: parseFloat(item.price.toString().replace('₱', '').replace(',', '')) / (item.quantity || 1),
-            paperType: item.paperType || 'standard',
-            isCustom: item.isCustom || false,
-            customWidth: item.customDimensions?.width || null,
-            customHeight: item.customDimensions?.height || null,
-            customUnit: item.customDimensions?.unit || 'inches',
-            resize: item.sizeMode || 'FITIN',
-            productType: productType,
-            productName: item.productName || item.name
-        });
-        photoCounter++;
-    }
-});
+    });
     
     console.log(`📦 Total photos to upload: ${photos.length}`);
     
-    // Create order data
     const orderData = {
         orderId: generateOrderId(),
         username: username,
@@ -4416,14 +4164,12 @@ selectedItems.forEach((item, itemIndex) => {
         timestamp: new Date().toISOString()
     };
     
-    // Show loading
     const btn = document.getElementById('completeOrderBtn');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<span class="spinner"></span> Processing Order...';
     btn.disabled = true;
     
     try {
-        // Get Google Auth token
         const token = await new Promise((resolve, reject) => {
             tokenClient.callback = (resp) => {
                 if (resp.error !== undefined) {
@@ -4434,17 +4180,13 @@ selectedItems.forEach((item, itemIndex) => {
             tokenClient.requestAccessToken();
         });
         
-        // Get orders folder
         const ordersFolderId = await getOrCreateOrdersFolder();
         
-        // Create order folder
         const folderName = `${username}_${orderData.orderCount}_${orderData.orderId}`;
         const mainFolder = await createDriveFolder(folderName, ordersFolderId);
         
-        // Create Photos subfolder
         const photosFolder = await createDriveFolder('Photos', mainFolder.id);
         
-        // Upload photos
         for (let i = 0; i < orderData.photos.length; i++) {
             const photo = orderData.photos[i];
             await uploadFileToDrive(
@@ -4454,37 +4196,31 @@ selectedItems.forEach((item, itemIndex) => {
             );
         }
         
-        // Upload Condition.txt
         await uploadFileToDrive(
             'Condition.txt',
             generateConditionFile(orderData),
             mainFolder.id
         );
         
-        // Upload End.txt
         await uploadFileToDrive(
             'End.txt',
             generateEndFile(orderData),
             mainFolder.id
         );
         
-        // Upload OrderReceipt.txt
         await uploadFileToDrive(
             'OrderReceipt.txt',
             generateReceiptFile(orderData),
             mainFolder.id
         );
         
-        // Remove ordered items from cart (only selected ones)
         shoppingCart = shoppingCart.filter(item => !item.selected);
         updateCartStorage();
         
-        // Show success message with photo count
         const message = `Hello ${username},\n\nThis is your Order Number: ${orderData.orderId} <button class="copy-btn" onclick="copyOrderNumber()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:5px;" title="Copy order number">📋</button>\n\nTotal Photos: ${photos.length}\n\nPlease copy and save the Order Number\n\nThank you for choosing FOTOCENTER!`;
         document.getElementById('orderSuccessMessage').innerHTML = message;
         document.getElementById('orderSuccessModal').style.display = 'flex';
         
-        // Update UI
         renderCartPage();
         updateCartUI();
         updateCartHover();
@@ -4533,7 +4269,6 @@ function updateCartHover() {
                     <div class="cart-hover-item-name">${item.productName || item.name} ${item.photoCount > 1 ? `(${item.photoCount} photos)` : ''}</div>
                     <div class="cart-hover-item-price">${item.price}</div>
                 </div>
-                <!-- REMOVED: Individual trash icon from hover -->
             </div>
         `;
     });
@@ -4580,7 +4315,6 @@ window.closePhotoPreview = closePhotoPreview;
 window.prevPreviewPhoto = prevPreviewPhoto;
 window.nextPreviewPhoto = nextPreviewPhoto;
 window.jumpToPreviewPhoto = jumpToPreviewPhoto;
-
-
-
-
+window.updateQuantity = updateQuantity;
+window.calculatePrice = calculatePrice;
+window.onSizeSelect = onSizeSelect;
