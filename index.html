@@ -17,20 +17,21 @@
                 <p class="logo-sub" data-i18n="philippines">Philippines</p>
             </div>
 
+            <!-- FIXED HAMBURGER MENU -->
             <div class="hamburger-menu" id="hamburgerMenu">
-    <button class="hamburger-icon">☰</button>
-    <div class="hamburger-dropdown" id="hamburgerDropdown">
-        <a href="#" onclick="navigateTo('photos'); return false;" class="dropdown-item">
-            <span class="dropdown-icon">✏️</span> <span data-i18n="editor">Editor</span>
-        </a>
-        <a href="#" onclick="navigateTo('shop'); return false;" class="dropdown-item">
-            <span class="dropdown-icon">🛍️</span> <span data-i18n="shop">Shop</span>
-        </a>
-        <a href="#" onclick="navigateTo('contact'); return false;" class="dropdown-item">
-            <span class="dropdown-icon">ℹ️</span> <span data-i18n="info">Info</span>
-        </a>
-    </div>
-</div>
+                <button class="hamburger-icon" id="hamburgerIcon" aria-label="Menu">☰</button>
+                <div class="hamburger-dropdown" id="hamburgerDropdown">
+                    <a href="#" onclick="navigateTo('photos'); return false;" class="dropdown-item">
+                        <span class="dropdown-icon">✏️</span> <span data-i18n="editor">Editor</span>
+                    </a>
+                    <a href="#" onclick="navigateTo('shop'); return false;" class="dropdown-item">
+                        <span class="dropdown-icon">🛍️</span> <span data-i18n="shop">Shop</span>
+                    </a>
+                    <a href="#" onclick="navigateTo('contact'); return false;" class="dropdown-item">
+                        <span class="dropdown-icon">ℹ️</span> <span data-i18n="info">Info</span>
+                    </a>
+                </div>
+            </div>
             
             <!-- CART MODAL -->
             <div id="cartModal" class="modal">
@@ -112,7 +113,7 @@
                        autocomplete="off">
             </div>
 
-            <!-- NAV ACTIONS with CART HOVER and LANGUAGE BUTTON -->
+            <!-- NAV ACTIONS -->
             <div class="nav-actions" id="cartHoverContainer">
                 <div style="display: flex; flex-direction: column; align-items: center;">
                     <a href="#" class="login-link" onclick="openLoginModal(); return false;"><span data-i18n="log_in">Log in</span></a>
@@ -127,7 +128,7 @@
                     </div>
                 </div>
                 
-                <!-- LANGUAGE BUTTON (TASK 5) -->
+                <!-- LANGUAGE BUTTON -->
                 <div class="language-dropdown" id="languageDropdown">
                     <button class="language-btn" id="languageBtn">
                         <span class="flag-icon">🇺🇸</span>
@@ -260,7 +261,7 @@
                 </div>
             </header>
 
-            <!-- SLIDESHOW SECTION -->
+            <!-- FIXED SLIDESHOW SECTION WITH CLICKABLE SLIDES -->
             <section class="slideshow-section">
                 <div class="container">
                     <div class="slideshow-container" id="productSlideshow">
@@ -793,4 +794,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
