@@ -4799,8 +4799,17 @@ button:disabled {
     font-size: 1.2rem;
 }
 
-.language-btn .currency-code {
+.language-btn .language-name {
     font-weight: 600;
+}
+
+.language-btn .currency-code {
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.language-btn:hover .currency-code {
+    color: white;
 }
 
 .language-btn .dropdown-arrow {
@@ -4812,7 +4821,7 @@ button:disabled {
     position: absolute;
     top: 100%;
     right: 0;
-    width: 240px;
+    width: 280px;
     background: white;
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
@@ -4871,6 +4880,15 @@ button:disabled {
     font-size: 0.85rem;
     color: var(--text-muted);
     font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.language-item .currency-symbol {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+    min-width: 30px;
+    text-align: right;
 }
 
 /* Mobile responsive */
@@ -4881,17 +4899,22 @@ button:disabled {
     }
     
     .language-menu {
-        width: 220px;
+        width: 250px;
         right: -20px;
     }
 }
 
 @media (max-width: 480px) {
-    .language-btn .currency-code {
+    .language-btn .language-name {
         display: none;
     }
     
     .language-btn {
         padding: 0.4rem 0.6rem;
     }
+    
+    .language-btn .currency-code {
+        font-size: 0.8rem;
+    }
 }
+
