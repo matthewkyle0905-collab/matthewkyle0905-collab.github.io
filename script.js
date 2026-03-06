@@ -4673,71 +4673,74 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-// ============== SIMPLE SLIDESHOW FIX ==============
+// ============== CORRECTED SLIDESHOW ==============
 
 // Wait for page to fully load
 window.addEventListener('load', function() {
-    console.log('Page loaded, creating slideshow...');
-    createSlideshow();
+    console.log('Creating slideshow...');
+    createSimpleSlideshow();
 });
 
-function createSlideshow() {
+function createSimpleSlideshow() {
     const track = document.getElementById('slidesTrack');
     const dotsContainer = document.getElementById('slideshowDots');
     
     if (!track) {
-        console.error('Slides track element not found!');
+        console.error('Slides track not found!');
         return;
     }
     
-    // Simple product data with reliable image URLs
+    // Product data with FALLBACK images (using working URLs)
     const products = [
         {
             name: 'Photo Cards',
             price: '₱600',
-            image: 'https://images.unsplash.com/photo-1607344645866-009c320c63e0?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?w=400&h=300&fit=crop',
             desc: 'Create personalized greeting cards'
         },
         {
             name: 'Calendar',
             price: '₱900',
-            image: 'https://images.unsplash.com/photo-1585241645927-15a8e971b94c?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?w=400&h=300&fit=crop',
             desc: 'Make your own custom calendar'
         },
         {
             name: 'Photo Book',
             price: '₱1,500',
-            image: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?w=400&h=300&fit=crop',
             desc: 'Premium hardcover photo books'
         },
         {
             name: 'Canvas',
             price: '₱2,400',
-            image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?w=400&h=300&fit=crop',
             desc: 'Your favorite photo on canvas'
         },
         {
             name: 'Mouse Pads',
             price: '₱480',
-            image: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?w=400&h=300&fit=crop',
             desc: 'Custom photo mouse pads'
         },
         {
             name: 'Double Cards',
             price: '₱720',
-            image: 'https://images.unsplash.com/photo-1607344645866-009c320c63e0?w=400&h=300&fit=crop&flip=2',
+            image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?w=400&h=300&fit=crop',
             desc: 'Elegant folded greeting cards'
         }
     ];
     
     // Clear and populate track
     track.innerHTML = '';
-    products.forEach((product, index) => {
+    products.forEach((product) => {
         const slide = document.createElement('div');
         slide.className = 'slide-card';
         slide.innerHTML = `
             <div class="slide-image">
-                <img src="${product.image}" alt="${product.name}" loading="lazy">
+                <img src="${product.image}" 
+                     alt="${product.name}" 
+                     loading="lazy"
+                     onerror="this.src='https://via.placeholder.com/300x200?text=${product.name}'">
             </div>
             <div class="slide-info">
                 <h3>${product.name}</h3>
@@ -4759,69 +4762,80 @@ function createSlideshow() {
         });
     }
     
-    // Set up navigation
+    // Slideshow variables
     let currentIndex = 0;
-    const slidesToShow = window.innerWidth <= 480 ? 2 : (window.innerWidth <= 768 ? 3 : 6);
-    const maxIndex = products.length - slidesToShow;
-    
-    // Add click handlers
-    document.getElementById('slideshowPrev')?.addEventListener('click', function() {
-        currentIndex = Math.max(0, currentIndex - 1);
-        updateSlidePosition(currentIndex);
-    });
-    
-    document.getElementById('slideshowNext')?.addEventListener('click', function() {
-        currentIndex = Math.min(maxIndex, currentIndex + 1);
-        updateSlidePosition(currentIndex);
-    });
-    
-    // Pause button
     let isPaused = false;
-    let interval = setInterval(autoSlide, 5000);
+    let interval;
     
-    document.getElementById('slideshowPause')?.addEventListener('click', function() {
-        isPaused = !isPaused;
-        this.textContent = isPaused ? '▶️' : '⏸️';
-        if (!isPaused) {
-            clearInterval(interval);
-            interval = setInterval(autoSlide, 5000);
-        }
-    });
+    // Set to show 1 slide at a time
+    const slidesToShow = 1;
+    const totalSlides = products.length;
     
-    function autoSlide() {
-        if (!isPaused) {
-            currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
-            updateSlidePosition(currentIndex);
-        }
-    }
+    // Set track width to show one slide
+    track.style.width = `${totalSlides * 100}%`;
     
+    // Update slide positions
     function updateSlidePosition(index) {
-        const slideWidth = track.children[0]?.offsetWidth || 180;
-        const gap = 24;
-        track.style.transform = `translateX(-${index * (slideWidth + gap)}px)`;
+        // Calculate percentage to move
+        const movePercent = (index / totalSlides) * 100;
+        track.style.transform = `translateX(-${movePercent}%)`;
         
         // Update dots
         document.querySelectorAll('.dot').forEach((dot, i) => {
             dot.classList.toggle('active', i === index);
         });
+        
+        currentIndex = index;
+    }
+    
+    // Navigation functions
+    function nextSlide() {
+        let newIndex = currentIndex + 1;
+        if (newIndex >= totalSlides) {
+            newIndex = 0; // Loop back to first
+        }
+        updateSlidePosition(newIndex);
+    }
+    
+    function prevSlide() {
+        let newIndex = currentIndex - 1;
+        if (newIndex < 0) {
+            newIndex = totalSlides - 1; // Loop to last
+        }
+        updateSlidePosition(newIndex);
     }
     
     function goToSlide(index) {
-        currentIndex = Math.min(index, maxIndex);
-        updateSlidePosition(currentIndex);
+        updateSlidePosition(index);
     }
     
-    // Handle resize
-    window.addEventListener('resize', function() {
-        const newSlidesToShow = window.innerWidth <= 480 ? 2 : (window.innerWidth <= 768 ? 3 : 6);
-        const newMaxIndex = products.length - newSlidesToShow;
-        if (currentIndex > newMaxIndex) {
-            currentIndex = newMaxIndex;
+    function togglePause() {
+        isPaused = !isPaused;
+        const pauseBtn = document.getElementById('slideshowPause');
+        if (pauseBtn) {
+            pauseBtn.textContent = isPaused ? '▶️' : '⏸️';
         }
-        updateSlidePosition(currentIndex);
-    });
+        
+        if (!isPaused) {
+            // Restart interval
+            clearInterval(interval);
+            interval = setInterval(nextSlide, 3000); // Change every 3 seconds
+        }
+    }
     
-    console.log('Slideshow created successfully!');
+    // Add event listeners
+    const prevBtn = document.getElementById('slideshowPrev');
+    const nextBtn = document.getElementById('slideshowNext');
+    const pauseBtn = document.getElementById('slideshowPause');
+    
+    if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+    if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+    if (pauseBtn) pauseBtn.addEventListener('click', togglePause);
+    
+    // Start auto-loop
+    interval = setInterval(nextSlide, 3000); // Change slide every 3 seconds
+    
+    console.log('Slideshow created with 1 slide view and auto-loop!');
 }
 
 // Make functions globally available
@@ -4845,6 +4859,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
