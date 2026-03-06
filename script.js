@@ -4678,6 +4678,57 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
 });
 
+// ============== HAMBURGER MENU FUNCTIONALITY (TASK 3) ==============
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupHamburgerMenu();
+});
+
+function setupHamburgerMenu() {
+    const hamburgerMenu = document.getElementById('hamburgerMenu');
+    const hamburgerIcon = document.querySelector('.hamburger-icon');
+    const hamburgerDropdown = document.getElementById('hamburgerDropdown');
+    
+    if (!hamburgerMenu || !hamburgerIcon || !hamburgerDropdown) return;
+    
+    // Toggle menu on icon click
+    hamburgerIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        hamburgerMenu.classList.toggle('open');
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!hamburgerMenu.contains(e.target)) {
+            hamburgerMenu.classList.remove('open');
+        }
+    });
+    
+    // Close menu when mouse leaves dropdown (with delay)
+    let timeoutId;
+    
+    hamburgerDropdown.addEventListener('mouseenter', function() {
+        clearTimeout(timeoutId);
+    });
+    
+    hamburgerDropdown.addEventListener('mouseleave', function() {
+        timeoutId = setTimeout(() => {
+            hamburgerMenu.classList.remove('open');
+        }, 300);
+    });
+    
+    // Close menu when clicking a menu item
+    const menuItems = hamburgerDropdown.querySelectorAll('.dropdown-item');
+    menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+            hamburgerMenu.classList.remove('open');
+        });
+    });
+    
+    console.log('✅ Hamburger menu initialized with 3 items (Editor, Shop, Info)');
+}
+
+
 // Make functions globally available
 window.renderCartPage = renderCartPage;
 window.updateCartItemQuantityFromCart = updateCartItemQuantityFromCart;
@@ -4699,6 +4750,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
