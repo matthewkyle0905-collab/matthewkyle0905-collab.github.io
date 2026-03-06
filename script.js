@@ -4852,7 +4852,9 @@ const productDatabase = {
     icon: '🃏',
     productType: 'doublecards'
 }
-};
+};  // ← THIS closes the productDatabase object!
+
+// Make sure there's nothing after this except the next function
 
 // Make slides clickable
 function makeSlidesClickable() {
@@ -5186,4 +5188,5 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
