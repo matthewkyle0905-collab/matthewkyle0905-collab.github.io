@@ -932,14 +932,16 @@ body {
     top: 1rem;
     right: 1rem;
     font-size: 1.5rem;
-    color: var(--text-muted);
+    color: #ff0000;  /* Bright red - to test visibility */
     cursor: pointer;
     transition: var(--transition);
+    z-index: 10;  /* Make sure it's on top */
+    font-weight: bold;
 }
 
-    .close-modal:hover {
-        color: var(--text);
-    }
+.close-modal:hover {
+    color: #cc0000;  /* Darker red on hover */
+}
 
 .modal-icon {
     font-size: 3rem;
@@ -4027,5 +4029,6 @@ button:disabled {
     color: var(--text-muted);
     margin-top: 0.1rem;
 }
+
 
 
