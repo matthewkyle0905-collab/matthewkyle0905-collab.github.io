@@ -4478,7 +4478,7 @@ class Slideshow {
         this.totalSlides = 0;
         this.isPaused = false;
         this.interval = null;
-        this.autoPlayDelay = 4000; // 4 seconds
+        this.autoPlayDelay = 6000; 
         
       this.products = [
     {
@@ -4734,7 +4734,7 @@ function setupHamburgerMenu() {
 const productDatabase = {
     photocards: {
         name: 'Photo Cards',
-        basePrice: '₱600',
+        basePrice: 'Starts at ₱25',
         mainImage: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -4754,7 +4754,7 @@ const productDatabase = {
     },
     calendar: {
         name: 'Calendar',
-        basePrice: '₱900',
+        basePrice: 'Starts at ₱60',
         mainImage: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -4774,7 +4774,7 @@ const productDatabase = {
     },
     photobook: {
         name: 'Photo Book',
-        basePrice: '₱1,500',
+        basePrice: 'Starts at ₱120',
         mainImage: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -4794,7 +4794,7 @@ const productDatabase = {
     },
     canvas: {
         name: 'Canvas',
-        basePrice: '₱2,400',
+        basePrice: 'Starts at ₱200',
         mainImage: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -4812,29 +4812,29 @@ const productDatabase = {
         icon: '🖼️',
         productType: 'canvas'
     },
-    mousepads: {
-        name: 'Mouse Pads',
-        basePrice: '₱480',
-        mainImage: 'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-        thumbnails: [
-            'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-            'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
-            'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
-        ],
-        sizes: printOptionsConfig.mousepads,
-        paperTypes: [
-            { name: 'Standard', price: '+₱0' },
-            { name: 'Glossy', price: '+₱10' },
-            { name: 'Matte', price: '+₱15' },
-            { name: 'Premium', price: '+₱25' }
-        ],
-        description: 'Custom photo mouse pads for your desk. Perfect for office or home use. Non-slip rubber base and smooth surface for optimal mouse control.',
-        icon: '🖱️',
-        productType: 'mousepads'
-    },
+   mousepads: {
+    name: 'Mouse Pads',
+    basePrice: 'Starts at ₱45',
+    mainImage: 'https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    thumbnails: [
+        'https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+        'https://images.pexels.com/photos/3945665/pexels-photo-3945665.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+        'https://images.pexels.com/photos/3945668/pexels-photo-3945668.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop'
+    ],
+    sizes: printOptionsConfig.mousepads,
+    paperTypes: [
+        { name: 'Standard', price: '+₱0' },
+        { name: 'Glossy', price: '+₱10' },
+        { name: 'Matte', price: '+₱15' },
+        { name: 'Premium', price: '+₱25' }
+    ],
+    description: 'Custom photo mouse pads for your desk. Perfect for office or home use. Non-slip rubber base and smooth surface for optimal mouse control.',
+    icon: '🖱️',
+    productType: 'mousepads'
+}
     doublecards: {
         name: 'Double Cards',
-        basePrice: '₱720',
+        basePrice: 'Starts at ₱70',
         mainImage: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -5036,6 +5036,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
