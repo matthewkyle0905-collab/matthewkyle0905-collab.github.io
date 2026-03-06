@@ -7239,126 +7239,73 @@ function closeWelcomePopup() {
     if (popup) popup.remove();
 }
 
-// ============== FINAL FIXES - ADD AT THE VERY END OF YOUR JS FILE ==============
+// ============== SIMPLE WORKING FIX - REPLACE EVERYTHING FROM HERE ==============
 
-// Force re-initialize hamburger menu with proper event handling
-(function fixHamburgerMenu() {
-    console.log('🔧 Fixing hamburger menu...');
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize slideshow
+    setTimeout(() => {
+        if (typeof Slideshow === 'function' && !window.slideshowInitialized) {
+            window.slideshow = new Slideshow();
+            window.slideshowInitialized = true;
+            console.log('✅ Slideshow initialized');
+        }
+    }, 500);
     
-    const hamburgerMenu = document.getElementById('hamburgerMenu');
-    const hamburgerIcon = document.querySelector('.hamburger-icon');
+    // Make slides clickable
+    setTimeout(makeSlidesClickable, 1500);
     
-    if (hamburgerMenu && hamburgerIcon) {
-        // Remove all existing click listeners by cloning
-        const newIcon = hamburgerIcon.cloneNode(true);
-        hamburgerIcon.parentNode.replaceChild(newIcon, hamburgerIcon);
-        
-        // Add fresh click listener
-        newIcon.addEventListener('click', function(e) {
+    // Setup hamburger menu
+    setupSimpleHamburger();
+});
+
+// Simple hamburger menu that works
+function setupSimpleHamburger() {
+    const menu = document.getElementById('hamburgerMenu');
+    const icon = document.querySelector('.hamburger-icon');
+    
+    if (icon) {
+        icon.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            hamburgerMenu.classList.toggle('open');
-            console.log('Hamburger menu toggled:', hamburgerMenu.classList.contains('open'));
-        });
+            menu.classList.toggle('open');
+        };
         
         // Close when clicking outside
         document.addEventListener('click', function(e) {
-            if (!hamburgerMenu.contains(e.target)) {
-                hamburgerMenu.classList.remove('open');
+            if (!menu.contains(e.target)) {
+                menu.classList.remove('open');
             }
         });
-        
-        console.log('✅ Hamburger menu fixed');
-    } else {
-        console.warn('❌ Hamburger menu elements not found');
     }
-})();
+}
 
-// Force slideshow to be clickable
-(function fixSlideshowClicks() {
-    console.log('🔧 Making slideshow clickable...');
+// Make slides clickable
+function makeSlidesClickable() {
+    const slides = document.querySelectorAll('.slide-card');
+    const products = ['photocards', 'calendar', 'photobook', 'canvas', 'mousepads', 'doublecards'];
     
-    // Wait a bit for slideshow to initialize
-    setTimeout(() => {
-        const slides = document.querySelectorAll('.slide-card');
-        
-        if (slides.length > 0) {
-            slides.forEach((slide, index) => {
-                // Get product type from the slide content
-                const productTypes = ['photocards', 'calendar', 'photobook', 'canvas', 'mousepads', 'doublecards'];
-                const productType = productTypes[index % productTypes.length];
-                
-                // Remove existing listeners and add new ones
-                const newSlide = slide.cloneNode(true);
-                slide.parentNode.replaceChild(newSlide, slide);
-                
-                newSlide.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Slide clicked:', productType);
-                    
-                    // Navigate to product page
-                    navigateTo('product-page');
-                    
-                    // Load product details
-                    setTimeout(() => {
-                        if (typeof loadProductDetails === 'function') {
-                            loadProductDetails(productType);
-                        } else {
-                            console.warn('loadProductDetails not found');
-                        }
-                    }, 100);
-                });
-                
-                // Restore cursor style
-                newSlide.style.cursor = 'pointer';
-            });
-            
-            console.log(`✅ Made ${slides.length} slides clickable`);
-        } else {
-            console.warn('❌ No slides found to fix');
-        }
-    }, 1000); // Wait 1 second for slideshow to render
-})();
-
-// Force reinitialize on page navigation
-(function setupNavigationListener() {
-    const originalNavigateTo = window.navigateTo;
-    
-    if (typeof originalNavigateTo === 'function') {
-        window.navigateTo = function(pageId) {
-            // Call original function
-            originalNavigateTo(pageId);
-            
-            // Re-fix slideshow when returning to home
-            if (pageId === 'home') {
-                setTimeout(() => {
-                    // Re-attach click handlers to slides
-                    const slides = document.querySelectorAll('.slide-card');
-                    slides.forEach((slide, index) => {
-                        const productTypes = ['photocards', 'calendar', 'photobook', 'canvas', 'mousepads', 'doublecards'];
-                        const productType = productTypes[index % productTypes.length];
-                        
-                        slide.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            navigateTo('product-page');
-                            setTimeout(() => {
-                                if (typeof loadProductDetails === 'function') {
-                                    loadProductDetails(productType);
-                                }
-                            }, 100);
-                        });
-                    });
-                    console.log('🔄 Re-attached slideshow click handlers');
-                }, 500);
-            }
+    slides.forEach((slide, i) => {
+        slide.onclick = function(e) {
+            e.preventDefault();
+            navigateTo('product-page');
+            setTimeout(() => {
+                if (typeof loadProductDetails === 'function') {
+                    loadProductDetails(products[i % products.length]);
+                }
+            }, 100);
         };
-        
-        console.log('✅ Navigation listener setup');
-    }
-})();
+        slide.style.cursor = 'pointer';
+    });
+}
 
+// Keep all your existing global functions
+window.prevSlide = function() { if (window.slideshow) window.slideshow.prevSlide(); };
+window.nextSlide = function() { if (window.slideshow) window.slideshow.nextSlide(); };
+window.goToSlide = function(i) { if (window.slideshow) window.slideshow.goToSlide(i); };
+window.toggleSlideshowPause = function() { if (window.slideshow) window.slideshow.togglePause(); };
+window.openProductPage = openProductPage;
+window.closeWelcomePopup = closeWelcomePopup;
 window.renderCartPage = renderCartPage;
 window.updateCartItemQuantityFromCart = updateCartItemQuantityFromCart;
 window.processOrderFromCart = processOrderFromCart;
@@ -7375,23 +7322,3 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
-window.prevSlide = prevSlide;
-window.nextSlide = nextSlide;
-window.goToSlide = goToSlide;
-window.toggleSlideshowPause = toggleSlideshowPause;
-window.openProductPage = openProductPage;
-window.closeWelcomePopup = closeWelcomePopup;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
