@@ -1,3 +1,1024 @@
+// ============== LANGUAGE & CURRENCY SYSTEM (TASK 5) ==============
+
+// Language and currency data with translations
+const languages = [
+    { 
+        code: 'us', 
+        name: 'English', 
+        flag: '🇺🇸', 
+        currency: 'USD', 
+        symbol: '$', 
+        rate: 0.018,
+        translations: {
+            // Navigation
+            'home': 'Home',
+            'editor': 'Editor',
+            'shop': 'Shop',
+            'info': 'Info',
+            'log_in': 'Log in',
+            'register_here': 'Register here!',
+            'cart': 'Cart',
+            'philippines': 'Philippines',
+            
+            // Hero section
+            'welcome': 'Welcome to FOTOCENTER PH',
+            'tagline': 'Paper copies for your digital photos',
+            'start_ordering': 'Start Ordering',
+            
+            // Homepage text
+            'your': 'Your',
+            'memories': 'MEMORIES',
+            'deserve_more': 'deserve more than just a screen.',
+            'help_transform': 'We help you transform your favorite digital moments into:',
+            'stunning_cards': '• Stunning photo cards for any occasion',
+            'personalized_calendars': '• Personalized calendars to cherish all year',
+            'beautiful_canvas': '• Beautiful canvas prints for your walls',
+            'and_more': '• And more...',
+            'turn_your': 'Turn your',
+            'into_art': 'into art you can hold.',
+            'upload_any': '✓ Upload any photo',
+            'edit_tools': '✓ Edit with our easy-to-use tools',
+            'choose_six': '✓ Choose from 6 product types',
+            'high_quality': '✓ Get high-quality prints delivered',
+            'simple_editor': 'All with our simple online editor.',
+            
+            // Shop page
+            'shop_description': 'Explore our personalized photo products.',
+            
+            // Cart page
+            'shopping_cart': 'SHOPPING CART',
+            'continue_shopping': 'Continue Shopping',
+            'all': 'ALL',
+            'printing': 'Printing',
+            'to_ship': 'To Ship',
+            'completed': 'Completed',
+            'cancel_return': 'Cancel/Return',
+            'select_all': 'Select All',
+            'items': 'items',
+            'delete_selected': 'Delete Selected',
+            'total': 'Total',
+            'selected_items': 'selected items',
+            'complete_order': 'COMPLETE ORDER',
+            
+            // Product detail page
+            'back_to_home': 'Back to Home',
+            'available_sizes': 'Available Sizes:',
+            'paper_types': 'Paper Types:',
+            'open_in_editor': 'OPEN IN EDITOR',
+            
+            // Editor page
+            'photo_upload_editing': 'Photo Upload & Editing',
+            'upload_description': 'Upload your photos and customize them before ordering prints.',
+            'upload_photos': 'Upload Photos',
+            'order_prints': 'Order Prints',
+            'click_browse': 'Click to browse or drag and drop images here',
+            'file_types': 'Supports JPG, PNG, GIF up to 10MB each',
+            'uploaded': 'Uploaded',
+            'photos': 'photos',
+            'photo_editor': 'PHOTO EDITOR',
+            'products': 'Products',
+            'none': 'None',
+            'select_photo': 'Select a photo to edit from above',
+            'select_photo_start': 'Select a photo to start editing',
+            'edit_tools': 'Edit Tools',
+            'brightness': 'Brightness',
+            'contrast': 'Contrast',
+            'saturation': 'Saturation',
+            'rotate_flip': 'Rotate & Flip',
+            'rotate_left': '↺ 90°',
+            'rotate_right': '↻ 90°',
+            'flip_h': '⬌ Flip H',
+            'flip_v': '⬍ Flip V',
+            'filters': 'Filters',
+            'grayscale': 'Grayscale',
+            'sepia': 'Sepia',
+            'vintage': 'Vintage',
+            'cool': 'Cool',
+            'warm': 'Warm',
+            'vivid': 'Vivid',
+            'noir': 'Noir',
+            'lomo': 'Lomo',
+            'dreamy': 'Dreamy',
+            'advanced_tools': 'Advanced Tools',
+            'crop': 'Crop',
+            'add_text': 'Add Text',
+            'red_eye': 'Red-Eye',
+            'auto_enhance': 'Auto Enhance',
+            'undo': 'Undo',
+            'redo': 'Redo',
+            'reset_all': 'Reset All',
+            'save_edits': 'Save Edits',
+            'download': 'Download',
+            
+            // Print options
+            'print_options': 'Print Options',
+            'paper_type': 'Paper Type',
+            'standard': 'Standard',
+            'glossy': 'Glossy',
+            'matte': 'Matte',
+            'premium': 'Premium',
+            'size_mode': 'Size Mode',
+            'fill': 'Fill',
+            'fit': 'Fit',
+            'size': 'Size',
+            'size_unit': 'Size Unit:',
+            'inches_default': 'Inches (default)',
+            'price_by_area': 'Price calculated by area',
+            'quantity': 'Quantity',
+            'base_price': 'Base Price:',
+            'paper_type_price': 'Paper Type Price:',
+            'quantity_price': 'Quantity Price:',
+            'add_to_cart': 'Add to Cart',
+            
+            // Other pages
+            'photo_cards': 'Photo Cards',
+            'cards_description': 'Create personalized greeting cards for every occasion.',
+            'custom_calendars': 'Custom Calendars',
+            'calendars_description': 'Create personalized calendars with your photos.',
+            'photo_book': 'Photo Book',
+            'photobook_description': 'Unleash your creativity with our photo books.',
+            'photo_gifts': 'Photo Gifts',
+            'gifts_description': 'Canvas, mouse pads and other photo gifts.',
+            'canvas': 'Canvas',
+            'canvas_description': 'Your favorite photo mounted on canvas.',
+            'fotocenter_branch': 'FOTOCENTER PH BRANCH',
+            'address': 'Address:',
+            'address_value': 'St. Agatha Homes, Malolos, Bulacan',
+            'phone': 'Phone:',
+            'phone_value': '(+63) 929 725 2291',
+            'email': 'Email:',
+            
+            // Modals
+            'your_cart': 'Your Cart',
+            'clear': 'Clear',
+            'checkout': 'Checkout',
+            'welcome_back': 'Welcome Back',
+            'sign_in_subtitle': 'Sign in to your FOTOCENTER account',
+            'email_address': 'Email Address',
+            'password': 'Password',
+            'remember_me': 'Remember Me',
+            'forgot': 'Forgot?',
+            'sign_in': 'Sign In',
+            'or': 'or',
+            'sign_in_google': 'Sign in with Google',
+            'sign_in_facebook': 'Sign in with Facebook',
+            'no_account': 'Don\'t have an account?',
+            'create_one': 'Create one',
+            'create_account': 'Create Account',
+            'join_today': 'Join FOTOCENTER today',
+            'full_name': 'Full Name',
+            'confirm_password': 'Confirm Password',
+            'sign_up_google': 'Sign up with Google',
+            'have_account': 'Already have an account?',
+            'photo_added': 'Photo Added to Cart!',
+            'photo_added_message': 'Your edited photo has been successfully added to your shopping cart.',
+            'continue_editing': 'Continue Editing',
+            'view_cart': 'View Cart',
+            'your_shopping_cart': 'Your Shopping Cart',
+            'view_cart_page': 'View Cart Page',
+            'order_submitted': 'Order Submitted Successfully!',
+            'ok': 'OK',
+            
+            // Footer
+            'menu': 'Menu',
+            'terms': 'Terms',
+            'terms_of_use': 'Terms of Use',
+            'payment_terms': 'Payment Terms',
+            'cookie_details': 'Cookie Details',
+            'copyright': '© Powered by FOTOCENTER. By continuing to use our website we assume you agree to the use of cookies.',
+            
+            // Reviews
+            'customer_reviews': 'Customer Reviews',
+            
+            // Chat
+            'support': 'FOTOCENTER Support',
+            'pricing': 'Pricing',
+            'delivery': 'Delivery',
+            'upload': 'Upload',
+            'quality': 'Quality',
+            'editing': 'Editing',
+            'payment': 'Payment',
+            'sizes': 'Sizes',
+            'refund': 'Refunds',
+            'send': 'Send',
+            
+            // Loading states
+            'loading_cart': 'Loading cart...',
+            'back': 'Back'
+        }
+    },
+    { 
+        code: 'uk', 
+        name: 'English', 
+        flag: '🇬🇧', 
+        currency: 'GBP', 
+        symbol: '£', 
+        rate: 0.014,
+        translations: {
+            // Copy all keys from US English but with UK spellings if needed
+            // For now, use same translations
+            'welcome': 'Welcome to FOTOCENTER PH',
+            'tagline': 'Paper copies for your digital photos',
+            'start_ordering': 'Start Ordering',
+            // ... etc (same as US for now)
+        }
+    },
+    { 
+        code: 'se', 
+        name: 'Svenska', 
+        flag: '🇸🇪', 
+        currency: 'SEK', 
+        symbol: 'kr', 
+        rate: 0.25,
+        translations: {
+            'welcome': 'Välkommen till FOTOCENTER PH',
+            'tagline': 'Papperskopior för dina digitala foton',
+            'start_ordering': 'Börja beställa',
+            'home': 'Hem',
+            'editor': 'Redigerare',
+            'shop': 'Butik',
+            'info': 'Info',
+            'log_in': 'Logga in',
+            'register_here': 'Registrera dig här!',
+            'cart': 'Varukorg',
+            'philippines': 'Filippinerna',
+            // Add more Swedish translations as needed
+        }
+    },
+    { 
+        code: 'no', 
+        name: 'Norsk', 
+        flag: '🇳🇴', 
+        currency: 'NOK', 
+        symbol: 'kr', 
+        rate: 0.26,
+        translations: {
+            'welcome': 'Velkommen til FOTOCENTER PH',
+            'tagline': 'Papirkopier for dine digitale bilder',
+            'start_ordering': 'Begynn å bestille',
+            // Add more Norwegian translations
+        }
+    },
+    { 
+        code: 'dk', 
+        name: 'Dansk', 
+        flag: '🇩🇰', 
+        currency: 'DKK', 
+        symbol: 'kr', 
+        rate: 0.23,
+        translations: {
+            'welcome': 'Velkommen til FOTOCENTER PH',
+            'tagline': 'Papirkopier til dine digitale fotos',
+            'start_ordering': 'Begynd at bestille',
+            // Add more Danish translations
+        }
+    },
+    { 
+        code: 'fi', 
+        name: 'Suomi', 
+        flag: '🇫🇮', 
+        currency: 'EUR', 
+        symbol: '€', 
+        rate: 0.018,
+        translations: {
+            'welcome': 'Tervetuloa FOTOCENTER PH',
+            'tagline': 'Paperikopiot digitaalisista valokuvistasi',
+            'start_ordering': 'Aloita tilaaminen',
+            // Add more Finnish translations
+        }
+    },
+    { 
+        code: 'de', 
+        name: 'Deutsch', 
+        flag: '🇩🇪', 
+        currency: 'EUR', 
+        symbol: '€', 
+        rate: 0.018,
+        translations: {
+            'welcome': 'Willkommen bei FOTOCENTER PH',
+            'tagline': 'Papierkopien für Ihre digitalen Fotos',
+            'start_ordering': 'Bestellen starten',
+            // Add more German translations
+        }
+    },
+    { 
+        code: 'nl', 
+        name: 'Nederlands', 
+        flag: '🇳🇱', 
+        currency: 'EUR', 
+        symbol: '€', 
+        rate: 0.018,
+        translations: {
+            'welcome': 'Welkom bij FOTOCENTER PH',
+            'tagline': 'Papieren kopieën voor uw digitale foto\'s',
+            'start_ordering': 'Begin met bestellen',
+            // Add more Dutch translations
+        }
+    },
+    { 
+        code: 'fr', 
+        name: 'Français', 
+        flag: '🇫🇷', 
+        currency: 'EUR', 
+        symbol: '€', 
+        rate: 0.018,
+        translations: {
+            'welcome': 'Bienvenue chez FOTOCENTER PH',
+            'tagline': 'Copies papier pour vos photos numériques',
+            'start_ordering': 'Commencez à commander',
+            // Add more French translations
+        }
+    },
+    { 
+        code: 'it', 
+        name: 'Italiano', 
+        flag: '🇮🇹', 
+        currency: 'EUR', 
+        symbol: '€', 
+        rate: 0.018,
+        translations: {
+            'welcome': 'Benvenuti a FOTOCENTER PH',
+            'tagline': 'Copie cartacee per le tue foto digitali',
+            'start_ordering': 'Inizia a ordinare',
+            // Add more Italian translations
+        }
+    },
+    { 
+        code: 'gr', 
+        name: 'Ελληνικά', 
+        flag: '🇬🇷', 
+        currency: 'EUR', 
+        symbol: '€', 
+        rate: 0.018,
+        translations: {
+            'welcome': 'Καλώς ήρθατε στο FOTOCENTER PH',
+            'tagline': 'Αντίγραφα χαρτιού για τις ψηφιακές σας φωτογραφίες',
+            'start_ordering': 'Ξεκινήστε την παραγγελία',
+            // Add more Greek translations
+        }
+    }
+];
+
+// Default language (US English)
+let currentLanguage = JSON.parse(localStorage.getItem('selectedLanguage')) || languages[0];
+
+// ============== LANGUAGE FUNCTIONS ==============
+
+// Initialize language dropdown
+function initLanguageDropdown() {
+    const languageBtn = document.getElementById('languageBtn');
+    const languageMenu = document.getElementById('languageMenu');
+    const languageDropdown = document.getElementById('languageDropdown');
+    
+    if (!languageBtn || !languageMenu) return;
+    
+    // Populate menu
+    languageMenu.innerHTML = '';
+    languages.forEach(lang => {
+        const item = document.createElement('div');
+        item.className = `language-item ${lang.code === currentLanguage.code ? 'active' : ''}`;
+        item.setAttribute('data-language', lang.code);
+        item.innerHTML = `
+            <span class="flag-icon">${lang.flag}</span>
+            <span class="language-name">${lang.name}</span>
+            <span class="currency-code">${lang.currency}</span>
+            <span class="currency-symbol">${lang.symbol}</span>
+        `;
+        item.addEventListener('click', () => selectLanguage(lang));
+        languageMenu.appendChild(item);
+    });
+    
+    // Toggle dropdown
+    languageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        languageDropdown.classList.toggle('open');
+    });
+    
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!languageDropdown.contains(e.target)) {
+            languageDropdown.classList.remove('open');
+        }
+    });
+    
+    // Update button display
+    updateLanguageButton();
+}
+
+// Select language
+function selectLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('selectedLanguage', JSON.stringify(lang));
+    
+    // Update UI
+    updateLanguageButton();
+    updateAllText();
+    updateAllPrices();
+    
+    // Close dropdown
+    document.getElementById('languageDropdown').classList.remove('open');
+    
+    // Update active state in menu
+    document.querySelectorAll('.language-item').forEach(item => {
+        item.classList.toggle('active', item.getAttribute('data-language') === lang.code);
+    });
+}
+
+// Update language button
+function updateLanguageButton() {
+    const btn = document.getElementById('languageBtn');
+    if (!btn) return;
+    
+    btn.innerHTML = `
+        <span class="flag-icon">${currentLanguage.flag}</span>
+        <span class="language-name">${currentLanguage.name}</span>
+        <span class="currency-code">${currentLanguage.currency}</span>
+        <span class="dropdown-arrow">▼</span>
+    `;
+}
+
+// Update all text on the page based on selected language
+function updateAllText() {
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translation = currentLanguage.translations[key];
+        if (translation) {
+            element.textContent = translation;
+        }
+    });
+}
+
+// Convert PHP to current currency
+function convertPrice(phpPrice) {
+    return (phpPrice * currentLanguage.rate).toFixed(2);
+}
+
+// Get formatted price with symbol
+function formatPrice(phpPrice) {
+    return `${currentLanguage.symbol}${convertPrice(phpPrice)}`;
+}
+
+// Update all prices on the page
+function updateAllPrices() {
+    // Update elements with data-php attribute
+    document.querySelectorAll('[data-php]').forEach(element => {
+        const phpPrice = parseFloat(element.getAttribute('data-php'));
+        if (!isNaN(phpPrice)) {
+            element.textContent = formatPrice(phpPrice);
+        }
+    });
+    
+    // Update slideshow prices (special handling)
+    document.querySelectorAll('.slide-price').forEach(el => {
+        const phpPrice = parseFloat(el.getAttribute('data-php'));
+        if (phpPrice) {
+            el.textContent = `For only ${formatPrice(phpPrice)} !!!`;
+        }
+    });
+    
+    // Update cart totals
+    updateCartUI();
+    
+    // Update editor prices
+    if (typeof calculatePrice === 'function') {
+        calculatePrice();
+    }
+}
+
+// ============== MODIFY EXISTING FUNCTIONS ==============
+
+// Override calculatePrice to use currency
+const originalCalculatePrice = window.calculatePrice || function() {};
+window.calculatePrice = function() {
+    if (originalCalculatePrice) originalCalculatePrice();
+    
+    // Convert displayed prices to current currency
+    document.querySelectorAll('#basePrice, #paperUpgradePrice, #quantityMultiplier, #advancedTotalPrice, #finalPrice').forEach(el => {
+        const phpPrice = parseFloat(el.getAttribute('data-php'));
+        if (!isNaN(phpPrice)) {
+            el.textContent = formatPrice(phpPrice);
+        }
+    });
+};
+
+// Override updatePrintOptions to add data-php attributes
+const originalUpdatePrintOptions = window.updatePrintOptions;
+window.updatePrintOptions = function(productType) {
+    if (originalUpdatePrintOptions) originalUpdatePrintOptions(productType);
+    
+    // Add data-php attributes to size prices
+    document.querySelectorAll('.size-price').forEach(el => {
+        const priceText = el.textContent.replace(/[^0-9.]/g, '');
+        const phpPrice = parseFloat(priceText);
+        if (!isNaN(phpPrice)) {
+            el.setAttribute('data-php', phpPrice);
+            el.textContent = formatPrice(phpPrice);
+        }
+    });
+};
+
+// Override renderCartPage to format prices
+const originalRenderCartPage = window.renderCartPage;
+window.renderCartPage = function() {
+    if (originalRenderCartPage) originalRenderCartPage();
+    
+    // Format cart item prices
+    document.querySelectorAll('.cart-item-price').forEach(el => {
+        const priceText = el.textContent.replace(/[^0-9.]/g, '');
+        const phpPrice = parseFloat(priceText);
+        if (!isNaN(phpPrice)) {
+            el.setAttribute('data-php', phpPrice);
+            el.textContent = formatPrice(phpPrice);
+        }
+    });
+    
+    // Format cart total
+    const cartTotal = document.getElementById('cartTotalSelected');
+    if (cartTotal) {
+        const priceText = cartTotal.textContent.replace(/[^0-9.]/g, '');
+        const phpPrice = parseFloat(priceText);
+        if (!isNaN(phpPrice)) {
+            cartTotal.setAttribute('data-php', phpPrice);
+            cartTotal.textContent = formatPrice(phpPrice);
+        }
+    }
+};
+
+// ============== MODIFY EXISTING PRODUCT DATA ==============
+
+// Update productDatabase to use PHP base prices
+const productDatabase = {
+    photocards: {
+        name: 'Photo Cards',
+        basePricePHP: 25, // PHP price
+        mainImage: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.photocards,
+        paperTypes: [
+            { name: 'Standard', pricePHP: 0 },
+            { name: 'Glossy', pricePHP: 10 },
+            { name: 'Matte', pricePHP: 15 },
+            { name: 'Premium', pricePHP: 25 }
+        ],
+        description: 'Create personalized greeting cards for any occasion. Perfect for birthdays, holidays, or just to say thank you. Choose from various sizes and paper types to match your style.',
+        icon: '🖼️',
+        productType: 'photocards'
+    },
+    calendar: {
+        name: 'Calendar',
+        basePricePHP: 60,
+        mainImage: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.calendar,
+        paperTypes: [
+            { name: 'Standard', pricePHP: 0 },
+            { name: 'Glossy', pricePHP: 10 },
+            { name: 'Matte', pricePHP: 15 },
+            { name: 'Premium', pricePHP: 25 }
+        ],
+        description: 'Create personalized calendars with your favorite photos. Perfect for gifts or home decoration. Choose from desk, wall, or mini calendars to match your style.',
+        icon: '📅',
+        productType: 'calendar'
+    },
+    photobook: {
+        name: 'Photo Book',
+        basePricePHP: 120,
+        mainImage: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.photobook,
+        paperTypes: [
+            { name: 'Standard', pricePHP: 0 },
+            { name: 'Glossy', pricePHP: 10 },
+            { name: 'Matte', pricePHP: 15 },
+            { name: 'Premium', pricePHP: 25 }
+        ],
+        description: 'Premium hardcover photo books to collect your memories. Perfect for weddings, vacations, or family albums. Choose from various sizes and binding options.',
+        icon: '📘',
+        productType: 'photobook'
+    },
+    canvas: {
+        name: 'Canvas',
+        basePricePHP: 200,
+        mainImage: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.canvas,
+        paperTypes: [
+            { name: 'Standard', pricePHP: 0 },
+            { name: 'Glossy', pricePHP: 10 },
+            { name: 'Matte', pricePHP: 15 },
+            { name: 'Premium', pricePHP: 25 }
+        ],
+        description: 'Your favorite photo mounted on high-quality canvas. Gallery-wrapped and ready to hang. Perfect for home decor or special gifts.',
+        icon: '🖼️',
+        productType: 'canvas'
+    },
+    mousepads: {
+        name: 'Mouse Pads',
+        basePricePHP: 45,
+        mainImage: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=200&h=200&fit=crop',
+            'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=200&h=200&fit=crop&flip=1',
+            'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.mousepads,
+        paperTypes: [
+            { name: 'Standard', pricePHP: 0 },
+            { name: 'Glossy', pricePHP: 10 },
+            { name: 'Matte', pricePHP: 15 },
+            { name: 'Premium', pricePHP: 25 }
+        ],
+        description: 'Custom photo mouse pads for your desk. Perfect for office or home use. Non-slip rubber base and smooth surface for optimal mouse control.',
+        icon: '🖱️',
+        productType: 'mousepads'
+    },
+    doublecards: {
+        name: 'Double Cards',
+        basePricePHP: 70,
+        mainImage: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.doublecards,
+        paperTypes: [
+            { name: 'Standard', pricePHP: 0 },
+            { name: 'Glossy', pricePHP: 10 },
+            { name: 'Matte', pricePHP: 15 },
+            { name: 'Premium', pricePHP: 25 }
+        ],
+        description: 'Elegant folded greeting cards for all special occasions. Perfect for invitations, thank you notes, or holiday greetings. Comes with matching envelopes.',
+        icon: '🃏',
+        productType: 'doublecards'
+    }
+};
+
+// ============== MODIFY LOAD PRODUCT DETAILS ==============
+
+function loadProductDetails(productType) {
+    const product = productDatabase[productType];
+    if (!product) return;
+    
+    // Set main image
+    document.getElementById('productMainImage').src = product.mainImage;
+    
+    // Set product name
+    document.getElementById('productName').textContent = product.name;
+    
+    // Set product price with currency conversion
+    const priceElement = document.getElementById('productPrice');
+    priceElement.setAttribute('data-php', product.basePricePHP);
+    priceElement.textContent = formatPrice(product.basePricePHP);
+    
+    // Set description
+    document.getElementById('productDescription').textContent = product.description;
+    
+    // Set icon
+    document.getElementById('productIcon').textContent = product.icon;
+    
+    // Load thumbnails
+    const thumbnailsContainer = document.getElementById('productThumbnails');
+    thumbnailsContainer.innerHTML = '';
+    product.thumbnails.forEach((thumb, index) => {
+        const thumbDiv = document.createElement('div');
+        thumbDiv.className = `thumbnail-item ${index === 0 ? 'active' : ''}`;
+        thumbDiv.innerHTML = `<img src="${thumb}" alt="Variation ${index + 1}">`;
+        thumbDiv.addEventListener('click', function() {
+            document.getElementById('productMainImage').src = thumb;
+            document.querySelectorAll('.thumbnail-item').forEach(item => item.classList.remove('active'));
+            this.classList.add('active');
+        });
+        thumbnailsContainer.appendChild(thumbDiv);
+    });
+    
+    // Load sizes
+    const sizesContainer = document.getElementById('productSizes');
+    sizesContainer.innerHTML = '';
+    product.sizes.forEach(size => {
+        const phpPrice = parseFloat(size.price);
+        const sizeDiv = document.createElement('div');
+        sizeDiv.className = 'size-item';
+        sizeDiv.innerHTML = `<span>${size.label}</span> <span data-php="${phpPrice}">${formatPrice(phpPrice)}</span>`;
+        sizesContainer.appendChild(sizeDiv);
+    });
+    
+    // Load paper types
+    const paperContainer = document.getElementById('productPaperTypes');
+    paperContainer.innerHTML = '';
+    product.paperTypes.forEach(paper => {
+        const paperDiv = document.createElement('div');
+        paperDiv.className = 'paper-item';
+        paperDiv.innerHTML = `<span>${paper.name}</span> <span data-php="${paper.pricePHP}">+${formatPrice(paper.pricePHP)}</span>`;
+        paperContainer.appendChild(paperDiv);
+    });
+    
+    // Store selected product for editor
+    document.getElementById('openEditorBtn').setAttribute('data-product', product.productType);
+}
+
+// ============== MODIFY SLIDESHOW ==============
+
+class Slideshow {
+    constructor() {
+        this.track = document.getElementById('slidesTrack');
+        this.dotsContainer = document.getElementById('slideshowDots');
+        this.prevBtn = document.getElementById('slideshowPrev');
+        this.nextBtn = document.getElementById('slideshowNext');
+        this.pauseBtn = document.getElementById('slideshowPause');
+        
+        this.currentIndex = 0;
+        this.totalSlides = 0;
+        this.isPaused = false;
+        this.interval = null;
+        this.autoPlayDelay = 5000; // 5 seconds
+        
+        this.products = [
+            {
+                name: 'Photo Cards',
+                pricePHP: 25,
+                image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+                desc: 'Create personalized greeting cards'
+            },
+            {
+                name: 'Calendar',
+                pricePHP: 60,
+                image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+                desc: 'Make your own custom calendar'
+            },
+            {
+                name: 'Photo Book',
+                pricePHP: 120,
+                image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+                desc: 'Premium hardcover photo books'
+            },
+            {
+                name: 'Canvas',
+                pricePHP: 200,
+                image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+                desc: 'Your favorite photo on canvas'
+            },
+            {
+                name: 'Mouse Pads',
+                pricePHP: 45,
+                image: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=1260&h=750&fit=crop',
+                desc: 'Custom photo mouse pads'
+            },
+            {
+                name: 'Double Cards',
+                pricePHP: 70,
+                image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+                desc: 'Elegant folded greeting cards'
+            }
+        ];
+        this.init();
+    }
+    
+    init() {
+        if (!this.track) {
+            console.error('Slideshow track not found');
+            return;
+        }
+        
+        this.totalSlides = this.products.length;
+        this.renderSlides();
+        this.createDots();
+        this.setupEventListeners();
+        this.startAutoPlay();
+        this.updateSlidePosition(0);
+    }
+    
+    renderSlides() {
+        this.track.innerHTML = '';
+        this.track.style.width = `${this.totalSlides * 100}%`;
+        
+        this.products.forEach(product => {
+            const slide = document.createElement('div');
+            slide.className = 'slide-card';
+            slide.style.width = `${100 / this.totalSlides}%`;
+            slide.innerHTML = `
+                <div class="slide-image">
+                    <img src="${product.image}" 
+                         alt="${product.name}" 
+                         loading="lazy"
+                         onerror="this.src='https://via.placeholder.com/1200x800?text=${product.name}'">
+                </div>
+                <div class="slide-info">
+                    <h3>${product.name}</h3>
+                    <p>${product.desc}</p>
+                    <div class="slide-price" data-php="${product.pricePHP}">For only ${formatPrice(product.pricePHP)} !!!</div>
+                </div>
+            `;
+            this.track.appendChild(slide);
+        });
+    }
+    
+    createDots() {
+        if (!this.dotsContainer) return;
+        
+        this.dotsContainer.innerHTML = '';
+        for (let i = 0; i < this.totalSlides; i++) {
+            const dot = document.createElement('button');
+            dot.className = `dot ${i === 0 ? 'active' : ''}`;
+            dot.setAttribute('data-index', i);
+            dot.addEventListener('click', () => this.goToSlide(i));
+            this.dotsContainer.appendChild(dot);
+        }
+    }
+    
+    setupEventListeners() {
+        if (this.prevBtn) {
+            const newPrev = this.prevBtn.cloneNode(true);
+            this.prevBtn.parentNode.replaceChild(newPrev, this.prevBtn);
+            this.prevBtn = newPrev;
+            this.prevBtn.addEventListener('click', () => this.prevSlide());
+        }
+        
+        if (this.nextBtn) {
+            const newNext = this.nextBtn.cloneNode(true);
+            this.nextBtn.parentNode.replaceChild(newNext, this.nextBtn);
+            this.nextBtn = newNext;
+            this.nextBtn.addEventListener('click', () => this.nextSlide());
+        }
+        
+        if (this.pauseBtn) {
+            const newPause = this.pauseBtn.cloneNode(true);
+            this.pauseBtn.parentNode.replaceChild(newPause, this.pauseBtn);
+            this.pauseBtn = newPause;
+            this.pauseBtn.addEventListener('click', () => this.togglePause());
+        }
+        
+        window.addEventListener('resize', () => {
+            this.updateSlidePosition(this.currentIndex);
+        });
+    }
+    
+    updateSlidePosition(index) {
+        if (index < 0) index = this.totalSlides - 1;
+        if (index >= this.totalSlides) index = 0;
+        
+        const translateX = -(index * 100 / this.totalSlides) + '%';
+        this.track.style.transform = `translateX(${translateX})`;
+        
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+        
+        this.currentIndex = index;
+    }
+    
+    nextSlide() {
+        const nextIndex = (this.currentIndex + 1) % this.totalSlides;
+        this.updateSlidePosition(nextIndex);
+    }
+    
+    prevSlide() {
+        const prevIndex = (this.currentIndex - 1 + this.totalSlides) % this.totalSlides;
+        this.updateSlidePosition(prevIndex);
+    }
+    
+    goToSlide(index) {
+        if (index >= 0 && index < this.totalSlides) {
+            this.updateSlidePosition(index);
+        }
+    }
+    
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        if (this.pauseBtn) {
+            this.pauseBtn.innerHTML = this.isPaused ? '▶️ Play' : '⏸️ Pause';
+        }
+        
+        if (this.isPaused) {
+            this.stopAutoPlay();
+        } else {
+            this.startAutoPlay();
+        }
+    }
+    
+    startAutoPlay() {
+        this.stopAutoPlay();
+        this.interval = setInterval(() => {
+            if (!this.isPaused) {
+                this.nextSlide();
+            }
+        }, this.autoPlayDelay);
+    }
+    
+    stopAutoPlay() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+    }
+}
+
+// ============== INITIALIZATION ==============
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize existing functions
+    if (typeof displayHomeProducts === 'function') displayHomeProducts();
+    if (typeof setupPhotoEditor === 'function') setupPhotoEditor();
+    if (typeof setupNavHighlight === 'function') setupNavHighlight();
+    if (typeof setupDragAndDrop === 'function') setupDragAndDrop();
+    if (typeof setupEventListeners === 'function') setupEventListeners();
+    if (typeof initPhotoMode === 'function') initPhotoMode();
+    if (typeof updateLoginStatus === 'function') updateLoginStatus();
+    if (typeof updateCartUI === 'function') updateCartUI();
+    if (typeof setupFaqScroll === 'function') setupFaqScroll();
+    if (typeof setupChatKeyboard === 'function') setupChatKeyboard();
+    if (typeof setupDropdownMenu === 'function') setupDropdownMenu();
+    
+    const cartBtn = document.querySelector('.cart-btn');
+    if (cartBtn) {
+        cartBtn.onclick = function(e) {
+            e.preventDefault();
+            navigateTo('cart-page');
+        };
+    }
+    
+    if (typeof renderShopProducts === 'function') renderShopProducts();
+    if (typeof renderReviews === 'function') renderReviews();
+    if (typeof updateCartBadgeOnLoad === 'function') updateCartBadgeOnLoad();
+    if (typeof loadChatHistory === 'function') loadChatHistory();
+    if (typeof updateUndoRedoButtons === 'function') updateUndoRedoButtons();
+    
+    setTimeout(() => {
+        if (typeof selectProduct === 'function') selectProduct('photocards');
+    }, 500);
+    
+    if (typeof initPrintOptions === 'function') initPrintOptions();
+    if (typeof initializeGoogleApi === 'function') initializeGoogleApi();
+    if (typeof initCartHover === 'function') initCartHover();
+    if (typeof initSelectAll === 'function') initSelectAll();
+    
+    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    if (deleteBtn) {
+        deleteBtn.onclick = null;
+        deleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🗑️ Delete Selected button clicked');
+            if (typeof deleteSelectedItems === 'function') deleteSelectedItems();
+        });
+    }
+    
+    // Initialize language system
+    initLanguageDropdown();
+    
+    // Update text and prices
+    setTimeout(() => {
+        updateAllText();
+        updateAllPrices();
+    }, 200);
+    
+    // Initialize slideshow
+    setTimeout(() => {
+        new Slideshow();
+    }, 100);
+    
+    // Initialize hamburger menu
+    if (typeof setupHamburgerMenu === 'function') setupHamburgerMenu();
+    
+    // Make slides clickable
+    setTimeout(() => {
+        if (typeof makeSlidesClickable === 'function') makeSlidesClickable();
+    }, 1000);
+});
+
+// ============== KEEP ALL YOUR EXISTING FUNCTIONS BELOW ==============
+// Copy and paste all your existing functions here:
+// - Sample products data
+// - Product icons mapping
+// - Calendar products data
+// - Print options configuration
+// - Unit conversion functions
+// - Cart management functions
+// - Photo editor functions
+// - Crop tool functions
+// - Google Drive functions
+// - etc.
+
+// [PASTE ALL YOUR EXISTING CODE HERE]
+
+// Make functions globally available
+
 // Sample products data
 const products = [
     { id: 1, name: "Photo Cards", price: "₱600", image: "https://i5.walmartimages.com/seo/48-Pack-Photo-Frame-Cards-with-Envelopes-Notecards-for-4x6-Picture-Insert-Ivory_5339c47e-9e2e-4d17-bbcc-46da7d0288fb.88480b050f2d7e488cd5a07e5e90cfb5.jpeg", description: "Create personalized greeting cards with your best photos" },
@@ -4728,446 +5749,7 @@ function setupHamburgerMenu() {
     console.log('✅ Hamburger menu initialized with 3 items (Editor, Shop, Info)');
 }
 
-// ============== PRODUCT DETAIL PAGE (TASK 4.5) ==============
 
-// Product database with all details
-const productDatabase = {
-    photocards: {
-        name: 'Photo Cards',
-        basePrice: 'Starts at ₱25',
-        mainImage: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-        thumbnails: [
-            'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-            'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
-            'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
-        ],
-        sizes: printOptionsConfig.photocards,
-        paperTypes: [
-            { name: 'Standard', price: '+₱0' },
-            { name: 'Glossy', price: '+₱10' },
-            { name: 'Matte', price: '+₱15' },
-            { name: 'Premium', price: '+₱25' }
-        ],
-        description: 'Create personalized greeting cards for any occasion. Perfect for birthdays, holidays, or just to say thank you. Choose from various sizes and paper types to match your style.',
-        icon: '🖼️',
-        productType: 'photocards'
-    },
-    calendar: {
-        name: 'Calendar',
-        basePrice: 'Starts at ₱60',
-        mainImage: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-        thumbnails: [
-            'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-            'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
-            'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
-        ],
-        sizes: printOptionsConfig.calendar,
-        paperTypes: [
-            { name: 'Standard', price: '+₱0' },
-            { name: 'Glossy', price: '+₱10' },
-            { name: 'Matte', price: '+₱15' },
-            { name: 'Premium', price: '+₱25' }
-        ],
-        description: 'Create personalized calendars with your favorite photos. Perfect for gifts or home decoration. Choose from desk, wall, or mini calendars to match your style.',
-        icon: '📅',
-        productType: 'calendar'
-    },
-    photobook: {
-        name: 'Photo Book',
-        basePrice: 'Starts at ₱120',
-        mainImage: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-        thumbnails: [
-            'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-            'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
-            'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
-        ],
-        sizes: printOptionsConfig.photobook,
-        paperTypes: [
-            { name: 'Standard', price: '+₱0' },
-            { name: 'Glossy', price: '+₱10' },
-            { name: 'Matte', price: '+₱15' },
-            { name: 'Premium', price: '+₱25' }
-        ],
-        description: 'Premium hardcover photo books to collect your memories. Perfect for weddings, vacations, or family albums. Choose from various sizes and binding options.',
-        icon: '📘',
-        productType: 'photobook'
-    },
-    canvas: {
-        name: 'Canvas',
-        basePrice: 'Starts at ₱200',
-        mainImage: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-        thumbnails: [
-            'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-            'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
-            'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
-        ],
-        sizes: printOptionsConfig.canvas,
-        paperTypes: [
-            { name: 'Standard', price: '+₱0' },
-            { name: 'Glossy', price: '+₱10' },
-            { name: 'Matte', price: '+₱15' },
-            { name: 'Premium', price: '+₱25' }
-        ],
-        description: 'Your favorite photo mounted on high-quality canvas. Gallery-wrapped and ready to hang. Perfect for home decor or special gifts.',
-        icon: '🖼️',
-        productType: 'canvas'
-    },
-   mousepads: {
-    name: 'Mouse Pads',
-    basePrice: 'Starts at ₱45',
-    mainImage: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=800&h=600&fit=crop',
-    thumbnails: [
-        'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=200&h=200&fit=crop',
-        'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=200&h=200&fit=crop&flip=1',
-        'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=200&h=200&fit=crop&rotate=90'
-    ],
-    sizes: printOptionsConfig.mousepads,
-    paperTypes: [
-        { name: 'Standard', price: '+₱0' },
-        { name: 'Glossy', price: '+₱10' },
-        { name: 'Matte', price: '+₱15' },
-        { name: 'Premium', price: '+₱25' }
-    ],
-    description: 'Custom photo mouse pads for your desk. Perfect for office or home use. Non-slip rubber base and smooth surface for optimal mouse control.',
-    icon: '🖱️',
-    productType: 'mousepads'
-},
-    doublecards: {
-    name: 'Double Cards',
-    basePrice: 'Starts at ₱70',
-    mainImage: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    thumbnails: [
-        'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-        'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
-        'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
-    ],
-    sizes: printOptionsConfig.doublecards,
-    paperTypes: [
-        { name: 'Standard', price: '+₱0' },
-        { name: 'Glossy', price: '+₱10' },
-        { name: 'Matte', price: '+₱15' },
-        { name: 'Premium', price: '+₱25' }
-    ],
-    description: 'Elegant folded greeting cards for all special occasions. Perfect for invitations, thank you notes, or holiday greetings. Comes with matching envelopes.',
-    icon: '🃏',
-    productType: 'doublecards'
-}
-};  // ← THIS closes the productDatabase object!
-
-// Make sure there's nothing after this except the next function
-
-// Make slides clickable
-function makeSlidesClickable() {
-    const slides = document.querySelectorAll('.slide-card');
-    slides.forEach((slide, index) => {
-        slide.style.cursor = 'pointer';
-        slide.addEventListener('click', function() {
-            const productTypes = ['photocards', 'calendar', 'photobook', 'canvas', 'mousepads', 'doublecards'];
-            openProductPage(productTypes[index]);
-        });
-    });
-}
-
-// Open product page
-function openProductPage(productType) {
-    navigateTo('product-page');
-    setTimeout(() => {
-        loadProductDetails(productType);
-    }, 100);
-}
-
-// Load product details
-function loadProductDetails(productType) {
-    const product = productDatabase[productType];
-    if (!product) return;
-    
-    // Set main image
-    document.getElementById('productMainImage').src = product.mainImage;
-    
-    // Set product name and price
-    document.getElementById('productName').textContent = product.name;
-    document.getElementById('productPrice').textContent = product.basePrice;
-    
-    // Set description
-    document.getElementById('productDescription').textContent = product.description;
-    
-    // Set icon
-    document.getElementById('productIcon').textContent = product.icon;
-    
-    // Load thumbnails
-    const thumbnailsContainer = document.getElementById('productThumbnails');
-    thumbnailsContainer.innerHTML = '';
-    product.thumbnails.forEach((thumb, index) => {
-        const thumbDiv = document.createElement('div');
-        thumbDiv.className = `thumbnail-item ${index === 0 ? 'active' : ''}`;
-        thumbDiv.innerHTML = `<img src="${thumb}" alt="Variation ${index + 1}">`;
-        thumbDiv.addEventListener('click', function() {
-            document.getElementById('productMainImage').src = thumb;
-            document.querySelectorAll('.thumbnail-item').forEach(item => item.classList.remove('active'));
-            this.classList.add('active');
-        });
-        thumbnailsContainer.appendChild(thumbDiv);
-    });
-    
-    // Load sizes
-    const sizesContainer = document.getElementById('productSizes');
-    sizesContainer.innerHTML = '';
-    product.sizes.forEach(size => {
-        const sizeDiv = document.createElement('div');
-        sizeDiv.className = 'size-item';
-        sizeDiv.innerHTML = `<span>${size.label}</span> <span>₱${size.price}</span>`;
-        sizesContainer.appendChild(sizeDiv);
-    });
-    
-    // Load paper types
-    const paperContainer = document.getElementById('productPaperTypes');
-    paperContainer.innerHTML = '';
-    product.paperTypes.forEach(paper => {
-        const paperDiv = document.createElement('div');
-        paperDiv.className = 'paper-item';
-        paperDiv.innerHTML = `<span>${paper.name}</span> <span>${paper.price}</span>`;
-        paperContainer.appendChild(paperDiv);
-    });
-    
-    // Store selected product for editor
-    document.getElementById('openEditorBtn').setAttribute('data-product', product.productType);
-}
-
-// Open editor with preselected product
-function openEditorWithProduct() {
-    const productType = document.getElementById('openEditorBtn').getAttribute('data-product');
-    
-    // Store in sessionStorage
-    sessionStorage.setItem('preselectedProduct', productType);
-    
-    // Navigate to editor
-    navigateTo('photos');
-    
-    // Show welcome popup
-    setTimeout(showWelcomePopup, 500);
-}
-
-// Show welcome popup
-function showWelcomePopup() {
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'popup-overlay';
-    overlay.id = 'popupOverlay';
-    
-    // Create popup
-    const popup = document.createElement('div');
-    popup.className = 'welcome-popup';
-    popup.id = 'welcomePopup';
-    popup.innerHTML = `
-        <h3>🎉 Welcome to the Editor!</h3>
-        <p>Click on the blank top box to upload photos and start creating your masterpiece.</p>
-        <button onclick="closeWelcomePopup()">Got it!</button>
-    `;
-    
-    document.body.appendChild(overlay);
-    document.body.appendChild(popup);
-}
-
-// Close welcome popup
-function closeWelcomePopup() {
-    const overlay = document.getElementById('popupOverlay');
-    const popup = document.getElementById('welcomePopup');
-    if (overlay) overlay.remove();
-    if (popup) popup.remove();
-}
-
-// Check for preselected product when editor loads
-function checkPreselectedProduct() {
-    const preselected = sessionStorage.getItem('preselectedProduct');
-    if (preselected) {
-        // Select the product in dropdown
-        selectProduct(preselected);
-        
-        // Clear the storage
-        sessionStorage.removeItem('preselectedProduct');
-        
-        // Show welcome popup if not already shown
-        if (!document.getElementById('welcomePopup')) {
-            showWelcomePopup();
-        }
-    }
-}
-
-// Override navigateTo to check for editor
-const originalNavigateTo = window.navigateTo;
-window.navigateTo = function(pageId) {
-    originalNavigateTo(pageId);
-    if (pageId === 'photos') {
-        setTimeout(checkPreselectedProduct, 300);
-    }
-};
-
-// Add event listener to open editor button
-document.addEventListener('DOMContentLoaded', function() {
-    const editorBtn = document.getElementById('openEditorBtn');
-    if (editorBtn) {
-        editorBtn.addEventListener('click', openEditorWithProduct);
-    }
-    
-    // Make slides clickable after slideshow loads
-    setTimeout(makeSlidesClickable, 1000);
-});
-
-// ============== LANGUAGE & CURRENCY SYSTEM (TASK 5) ==============
-
-// Language and currency data
-const languages = [
-    { code: 'us', name: 'US English', flag: '🇺🇸', currency: 'USD', symbol: '$', rate: 0.018 },  // DEFAULT
-    { code: 'uk', name: 'UK English', flag: '🇬🇧', currency: 'GBP', symbol: '£', rate: 0.014 },
-    { code: 'se', name: 'Svenska', flag: '🇸🇪', currency: 'SEK', symbol: 'kr', rate: 0.25 },
-    { code: 'no', name: 'Norsk', flag: '🇳🇴', currency: 'NOK', symbol: 'kr', rate: 0.26 },
-    { code: 'dk', name: 'Dansk', flag: '🇩🇰', currency: 'DKK', symbol: 'kr', rate: 0.23 },
-    { code: 'fi', name: 'Suomi', flag: '🇫🇮', currency: 'EUR', symbol: '€', rate: 0.018 },
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪', currency: 'EUR', symbol: '€', rate: 0.018 },
-    { code: 'nl', name: 'Nederlands', flag: '🇳🇱', currency: 'EUR', symbol: '€', rate: 0.018 },
-    { code: 'fr', name: 'Français', flag: '🇫🇷', currency: 'EUR', symbol: '€', rate: 0.018 },
-    { code: 'it', name: 'Italiano', flag: '🇮🇹', currency: 'EUR', symbol: '€', rate: 0.018 },
-    { code: 'gr', name: 'Ελληνικά', flag: '🇬🇷', currency: 'EUR', symbol: '€', rate: 0.018 }
-];
-
-let currentLanguage = JSON.parse(localStorage.getItem('selectedLanguage')) || languages[0];
-
-// Initialize language dropdown
-function initLanguageDropdown() {
-    const languageBtn = document.getElementById('languageBtn');
-    const languageMenu = document.getElementById('languageMenu');
-    const languageDropdown = document.getElementById('languageDropdown');
-    
-    if (!languageBtn || !languageMenu) return;
-    
-    // Populate menu
-    languageMenu.innerHTML = '';
-    languages.forEach(lang => {
-        const item = document.createElement('div');
-        item.className = `language-item ${lang.code === currentLanguage.code ? 'active' : ''}`;
-        item.setAttribute('data-language', lang.code);
-        item.innerHTML = `
-            <span class="flag-icon">${lang.flag}</span>
-            <span class="language-name">${lang.name}</span>
-            <span class="currency-code">${lang.currency}</span>
-        `;
-        item.addEventListener('click', () => selectLanguage(lang));
-        languageMenu.appendChild(item);
-    });
-    
-    // Toggle dropdown
-    languageBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        languageDropdown.classList.toggle('open');
-    });
-    
-    // Close when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!languageDropdown.contains(e.target)) {
-            languageDropdown.classList.remove('open');
-        }
-    });
-    
-    // Update button display
-    updateLanguageButton();
-}
-
-// Select language
-function selectLanguage(lang) {
-    currentLanguage = lang;
-    localStorage.setItem('selectedLanguage', JSON.stringify(lang));
-    
-    // Update UI
-    updateLanguageButton();
-    updateAllPrices();
-    
-    // Close dropdown
-    document.getElementById('languageDropdown').classList.remove('open');
-    
-    // Update active state in menu
-    document.querySelectorAll('.language-item').forEach(item => {
-        item.classList.toggle('active', item.getAttribute('data-language') === lang.code);
-    });
-}
-
-// Update language button
-function updateLanguageButton() {
-    const btn = document.getElementById('languageBtn');
-    if (!btn) return;
-    
-    btn.innerHTML = `
-        <span class="flag-icon">${currentLanguage.flag}</span>
-        <span class="currency-code">${currentLanguage.currency}</span>
-        <span class="dropdown-arrow">▼</span>
-    `;
-}
-
-// Convert PHP to current currency
-function convertPrice(phpPrice) {
-    return (phpPrice * currentLanguage.rate).toFixed(2);
-}
-
-// Get formatted price with symbol
-function formatPrice(phpPrice) {
-    return `${currentLanguage.symbol}${convertPrice(phpPrice)}`;
-}
-
-// Update all prices on the page
-function updateAllPrices() {
-    // Update slideshow prices
-    document.querySelectorAll('.slide-price').forEach(el => {
-        const phpPrice = parseFloat(el.getAttribute('data-php') || el.textContent.replace(/[^0-9.]/g, ''));
-        if (phpPrice) {
-            el.setAttribute('data-php', phpPrice);
-            el.textContent = `For only ${formatPrice(phpPrice)} !!!`;
-        }
-    });
-    
-    // Update product page prices
-    const productPrice = document.getElementById('productPrice');
-    if (productPrice && productPrice.getAttribute('data-php')) {
-        const phpPrice = parseFloat(productPrice.getAttribute('data-php'));
-        productPrice.textContent = formatPrice(phpPrice);
-    }
-    
-    // Update cart totals
-    updateCartUI();
-    
-    // Update editor prices
-    calculatePrice();
-}
-
-// Override calculatePrice to use currency
-const originalCalculatePrice = calculatePrice;
-calculatePrice = function() {
-    originalCalculatePrice();
-    
-    // Convert displayed prices to current currency
-    document.querySelectorAll('#basePrice, #paperUpgradePrice, #quantityMultiplier, #advancedTotalPrice, #finalPrice').forEach(el => {
-        const phpPrice = parseFloat(el.getAttribute('data-php') || el.textContent.replace(/[^0-9.]/g, ''));
-        if (phpPrice && !isNaN(phpPrice)) {
-            el.setAttribute('data-php', phpPrice);
-            el.textContent = formatPrice(phpPrice);
-        }
-    });
-};
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // ... existing code ...
-    
-    // Initialize language dropdown
-    initLanguageDropdown();
-    
-    // Update all prices
-    setTimeout(updateAllPrices, 200);
-});
-
-// Export functions
-window.openProductPage = openProductPage;
-window.closeWelcomePopup = closeWelcomePopup;
-
-// Make functions globally available
 window.renderCartPage = renderCartPage;
 window.updateCartItemQuantityFromCart = updateCartItemQuantityFromCart;
 window.processOrderFromCart = processOrderFromCart;
@@ -5188,5 +5770,10 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+window.openProductPage = openProductPage;
+window.closeWelcomePopup = closeWelcomePopup;
+
+
+
 
 
