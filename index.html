@@ -1,3 +1,5 @@
+HTML
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,25 +15,25 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand" onclick="navigateTo('home'); return false;" style="cursor: pointer;">
-                <h1 class="logo">FOTOCENTER</h1>
-                <p class="logo-sub">Philippines</p>
-            </div>
+    <h1 class="logo">FOTOCENTER</h1>
+    <p class="logo-sub">Philippines</p>
+</div>
 
-            <!-- Hamburger Menu (NO HOME BUTTON) -->
-            <div class="hamburger-menu" id="hamburgerMenu">
-                <button class="hamburger-icon">☰</button>
-                <div class="hamburger-dropdown" id="hamburgerDropdown">
-                    <a href="#" onclick="navigateTo('photos'); return false;" class="dropdown-item">
-                        <span class="dropdown-icon">✏️</span> Editor
-                    </a>
-                    <a href="#" onclick="navigateTo('shop'); return false;" class="dropdown-item">
-                        <span class="dropdown-icon">🛍️</span> Shop
-                    </a>
-                    <a href="#" onclick="navigateTo('contact'); return false;" class="dropdown-item">
-                        <span class="dropdown-icon">ℹ️</span> Info
-                    </a>
-                </div>
-            </div>
+<!-- Hamburger Menu (NO HOME BUTTON) -->
+<div class="hamburger-menu" id="hamburgerMenu">
+    <button class="hamburger-icon">☰</button>
+    <div class="hamburger-dropdown" id="hamburgerDropdown">
+        <a href="#" onclick="navigateTo('photos'); return false;" class="dropdown-item">
+            <span class="dropdown-icon">✏️</span> Editor
+        </a>
+        <a href="#" onclick="navigateTo('shop'); return false;" class="dropdown-item">
+            <span class="dropdown-icon">🛍️</span> Shop
+        </a>
+        <a href="#" onclick="navigateTo('contact'); return false;" class="dropdown-item">
+            <span class="dropdown-icon">ℹ️</span> Info
+        </a>
+    </div>
+</div>
             
             <!-- CART MODAL -->
             <div id="cartModal" class="modal">
@@ -40,7 +42,7 @@
                     <h3>Your Cart</h3>
                     <div id="cartItemsList" class="cart-items-list"></div>
                     <div class="cart-summary">
-                        <div>Total: <span id="cartTotalAmount">$0.00</span></div>
+                        <div>Total: <span id="cartTotalAmount">₱ 0.00</span></div>
                         <div class="cart-actions">
                             <button onclick="clearCart()">Clear</button>
                             <button onclick="proceedToCheckout()">Checkout</button>
@@ -49,7 +51,7 @@
                 </div>
             </div>
 
-            <!-- LOGIN MODAL -->
+            <!-- LOGIN MODAL - UPDATED with styled version -->
             <div id="loginModal" class="modal">
                 <div class="modal-content">
                     <span class="close-modal" onclick="closeLoginModal()">&times;</span>
@@ -113,37 +115,38 @@
                        autocomplete="off">
             </div>
 
-            <!-- NAV ACTIONS with CART HOVER and LANGUAGE BUTTON -->
             <div class="nav-actions" id="cartHoverContainer">
-                <div style="display: flex; flex-direction: column; align-items: center;">
-                    <a href="#" class="login-link" onclick="openLoginModal(); return false;">Log in</a>
-                    <a href="#" style="font-style: italic; text-decoration: underline; font-size: 0.8rem; color: var(--accent); margin-top: 2px;" onclick="navigateTo('signup'); return false;">Register here!</a>
-                </div>
-                <div class="cart-hover-wrapper">
-                    <button class="cart-btn" id="cartHoverBtn" onclick="navigateTo('cart-page'); return false;">
-                        🛒 Cart <span id="cartCount" class="cart-badge">0</span>
-                    </button>
-                    <div class="cart-hover-dropdown" id="cartHoverDropdown">
-                        <div class="cart-hover-loading">Loading cart...</div>
-                    </div>
-                </div>
-                
-                <!-- LANGUAGE BUTTON (TASK 5) -->
-                <div class="language-dropdown" id="languageDropdown">
-                    <button class="language-btn" id="languageBtn">
-                        <span class="flag-icon">🇺🇸</span>
-                        <span class="currency-code">USD</span>
-                        <span class="dropdown-arrow">▼</span>
-                    </button>
-                    <div class="language-menu" id="languageMenu">
-                        <!-- Populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <a href="#" class="login-link" onclick="openLoginModal(); return false;">Log in</a>
+        <a href="#" style="font-style: italic; text-decoration: underline; font-size: 0.8rem; color: var(--accent); margin-top: 2px;" onclick="navigateTo('signup'); return false;">Register here!</a>
+    </div>
+    <div class="cart-hover-wrapper">
+        <button class="cart-btn" id="cartHoverBtn" onclick="navigateTo('cart-page'); return false;">
+            🛒 Cart <span id="cartCount" class="cart-badge">0</span>
+        </button>
+        <div class="cart-hover-dropdown" id="cartHoverDropdown">
+            <div class="cart-hover-loading">Loading cart...</div>
+        </div>
+    </div>
+    
+    <!-- LANGUAGE BUTTON (TASK 5) -->
+    <div class="language-dropdown" id="languageDropdown">
+        <button class="language-btn" id="languageBtn">
+            <span class="flag-icon">🇺🇸</span>
+            <span class="currency-code">USD</span>
+            <span class="dropdown-arrow">▼</span>
+        </button>
+        <div class="language-menu" id="languageMenu">
+            <!-- Populated by JavaScript -->
+        </div>
+    </div>
+</div>
         </div>
     </nav>
 
     <main>
+        <!-- FULL PAGE LOGIN SECTION REMOVED -->
+        
         <!-- SHOP PAGE -->
         <section id="shop" class="page">
             <div class="container">
@@ -192,7 +195,7 @@
                 <div class="cart-sticky-bottom">
                     <div class="cart-total-info">
                         <span>Total (<span id="selectedItemsCount">0</span> selected items):</span>
-                        <span class="cart-total-amount" id="cartTotalSelected">$0.00</span>
+                        <span class="cart-total-amount" id="cartTotalSelected">₱0.00</span>
                     </div>
                     <button class="complete-order-btn" id="completeOrderBtn" onclick="processOrderFromCart()">
                         ✅ COMPLETE ORDER
@@ -201,7 +204,7 @@
             </div>
         </section>
 
-        <!-- SIGNUP PAGE -->
+        <!-- SIGNUP PAGE WITH FIXED X BUTTON -->
         <section id="signup" class="page">
             <div class="login-container">
                 <div class="login-box" style="position: relative;">
@@ -252,7 +255,7 @@
             </div>
         </section>
 
-        <!-- HOMEPAGE -->
+        <!-- HOMEPAGE - REDESIGNED WITH SLIDESHOW -->
         <section id="home" class="page active">
             <header class="hero">
                 <div class="hero-content">
@@ -262,15 +265,24 @@
                 </div>
             </header>
 
-            <!-- SLIDESHOW SECTION -->
+            <!-- ============== SLIDESHOW SECTION ============== -->
             <section class="slideshow-section">
                 <div class="container">
                     <div class="slideshow-container" id="productSlideshow">
+                        <!-- Left Arrow -->
                         <button class="slideshow-arrow arrow-left" id="slideshowPrev" aria-label="Previous slide">&#10094;</button>
+                        
+                        <!-- Slides Wrapper -->
                         <div class="slides-wrapper" id="slidesWrapper">
-                            <div class="slides-track" id="slidesTrack"></div>
+                            <div class="slides-track" id="slidesTrack">
+                                <!-- Slides will be populated by JavaScript -->
+                            </div>
                         </div>
+                        
+                        <!-- Right Arrow -->
                         <button class="slideshow-arrow arrow-right" id="slideshowNext" aria-label="Next slide">&#10095;</button>
+                        
+                        <!-- Navigation Dots + Pause Button -->
                         <div class="slideshow-controls">
                             <div class="slideshow-dots" id="slideshowDots"></div>
                             <button class="slideshow-pause" id="slideshowPause" aria-label="Pause slideshow">⏸️</button>
@@ -282,12 +294,21 @@
             <!-- Video Section -->
             <section class="home-content-section">
                 <div class="container">
+                    <!-- Video Section -->
                     <div class="video-wrapper">
-                        <iframe width="100%" height="500" src="https://www.youtube.com/embed/RuXa_yxZMGI?autoplay=1&loop=1&playlist=RuXa_yxZMGI&mute=1&rel=0" title="FOTOCENTER Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <iframe width="100%"
+                                height="500"
+                                src="https://www.youtube.com/embed/RuXa_yxZMGI?autoplay=1&loop=1&playlist=RuXa_yxZMGI&mute=1&rel=0"
+                                title="FOTOCENTER Tutorial"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen>
+                        </iframe>
                     </div>
 
                     <!-- Two Column Text Section -->
                     <div class="text-columns">
+                        <!-- Left Column -->
                         <div class="text-card left-card">
                             <h2 class="card-heading">Your <span class="memories-word">MEMORIES</span> deserve more than just a screen.</h2>
                             <p class="card-subheading">We help you transform your favorite digital moments into:</p>
@@ -299,6 +320,7 @@
                             </ul>
                         </div>
 
+                        <!-- Right Column -->
                         <div class="text-card right-card">
                             <h2 class="card-heading">Turn your <span class="memories-word">MEMORIES</span> into art you can hold.</h2>
                             <ul class="card-list check-list">
@@ -314,32 +336,43 @@
             </section>
         </section>
 
-        <!-- PRODUCT DETAIL PAGE -->
+        <!-- ============== PRODUCT DETAIL PAGE (TASK 4.5) ============== -->
         <section id="product-page" class="page">
             <div class="container product-detail-container">
+                <!-- Back Button -->
                 <button class="back-btn" id="productBackBtn" onclick="navigateTo('home'); return false;">← Back to Home</button>
                 
                 <div class="product-detail-layout">
+                    <!-- LEFT COLUMN: Main Image + 3 Thumbnails -->
                     <div class="product-left">
                         <div class="main-image-container">
                             <img id="productMainImage" src="" alt="Product" class="main-product-image">
                         </div>
-                        <div class="thumbnail-row" id="productThumbnails"></div>
+                        
+                        <!-- 3 Small Thumbnails (Product Variations) -->
+                        <div class="thumbnail-row" id="productThumbnails">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
                     </div>
                     
+                    <!-- RIGHT COLUMN: Specs Panel -->
                     <div class="product-right">
                         <div class="specs-panel">
                             <h2 id="productName">Product Name</h2>
-                            <div class="product-price" id="productPrice">$0.00</div>
+                            <div class="product-price" id="productPrice">₱0</div>
                             
                             <div class="sizes-section">
                                 <h4>Available Sizes:</h4>
-                                <div id="productSizes" class="sizes-list"></div>
+                                <div id="productSizes" class="sizes-list">
+                                    <!-- Populated by JS -->
+                                </div>
                             </div>
                             
                             <div class="paper-types-section">
                                 <h4>Paper Types:</h4>
-                                <div id="productPaperTypes" class="paper-list"></div>
+                                <div id="productPaperTypes" class="paper-list">
+                                    <!-- Populated by JS -->
+                                </div>
                             </div>
                             
                             <button class="open-editor-btn" id="openEditorBtn">OPEN IN EDITOR</button>
@@ -347,6 +380,7 @@
                     </div>
                 </div>
                 
+                <!-- Description Box with Animated Icon -->
                 <div class="description-box">
                     <div class="description-content">
                         <p id="productDescription">Product description goes here.</p>
@@ -374,6 +408,7 @@
                     </div>
                 </div>
 
+                <!-- Upload & Editing Section -->
                 <div id="uploadView" class="upload-view active-view">
                     <div class="upload-section">
                         <div class="upload-box" id="dropArea">
@@ -389,7 +424,9 @@
                             </label>
                         </div>
 
-                        <div id="uploadedImages" class="uploaded-images"></div>
+                        <div id="uploadedImages" class="uploaded-images">
+                            <!-- Uploaded thumbnails will appear here -->
+                        </div>
 
                         <div id="editorContainer" class="editor-container">
                             <div class="editor-header">
@@ -397,8 +434,12 @@
                                     <h3 class="editor-title">PHOTO EDITOR</h3>
                                     <div class="editor-header-right">
                                         <div class="product-dropdown-container">
-                                            <button class="product-dropdown-btn" id="productDropdownBtn">Products ▼</button>
-                                            <div class="product-dropdown-menu" id="productDropdownMenu"></div>
+                                            <button class="product-dropdown-btn" id="productDropdownBtn">
+                                                Products ▼
+                                            </button>
+                                            <div class="product-dropdown-menu" id="productDropdownMenu">
+                                                <!-- Dropdown items will be populated by JavaScript -->
+                                            </div>
                                         </div>
                                         <div class="current-product-badge" id="currentProductBadge">
                                             <span class="badge-text">None</span>
@@ -419,6 +460,7 @@
                                 <div class="editor-sidebar">
                                     <div class="editor-tools">
                                         <h4>Edit Tools</h4>
+
                                         <div class="tool-group">
                                             <label>Brightness</label>
                                             <div class="slider-container">
@@ -496,36 +538,41 @@
                                 </div>
                             </div>
 
-                            <!-- PRINT OPTIONS -->
+                            <!-- ============== REDESIGNED PRINT OPTIONS ============== -->
                             <div class="editor-footer">
                                 <h4>Print Options</h4>
+                                
+                                <!-- UNIFIED PRINT OPTIONS - NO SIMPLE VIEW, NO ADVANCED HEADER -->
                                 <div class="print-options-unified">
+                                    
+                                    <!-- Paper Type - Radio Buttons (Only ONE can be selected) -->
                                     <div class="advanced-section">
                                         <h5>Paper Type</h5>
                                         <div class="paper-type-grid">
                                             <label class="paper-type-btn">
                                                 <input type="radio" name="paperType" value="standard" checked onchange="calculatePrice()">
                                                 <span class="paper-label">Standard</span>
-                                                <span class="paper-price">+$0.00</span>
+                                                <span class="paper-price">+₱0</span>
                                             </label>
                                             <label class="paper-type-btn">
                                                 <input type="radio" name="paperType" value="glossy" onchange="calculatePrice()">
                                                 <span class="paper-label">Glossy</span>
-                                                <span class="paper-price">+$0.18</span>
+                                                <span class="paper-price">+₱10</span>
                                             </label>
                                             <label class="paper-type-btn">
                                                 <input type="radio" name="paperType" value="matte" onchange="calculatePrice()">
                                                 <span class="paper-label">Matte</span>
-                                                <span class="paper-price">+$0.27</span>
+                                                <span class="paper-price">+₱15</span>
                                             </label>
                                             <label class="paper-type-btn">
                                                 <input type="radio" name="paperType" value="premium" onchange="calculatePrice()">
                                                 <span class="paper-label">Premium</span>
-                                                <span class="paper-price">+$0.45</span>
+                                                <span class="paper-price">+₱25</span>
                                             </label>
                                         </div>
                                     </div>
 
+                                    <!-- Size Mode - Button Style -->
                                     <div class="advanced-section">
                                         <h5>Size Mode</h5>
                                         <div class="size-mode-grid">
@@ -540,8 +587,11 @@
                                         </div>
                                     </div>
 
+                                    <!-- Size Section with Unit Selector (ONLY ONE) -->
                                     <div class="advanced-section">
                                         <h5>Size</h5>
+                                        
+                                        <!-- Unit Selector - Only here, below Size header -->
                                         <div class="unit-selector">
                                             <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                                                 <span style="font-weight: 600; color: var(--text);">Size Unit:</span>
@@ -559,7 +609,12 @@
                                             </div>
                                         </div>
 
-                                        <div class="advanced-sizes-grid" id="sizeOptionsContainer"></div>
+                                        <!-- Standard Sizes Container -->
+                                        <div class="advanced-sizes-grid" id="sizeOptionsContainer">
+                                            <!-- Sizes will be dynamically populated by JavaScript -->
+                                        </div>
+                                        
+                                        <!-- CUSTOM SIZE INPUTS - Fixed with mm -->
                                         <div id="customSizeContainer" style="display: none; margin-top: 1rem;">
                                             <div class="custom-size-row">
                                                 <input type="number" id="customWidth" class="custom-size-input" min="1" max="100" value="8" placeholder="W">
@@ -571,10 +626,11 @@
                                                     <option value="mm">mm</option>
                                                 </select>
                                             </div>
-                                            <p class="size-note">Price calculated by area</p>
+                                            <p class="size-note">Price calculated by area (₱0.50 per sq inch)</p>
                                         </div>
                                     </div>
 
+                                    <!-- Quantity -->
                                     <div class="advanced-section">
                                         <h5>Quantity</h5>
                                         <div class="quantity-controls advanced">
@@ -584,37 +640,42 @@
                                         </div>
                                     </div>
 
+                                    <!-- Price Breakdown -->
                                     <div class="price-breakdown-modern">
                                         <div class="breakdown-item">
                                             <span>Base Price:</span>
-                                            <span id="basePrice">$0.45</span>
+                                            <span id="basePrice">₱25.00</span>
                                         </div>
                                         <div class="breakdown-item">
                                             <span>Paper Type Price:</span>
-                                            <span id="paperUpgradePrice">$0.00</span>
+                                            <span id="paperUpgradePrice">₱0.00</span>
                                         </div>
                                         <div class="breakdown-item">
                                             <span>Quantity Price:</span>
-                                            <span id="quantityMultiplier">$0.45</span>
+                                            <span id="quantityMultiplier">₱25.00</span>
                                         </div>
                                         <div class="breakdown-total-modern">
                                             <span>TOTAL:</span>
-                                            <span id="advancedTotalPrice">$0.45</span>
+                                            <span id="advancedTotalPrice">₱25.00</span>
                                         </div>
                                     </div>
                                 </div>
 
+                                <!-- ADD TO CART BUTTON -->
                                 <button id="addToCart" class="add-cart-btn" onclick="addPhotoToCart()">
                                     <span class="cart-icon">🛒</span>
-                                    Add to Cart - <span id="finalPrice">$0.45</span>
+                                    Add to Cart - <span id="finalPrice">₱25.00</span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Print Products Section -->
                 <div id="printsView" class="prints-view" style="display: none;">
-                    <div class="print-products-grid" id="printProductsGrid"></div>
+                    <div class="print-products-grid" id="printProductsGrid">
+                        <!-- Print products will be loaded here -->
+                    </div>
                 </div>
             </div>
         </section>
@@ -623,6 +684,7 @@
             <div class="container">
                 <h2>Photo Cards</h2>
                 <p>Create personalized greeting cards for every occasion.</p>
+                <!-- Cards content -->
             </div>
         </section>
 
@@ -630,6 +692,7 @@
             <div class="container">
                 <h2>Custom Calendars</h2>
                 <p>Create personalized calendars with your photos.</p>
+                <!-- Calendars content -->
             </div>
         </section>
 
@@ -685,11 +748,13 @@
         <div class="modal-content cart-modal">
             <span class="close-modal" onclick="closeCartModal()">&times;</span>
             <h3>Your Shopping Cart</h3>
-            <div class="cart-items" id="cartItemsList"></div>
+            <div class="cart-items" id="cartItemsList">
+                <!-- Cart items will be displayed here -->
+            </div>
             <div class="cart-summary">
                 <div class="cart-total">
                     <span>Total:</span>
-                    <span id="cartTotalAmount">$0.00</span>
+                    <span id="cartTotalAmount">₱ 0.00</span>
                 </div>
                 <div class="cart-actions">
                     <button class="modal-btn continue-btn" onclick="closeCartModal()">Continue Shopping</button>
@@ -761,23 +826,51 @@
                 <h3>FOTOCENTER Support</h3>
                 <button class="chat-close" onclick="toggleChat()">✕</button>
             </div>
+
+            <!-- Horizontal FAQ Bar -->
             <div class="chat-faq-bar" id="chatFaqBar">
                 <div class="faq-scroll-container">
                     <div class="faq-items">
-                        <div class="faq-item" onclick="selectFaqQuestion('pricing')"><span class="faq-icon">💰</span><span class="faq-text">Pricing</span></div>
-                        <div class="faq-item" onclick="selectFaqQuestion('delivery')"><span class="faq-icon">🚚</span><span class="faq-text">Delivery</span></div>
-                        <div class="faq-item" onclick="selectFaqQuestion('upload')"><span class="faq-icon">📤</span><span class="faq-text">Upload</span></div>
-                        <div class="faq-item" onclick="selectFaqQuestion('quality')"><span class="faq-icon">✨</span><span class="faq-text">Quality</span></div>
-                        <div class="faq-item" onclick="selectFaqQuestion('editing')"><span class="faq-icon">🎨</span><span class="faq-text">Editing</span></div>
-                        <div class="faq-item" onclick="selectFaqQuestion('payment')"><span class="faq-icon">💳</span><span class="faq-text">Payment</span></div>
-                        <div class="faq-item" onclick="selectFaqQuestion('sizes')"><span class="faq-icon">📏</span><span class="faq-text">Sizes</span></div>
-                        <div class="faq-item" onclick="selectFaqQuestion('refund')"><span class="faq-icon">↩️</span><span class="faq-text">Refunds</span></div>
+                        <div class="faq-item" onclick="selectFaqQuestion('pricing')">
+                            <span class="faq-icon">💰</span>
+                            <span class="faq-text">Pricing</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('delivery')">
+                            <span class="faq-icon">🚚</span>
+                            <span class="faq-text">Delivery</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('upload')">
+                            <span class="faq-icon">📤</span>
+                            <span class="faq-text">Upload</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('quality')">
+                            <span class="faq-icon">✨</span>
+                            <span class="faq-text">Quality</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('editing')">
+                            <span class="faq-icon">🎨</span>
+                            <span class="faq-text">Editing</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('payment')">
+                            <span class="faq-icon">💳</span>
+                            <span class="faq-text">Payment</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('sizes')">
+                            <span class="faq-icon">📏</span>
+                            <span class="faq-text">Sizes</span>
+                        </div>
+                        <div class="faq-item" onclick="selectFaqQuestion('refund')">
+                            <span class="faq-icon">↩️</span>
+                            <span class="faq-text">Refunds</span>
+                        </div>
                     </div>
                 </div>
                 <div class="faq-scroll-indicator left">‹</div>
                 <div class="faq-scroll-indicator right">›</div>
             </div>
+
             <div class="chat-messages" id="chatMessages"></div>
+
             <div class="chat-input-area">
                 <input type="text" id="chatInput" placeholder="Type your message..." class="chat-input">
                 <button onclick="sendMessage()" class="chat-send-btn">Send</button>
