@@ -472,9 +472,11 @@ function updateLanguageButton() {
 function updateAllText() {
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
-        const translation = currentLanguage.translations[key];
-        if (translation) {
-            element.textContent = translation;
+        // Check if translations exist and have the key
+        if (currentLanguage && currentLanguage.translations && currentLanguage.translations[key]) {
+            element.textContent = currentLanguage.translations[key];
+        } else {
+            console.warn(`Translation missing for key: ${key}`);
         }
     });
 }
@@ -5537,6 +5539,48 @@ function setupHamburgerMenu() {
     console.log('✅ Hamburger menu initialized with 3 items (Editor, Shop, Info)');
 }
 
+// ============== SLIDESHOW HELPER FUNCTIONS ==============
+function prevSlide() {
+    const slideshow = document.querySelector('.slideshow-container');
+    if (slideshow && slideshow.__component) {
+        slideshow.__component.prevSlide();
+    }
+}
+
+function nextSlide() {
+    const slideshow = document.querySelector('.slideshow-container');
+    if (slideshow && slideshow.__component) {
+        slideshow.__component.nextSlide();
+    }
+}
+
+function goToSlide(index) {
+    const slideshow = document.querySelector('.slideshow-container');
+    if (slideshow && slideshow.__component) {
+        slideshow.__component.goToSlide(index);
+    }
+}
+
+function toggleSlideshowPause() {
+    const slideshow = document.querySelector('.slideshow-container');
+    if (slideshow && slideshow.__component) {
+        slideshow.__component.togglePause();
+    }
+}
+
+function openProductPage(productType) {
+    navigateTo('product-page');
+    setTimeout(() => {
+        loadProductDetails(productType);
+    }, 100);
+}
+
+function closeWelcomePopup() {
+    const overlay = document.getElementById('popupOverlay');
+    const popup = document.getElementById('welcomePopup');
+    if (overlay) overlay.remove();
+    if (popup) popup.remove();
+}
 
 window.renderCartPage = renderCartPage;
 window.updateCartItemQuantityFromCart = updateCartItemQuantityFromCart;
@@ -5560,6 +5604,7 @@ window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
 window.openProductPage = openProductPage;
 window.closeWelcomePopup = closeWelcomePopup;
+
 
 
 
