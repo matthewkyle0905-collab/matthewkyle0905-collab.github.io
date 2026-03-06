@@ -4480,45 +4480,44 @@ class Slideshow {
         this.interval = null;
         this.autoPlayDelay = 4000; // 4 seconds
         
-        this.products = [
-            {
-                name: 'Photo Cards',
-                price: '₱600',
-                image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?w=1200&h=800&fit=crop',
-                desc: 'Create personalized greeting cards'
-            },
-            {
-                name: 'Calendar',
-                price: '₱900',
-                image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?w=1200&h=800&fit=crop',
-                desc: 'Make your own custom calendar'
-            },
-            {
-                name: 'Photo Book',
-                price: '₱1,500',
-                image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?w=1200&h=800&fit=crop',
-                desc: 'Premium hardcover photo books'
-            },
-            {
-                name: 'Canvas',
-                price: '₱2,400',
-                image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?w=1200&h=800&fit=crop',
-                desc: 'Your favorite photo on canvas'
-            },
-            {
-                name: 'Mouse Pads',
-                price: '₱480',
-                image: 'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?w=1200&h=800&fit=crop',
-                desc: 'Custom photo mouse pads'
-            },
-            {
-                name: 'Double Cards',
-                price: '₱720',
-                image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?w=1200&h=800&fit=crop',
-                desc: 'Elegant folded greeting cards'
-            }
-        ];
-        
+      this.products = [
+    {
+        name: 'Photo Cards',
+        price: '₱600',
+        image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+        desc: 'Create personalized greeting cards'
+    },
+    {
+        name: 'Calendar',
+        price: '₱900',
+        image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+        desc: 'Make your own custom calendar'
+    },
+    {
+        name: 'Photo Book',
+        price: '₱1,500',
+        image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+        desc: 'Premium hardcover photo books'
+    },
+    {
+        name: 'Canvas',
+        price: '₱2,400',
+        image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+        desc: 'Your favorite photo on canvas'
+    },
+    {
+        name: 'Mouse Pads',
+        price: '₱480',
+        image: 'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+        desc: 'Custom photo mouse pads'
+    },
+    {
+        name: 'Double Cards',
+        price: '₱720',
+        image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
+        desc: 'Elegant folded greeting cards'
+    }
+];
         this.init();
     }
     
@@ -4700,6 +4699,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
