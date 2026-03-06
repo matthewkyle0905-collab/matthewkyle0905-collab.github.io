@@ -4464,192 +4464,220 @@ function forceCartUpdate() {
     }
 }
 
-// ============== FIXED SLIDESHOW ==============
+// ============== PROFESSIONAL SLIDESHOW ==============
 
-// Wait for page to fully load
-window.addEventListener('load', function() {
-    console.log('Creating slideshow...');
-    createSlideshow();
-});
-
-function createSlideshow() {
-    const track = document.getElementById('slidesTrack');
-    const dotsContainer = document.getElementById('slideshowDots');
-    
-    if (!track) {
-        console.error('Slides track not found!');
-        return;
+class Slideshow {
+    constructor() {
+        this.track = document.getElementById('slidesTrack');
+        this.dotsContainer = document.getElementById('slideshowDots');
+        this.prevBtn = document.getElementById('slideshowPrev');
+        this.nextBtn = document.getElementById('slideshowNext');
+        this.pauseBtn = document.getElementById('slideshowPause');
+        
+        this.currentIndex = 0;
+        this.totalSlides = 0;
+        this.isPaused = false;
+        this.interval = null;
+        this.autoPlayDelay = 4000; // 4 seconds
+        
+        this.products = [
+            {
+                name: 'Photo Cards',
+                price: '₱600',
+                image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?w=1200&h=800&fit=crop',
+                desc: 'Create personalized greeting cards'
+            },
+            {
+                name: 'Calendar',
+                price: '₱900',
+                image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?w=1200&h=800&fit=crop',
+                desc: 'Make your own custom calendar'
+            },
+            {
+                name: 'Photo Book',
+                price: '₱1,500',
+                image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?w=1200&h=800&fit=crop',
+                desc: 'Premium hardcover photo books'
+            },
+            {
+                name: 'Canvas',
+                price: '₱2,400',
+                image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?w=1200&h=800&fit=crop',
+                desc: 'Your favorite photo on canvas'
+            },
+            {
+                name: 'Mouse Pads',
+                price: '₱480',
+                image: 'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?w=1200&h=800&fit=crop',
+                desc: 'Custom photo mouse pads'
+            },
+            {
+                name: 'Double Cards',
+                price: '₱720',
+                image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?w=1200&h=800&fit=crop',
+                desc: 'Elegant folded greeting cards'
+            }
+        ];
+        
+        this.init();
     }
     
-    // Product data with working images
-    const products = [
-        {
-            name: 'Photo Cards',
-            price: '₱600',
-            image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?w=800&h=600&fit=crop',
-            desc: 'Create personalized greeting cards'
-        },
-        {
-            name: 'Calendar',
-            price: '₱900',
-            image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?w=800&h=600&fit=crop',
-            desc: 'Make your own custom calendar'
-        },
-        {
-            name: 'Photo Book',
-            price: '₱1,500',
-            image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?w=800&h=600&fit=crop',
-            desc: 'Premium hardcover photo books'
-        },
-        {
-            name: 'Canvas',
-            price: '₱2,400',
-            image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?w=800&h=600&fit=crop',
-            desc: 'Your favorite photo on canvas'
-        },
-        {
-            name: 'Mouse Pads',
-            price: '₱480',
-            image: 'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?w=800&h=600&fit=crop',
-            desc: 'Custom photo mouse pads'
-        },
-        {
-            name: 'Double Cards',
-            price: '₱720',
-            image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?w=800&h=600&fit=crop',
-            desc: 'Elegant folded greeting cards'
+    init() {
+        if (!this.track) {
+            console.error('Slideshow track not found');
+            return;
         }
-    ];
+        
+        this.totalSlides = this.products.length;
+        this.renderSlides();
+        this.createDots();
+        this.setupEventListeners();
+        this.startAutoPlay();
+        this.updateSlidePosition(0);
+    }
     
-    // Clear and populate track
-    track.innerHTML = '';
-    products.forEach((product) => {
-        const slide = document.createElement('div');
-        slide.className = 'slide-card';
-        slide.innerHTML = `
-            <div class="slide-image">
-                <img src="${product.image}" 
-                     alt="${product.name}" 
-                     loading="lazy"
-                     onerror="this.src='https://via.placeholder.com/800x600?text=${product.name}'">
-            </div>
-            <div class="slide-info">
-                <h3>${product.name}</h3>
-                <p>${product.desc}</p>
-                <div class="slide-price">${product.price}</div>
-            </div>
-        `;
-        track.appendChild(slide);
-    });
-    
-    // Create dots
-    if (dotsContainer) {
-        dotsContainer.innerHTML = '';
-        products.forEach((_, index) => {
-            const dot = document.createElement('button');
-            dot.className = `dot ${index === 0 ? 'active' : ''}`;
-            dot.onclick = function() { goToSlide(index); };
-            dotsContainer.appendChild(dot);
+    renderSlides() {
+        // Clear track
+        this.track.innerHTML = '';
+        
+        // Set track width: totalSlides * 100%
+        this.track.style.width = `${this.totalSlides * 100}%`;
+        
+        // Create slides
+        this.products.forEach(product => {
+            const slide = document.createElement('div');
+            slide.className = 'slide-card';
+            slide.style.width = `${100 / this.totalSlides}%`; // Each slide takes equal width
+            slide.innerHTML = `
+                <div class="slide-image">
+                    <img src="${product.image}" 
+                         alt="${product.name}" 
+                         loading="lazy"
+                         onerror="this.src='https://via.placeholder.com/1200x800?text=${product.name}'">
+                </div>
+                <div class="slide-info">
+                    <h3>${product.name}</h3>
+                    <p>${product.desc}</p>
+                    <div class="slide-price">${product.price}</div>
+                </div>
+            `;
+            this.track.appendChild(slide);
         });
     }
     
-    // Slideshow variables
-    let currentIndex = 0;
-    let isPaused = false;
-    let interval;
-    
-    const totalSlides = products.length;
-    
-    // Set track width
-    track.style.width = `${totalSlides * 100}%`;
-    
-    // Function to update slide position
-    function updateSlidePosition(index) {
-        // Ensure index is within bounds
-        if (index < 0) index = totalSlides - 1;
-        if (index >= totalSlides) index = 0;
+    createDots() {
+        if (!this.dotsContainer) return;
         
-        // Calculate percentage to move
-        const movePercent = (index / totalSlides) * 100;
-        track.style.transform = `translateX(-${movePercent}%)`;
+        this.dotsContainer.innerHTML = '';
+        for (let i = 0; i < this.totalSlides; i++) {
+            const dot = document.createElement('button');
+            dot.className = `dot ${i === 0 ? 'active' : ''}`;
+            dot.setAttribute('data-index', i);
+            dot.addEventListener('click', () => this.goToSlide(i));
+            this.dotsContainer.appendChild(dot);
+        }
+    }
+    
+    setupEventListeners() {
+        // Remove existing listeners by cloning and replacing
+        if (this.prevBtn) {
+            const newPrev = this.prevBtn.cloneNode(true);
+            this.prevBtn.parentNode.replaceChild(newPrev, this.prevBtn);
+            this.prevBtn = newPrev;
+            this.prevBtn.addEventListener('click', () => this.prevSlide());
+        }
+        
+        if (this.nextBtn) {
+            const newNext = this.nextBtn.cloneNode(true);
+            this.nextBtn.parentNode.replaceChild(newNext, this.nextBtn);
+            this.nextBtn = newNext;
+            this.nextBtn.addEventListener('click', () => this.nextSlide());
+        }
+        
+        if (this.pauseBtn) {
+            const newPause = this.pauseBtn.cloneNode(true);
+            this.pauseBtn.parentNode.replaceChild(newPause, this.pauseBtn);
+            this.pauseBtn = newPause;
+            this.pauseBtn.addEventListener('click', () => this.togglePause());
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            this.updateSlidePosition(this.currentIndex);
+        });
+    }
+    
+    updateSlidePosition(index) {
+        // Ensure index is valid
+        if (index < 0) index = this.totalSlides - 1;
+        if (index >= this.totalSlides) index = 0;
+        
+        // Calculate translation: - (index * 100)%
+        const translateX = -(index * 100 / this.totalSlides) + '%';
+        this.track.style.transform = `translateX(${translateX})`;
         
         // Update dots
-        document.querySelectorAll('.dot').forEach((dot, i) => {
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, i) => {
             dot.classList.toggle('active', i === index);
         });
         
-        currentIndex = index;
+        this.currentIndex = index;
     }
     
-    // Next slide function
-    function nextSlide() {
-        let newIndex = currentIndex + 1;
-        if (newIndex >= totalSlides) {
-            newIndex = 0; // Loop back to first
+    nextSlide() {
+        const nextIndex = (this.currentIndex + 1) % this.totalSlides;
+        this.updateSlidePosition(nextIndex);
+    }
+    
+    prevSlide() {
+        const prevIndex = (this.currentIndex - 1 + this.totalSlides) % this.totalSlides;
+        this.updateSlidePosition(prevIndex);
+    }
+    
+    goToSlide(index) {
+        if (index >= 0 && index < this.totalSlides) {
+            this.updateSlidePosition(index);
         }
-        updateSlidePosition(newIndex);
     }
     
-    // Previous slide function
-    function prevSlide() {
-        let newIndex = currentIndex - 1;
-        if (newIndex < 0) {
-            newIndex = totalSlides - 1; // Loop to last
-        }
-        updateSlidePosition(newIndex);
-    }
-    
-    // Go to specific slide
-    function goToSlide(index) {
-        updateSlidePosition(index);
-    }
-    
-    // Toggle pause
-    function togglePause() {
-        isPaused = !isPaused;
-        const pauseBtn = document.getElementById('slideshowPause');
-        if (pauseBtn) {
-            pauseBtn.innerHTML = isPaused ? '▶️ Play' : '⏸️ Pause';
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        if (this.pauseBtn) {
+            this.pauseBtn.innerHTML = this.isPaused ? '▶️ Play' : '⏸️ Pause';
         }
         
-        if (isPaused) {
-            clearInterval(interval);
+        if (this.isPaused) {
+            this.stopAutoPlay();
         } else {
-            clearInterval(interval);
-            interval = setInterval(nextSlide, 4000); // Change every 4 seconds
+            this.startAutoPlay();
         }
     }
     
-    // Add event listeners
-    const prevBtn = document.getElementById('slideshowPrev');
-    const nextBtn = document.getElementById('slideshowNext');
-    const pauseBtn = document.getElementById('slideshowPause');
-    
-    // Remove old listeners and add new ones
-    if (prevBtn) {
-        prevBtn.replaceWith(prevBtn.cloneNode(true));
-        document.getElementById('slideshowPrev').addEventListener('click', prevSlide);
+    startAutoPlay() {
+        this.stopAutoPlay(); // Clear any existing interval
+        this.interval = setInterval(() => {
+            if (!this.isPaused) {
+                this.nextSlide();
+            }
+        }, this.autoPlayDelay);
     }
     
-    if (nextBtn) {
-        nextBtn.replaceWith(nextBtn.cloneNode(true));
-        document.getElementById('slideshowNext').addEventListener('click', nextSlide);
+    stopAutoPlay() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
     }
-    
-    if (pauseBtn) {
-        pauseBtn.replaceWith(pauseBtn.cloneNode(true));
-        document.getElementById('slideshowPause').addEventListener('click', togglePause);
-    }
-    
-    // Start auto-loop
-    clearInterval(interval);
-    interval = setInterval(nextSlide, 4000); // Change slide every 4 seconds
-    
-    // Set initial position
-    updateSlidePosition(0);
-    
-    console.log('Slideshow created successfully!');
 }
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Small delay to ensure DOM is ready
+    setTimeout(() => {
+        new Slideshow();
+    }, 100);
+});
 
 // Make functions globally available
 window.renderCartPage = renderCartPage;
@@ -4672,6 +4700,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
