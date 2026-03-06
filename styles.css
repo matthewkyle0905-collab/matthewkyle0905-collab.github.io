@@ -4253,5 +4253,24 @@ button:disabled {
         gap: 1rem;
     }
 }
+/* debug */
+/* TEMPORARY DEBUG - REMOVE AFTER FIXING */
+.slide-card {
+    border: 2px solid red !important;
+    background: white !important;
+    min-height: 250px !important;
+}
+
+.slide-image {
+    background: #f0f0f0 !important;
+    min-height: 150px !important;
+}
+
+.slide-image img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
 
 
