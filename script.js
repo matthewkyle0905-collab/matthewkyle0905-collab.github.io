@@ -4833,24 +4833,25 @@ const productDatabase = {
     productType: 'mousepads'
 },
     doublecards: {
-        name: 'Double Cards',
-        basePrice: 'Starts at ₱70',
-        mainImage: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-        thumbnails: [
-            'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-            'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
-            'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
-          sizes: printOptionsConfig.doublecards,
-        paperTypes: [
-            { name: 'Standard', price: '+₱0' },
-            { name: 'Glossy', price: '+₱10' },
-            { name: 'Matte', price: '+₱15' },
-            { name: 'Premium', price: '+₱25' }
-        ],
-        description: 'Elegant folded greeting cards for all special occasions. Perfect for invitations, thank you notes, or holiday greetings. Comes with matching envelopes.',
-        icon: '🃏',
-        productType: 'doublecards'
-    }
+    name: 'Double Cards',
+    basePrice: 'Starts at ₱70',
+    mainImage: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    thumbnails: [
+        'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+        'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+        'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+    ],
+    sizes: printOptionsConfig.doublecards,
+    paperTypes: [
+        { name: 'Standard', price: '+₱0' },
+        { name: 'Glossy', price: '+₱10' },
+        { name: 'Matte', price: '+₱15' },
+        { name: 'Premium', price: '+₱25' }
+    ],
+    description: 'Elegant folded greeting cards for all special occasions. Perfect for invitations, thank you notes, or holiday greetings. Comes with matching envelopes.',
+    icon: '🃏',
+    productType: 'doublecards'
+}
 };
 
 // Make slides clickable
@@ -5010,6 +5011,156 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(makeSlidesClickable, 1000);
 });
 
+// ============== LANGUAGE & CURRENCY SYSTEM (TASK 5) ==============
+
+// Language and currency data
+const languages = [
+    { code: 'us', name: 'US English', flag: '🇺🇸', currency: 'USD', symbol: '$', rate: 0.018 },  // DEFAULT
+    { code: 'uk', name: 'UK English', flag: '🇬🇧', currency: 'GBP', symbol: '£', rate: 0.014 },
+    { code: 'se', name: 'Svenska', flag: '🇸🇪', currency: 'SEK', symbol: 'kr', rate: 0.25 },
+    { code: 'no', name: 'Norsk', flag: '🇳🇴', currency: 'NOK', symbol: 'kr', rate: 0.26 },
+    { code: 'dk', name: 'Dansk', flag: '🇩🇰', currency: 'DKK', symbol: 'kr', rate: 0.23 },
+    { code: 'fi', name: 'Suomi', flag: '🇫🇮', currency: 'EUR', symbol: '€', rate: 0.018 },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪', currency: 'EUR', symbol: '€', rate: 0.018 },
+    { code: 'nl', name: 'Nederlands', flag: '🇳🇱', currency: 'EUR', symbol: '€', rate: 0.018 },
+    { code: 'fr', name: 'Français', flag: '🇫🇷', currency: 'EUR', symbol: '€', rate: 0.018 },
+    { code: 'it', name: 'Italiano', flag: '🇮🇹', currency: 'EUR', symbol: '€', rate: 0.018 },
+    { code: 'gr', name: 'Ελληνικά', flag: '🇬🇷', currency: 'EUR', symbol: '€', rate: 0.018 }
+];
+
+let currentLanguage = JSON.parse(localStorage.getItem('selectedLanguage')) || languages[0];
+
+// Initialize language dropdown
+function initLanguageDropdown() {
+    const languageBtn = document.getElementById('languageBtn');
+    const languageMenu = document.getElementById('languageMenu');
+    const languageDropdown = document.getElementById('languageDropdown');
+    
+    if (!languageBtn || !languageMenu) return;
+    
+    // Populate menu
+    languageMenu.innerHTML = '';
+    languages.forEach(lang => {
+        const item = document.createElement('div');
+        item.className = `language-item ${lang.code === currentLanguage.code ? 'active' : ''}`;
+        item.setAttribute('data-language', lang.code);
+        item.innerHTML = `
+            <span class="flag-icon">${lang.flag}</span>
+            <span class="language-name">${lang.name}</span>
+            <span class="currency-code">${lang.currency}</span>
+        `;
+        item.addEventListener('click', () => selectLanguage(lang));
+        languageMenu.appendChild(item);
+    });
+    
+    // Toggle dropdown
+    languageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        languageDropdown.classList.toggle('open');
+    });
+    
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!languageDropdown.contains(e.target)) {
+            languageDropdown.classList.remove('open');
+        }
+    });
+    
+    // Update button display
+    updateLanguageButton();
+}
+
+// Select language
+function selectLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('selectedLanguage', JSON.stringify(lang));
+    
+    // Update UI
+    updateLanguageButton();
+    updateAllPrices();
+    
+    // Close dropdown
+    document.getElementById('languageDropdown').classList.remove('open');
+    
+    // Update active state in menu
+    document.querySelectorAll('.language-item').forEach(item => {
+        item.classList.toggle('active', item.getAttribute('data-language') === lang.code);
+    });
+}
+
+// Update language button
+function updateLanguageButton() {
+    const btn = document.getElementById('languageBtn');
+    if (!btn) return;
+    
+    btn.innerHTML = `
+        <span class="flag-icon">${currentLanguage.flag}</span>
+        <span class="currency-code">${currentLanguage.currency}</span>
+        <span class="dropdown-arrow">▼</span>
+    `;
+}
+
+// Convert PHP to current currency
+function convertPrice(phpPrice) {
+    return (phpPrice * currentLanguage.rate).toFixed(2);
+}
+
+// Get formatted price with symbol
+function formatPrice(phpPrice) {
+    return `${currentLanguage.symbol}${convertPrice(phpPrice)}`;
+}
+
+// Update all prices on the page
+function updateAllPrices() {
+    // Update slideshow prices
+    document.querySelectorAll('.slide-price').forEach(el => {
+        const phpPrice = parseFloat(el.getAttribute('data-php') || el.textContent.replace(/[^0-9.]/g, ''));
+        if (phpPrice) {
+            el.setAttribute('data-php', phpPrice);
+            el.textContent = `For only ${formatPrice(phpPrice)} !!!`;
+        }
+    });
+    
+    // Update product page prices
+    const productPrice = document.getElementById('productPrice');
+    if (productPrice && productPrice.getAttribute('data-php')) {
+        const phpPrice = parseFloat(productPrice.getAttribute('data-php'));
+        productPrice.textContent = formatPrice(phpPrice);
+    }
+    
+    // Update cart totals
+    updateCartUI();
+    
+    // Update editor prices
+    calculatePrice();
+}
+
+// Override calculatePrice to use currency
+const originalCalculatePrice = calculatePrice;
+calculatePrice = function() {
+    originalCalculatePrice();
+    
+    // Convert displayed prices to current currency
+    document.querySelectorAll('#basePrice, #paperUpgradePrice, #quantityMultiplier, #advancedTotalPrice, #finalPrice').forEach(el => {
+        const phpPrice = parseFloat(el.getAttribute('data-php') || el.textContent.replace(/[^0-9.]/g, ''));
+        if (phpPrice && !isNaN(phpPrice)) {
+            el.setAttribute('data-php', phpPrice);
+            el.textContent = formatPrice(phpPrice);
+        }
+    });
+};
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Initialize language dropdown
+    initLanguageDropdown();
+    
+    // Update all prices
+    setTimeout(updateAllPrices, 200);
+});
+
 // Export functions
 window.openProductPage = openProductPage;
 window.closeWelcomePopup = closeWelcomePopup;
@@ -5035,21 +5186,4 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
