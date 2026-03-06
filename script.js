@@ -4673,110 +4673,156 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-// ============== FIXED SLIDESHOW WITH WORKING IMAGES ==============
+// ============== SIMPLE SLIDESHOW FIX ==============
 
-// Slideshow data with working image URLs
-const slideshowProducts = [
-    {
-        id: 'slide-photocard',
-        name: 'Photo Cards',
-        price: '₱600',
-        image: 'https://drive.google.com/thumbnail?id=1TjeZ9cMDpV5cDO4kKbf2i5LAVRYmZMgB&sz=w400',
-        description: 'Create personalized greeting cards'
-    },
-    {
-        id: 'slide-calendar',
-        name: 'Calendar',
-        price: '₱900',
-        image: 'https://drive.google.com/thumbnail?id=1Vk4kCk5H7aBfQNIMfowj-zK5KaGVQT9f&sz=w400',
-        description: 'Make your own custom calendar'
-    },
-    {
-        id: 'slide-photobook',
-        name: 'Photo Book',
-        price: '₱1,500',
-        image: 'https://drive.google.com/thumbnail?id=1Mn4SxXIW1k7fAyOmetReCcbB8GlBNXzM&sz=w400',
-        description: 'Premium hardcover photo books'
-    },
-    {
-        id: 'slide-canvas',
-        name: 'Canvas',
-        price: '₱2,400',
-        image: 'https://drive.google.com/thumbnail?id=17kZoqDG1oYd01tNSSf189pWL9F2MeVWY&sz=w400',
-        description: 'Your favorite photo on canvas'
-    },
-    {
-        id: 'slide-mousepad',
-        name: 'Mouse Pads',
-        price: '₱480',
-        image: 'https://drive.google.com/thumbnail?id=18LKI-POXkcITgdWz66VAMmgnZzlABgWz&sz=w400',
-        description: 'Custom photo mouse pads'
-    },
-    {
-        id: 'slide-doublecards',
-        name: 'Double Cards',
-        price: '₱720',
-        image: 'https://drive.google.com/thumbnail?id=1MlBBcslwfzMmGJ7AuOQJy-UvM8aE5Oou&sz=w400',
-        description: 'Elegant folded greeting cards'
-    }
-];
+// Wait for page to fully load
+window.addEventListener('load', function() {
+    console.log('Page loaded, creating slideshow...');
+    createSlideshow();
+});
 
-// Re-initialize slideshow with working images
-function initFixedSlideshow() {
-    console.log('Initializing fixed slideshow...');
+function createSlideshow() {
     const track = document.getElementById('slidesTrack');
     const dotsContainer = document.getElementById('slideshowDots');
     
     if (!track) {
-        console.log('Track not found!');
+        console.error('Slides track element not found!');
         return;
     }
     
-    // Clear existing content
-    track.innerHTML = '';
+    // Simple product data with reliable image URLs
+    const products = [
+        {
+            name: 'Photo Cards',
+            price: '₱600',
+            image: 'https://images.unsplash.com/photo-1607344645866-009c320c63e0?w=400&h=300&fit=crop',
+            desc: 'Create personalized greeting cards'
+        },
+        {
+            name: 'Calendar',
+            price: '₱900',
+            image: 'https://images.unsplash.com/photo-1585241645927-15a8e971b94c?w=400&h=300&fit=crop',
+            desc: 'Make your own custom calendar'
+        },
+        {
+            name: 'Photo Book',
+            price: '₱1,500',
+            image: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&h=300&fit=crop',
+            desc: 'Premium hardcover photo books'
+        },
+        {
+            name: 'Canvas',
+            price: '₱2,400',
+            image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&h=300&fit=crop',
+            desc: 'Your favorite photo on canvas'
+        },
+        {
+            name: 'Mouse Pads',
+            price: '₱480',
+            image: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=400&h=300&fit=crop',
+            desc: 'Custom photo mouse pads'
+        },
+        {
+            name: 'Double Cards',
+            price: '₱720',
+            image: 'https://images.unsplash.com/photo-1607344645866-009c320c63e0?w=400&h=300&fit=crop&flip=2',
+            desc: 'Elegant folded greeting cards'
+        }
+    ];
     
-    // Add slides with images
-    slideshowProducts.forEach((product, index) => {
-        const slideDiv = document.createElement('div');
-        slideDiv.className = 'slide-card';
-        slideDiv.innerHTML = `
+    // Clear and populate track
+    track.innerHTML = '';
+    products.forEach((product, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'slide-card';
+        slide.innerHTML = `
             <div class="slide-image">
-                <img src="${product.image}" 
-                     alt="${product.name}" 
-                     loading="lazy"
-                     onerror="this.src='https://via.placeholder.com/300x200?text=${product.name}'">
+                <img src="${product.image}" alt="${product.name}" loading="lazy">
             </div>
             <div class="slide-info">
                 <h3>${product.name}</h3>
-                <p>${product.description}</p>
+                <p>${product.desc}</p>
                 <div class="slide-price">${product.price}</div>
             </div>
         `;
-        track.appendChild(slideDiv);
+        track.appendChild(slide);
     });
     
-    // Recreate dots
+    // Create dots
     if (dotsContainer) {
         dotsContainer.innerHTML = '';
-        slideshowProducts.forEach((_, index) => {
+        products.forEach((_, index) => {
             const dot = document.createElement('button');
             dot.className = `dot ${index === 0 ? 'active' : ''}`;
-            dot.setAttribute('data-index', index);
             dot.onclick = function() { goToSlide(index); };
             dotsContainer.appendChild(dot);
         });
     }
     
-    // Reset slide position
-    currentSlideIndex = 0;
-    updateSlidePosition();
+    // Set up navigation
+    let currentIndex = 0;
+    const slidesToShow = window.innerWidth <= 480 ? 2 : (window.innerWidth <= 768 ? 3 : 6);
+    const maxIndex = products.length - slidesToShow;
     
-    console.log('Slideshow fixed! Slides added:', slideshowProducts.length);
+    // Add click handlers
+    document.getElementById('slideshowPrev')?.addEventListener('click', function() {
+        currentIndex = Math.max(0, currentIndex - 1);
+        updateSlidePosition(currentIndex);
+    });
+    
+    document.getElementById('slideshowNext')?.addEventListener('click', function() {
+        currentIndex = Math.min(maxIndex, currentIndex + 1);
+        updateSlidePosition(currentIndex);
+    });
+    
+    // Pause button
+    let isPaused = false;
+    let interval = setInterval(autoSlide, 5000);
+    
+    document.getElementById('slideshowPause')?.addEventListener('click', function() {
+        isPaused = !isPaused;
+        this.textContent = isPaused ? '▶️' : '⏸️';
+        if (!isPaused) {
+            clearInterval(interval);
+            interval = setInterval(autoSlide, 5000);
+        }
+    });
+    
+    function autoSlide() {
+        if (!isPaused) {
+            currentIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
+            updateSlidePosition(currentIndex);
+        }
+    }
+    
+    function updateSlidePosition(index) {
+        const slideWidth = track.children[0]?.offsetWidth || 180;
+        const gap = 24;
+        track.style.transform = `translateX(-${index * (slideWidth + gap)}px)`;
+        
+        // Update dots
+        document.querySelectorAll('.dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+    }
+    
+    function goToSlide(index) {
+        currentIndex = Math.min(index, maxIndex);
+        updateSlidePosition(currentIndex);
+    }
+    
+    // Handle resize
+    window.addEventListener('resize', function() {
+        const newSlidesToShow = window.innerWidth <= 480 ? 2 : (window.innerWidth <= 768 ? 3 : 6);
+        const newMaxIndex = products.length - newSlidesToShow;
+        if (currentIndex > newMaxIndex) {
+            currentIndex = newMaxIndex;
+        }
+        updateSlidePosition(currentIndex);
+    });
+    
+    console.log('Slideshow created successfully!');
 }
-
-// Call this after page loads
-setTimeout(initFixedSlideshow, 500);
-
 
 // Make functions globally available
 window.renderCartPage = renderCartPage;
@@ -4799,6 +4845,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
