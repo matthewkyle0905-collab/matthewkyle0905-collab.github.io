@@ -4625,19 +4625,30 @@ button:disabled {
     top: 1rem;
     right: 1rem;
     font-size: 4rem;
-    opacity: 0.3;
+    opacity: 0.9;
     pointer-events: none;
+    color: var(--accent);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3)); /* Adds shadow */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Alternative text shadow */
 }
 
-/* Animation for decorative icon */
 .animated-icon {
     animation: pulse 2s infinite ease-in-out;
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); opacity: 0.3; }
-    50% { transform: scale(1.2); opacity: 0.5; }
-    100% { transform: scale(1); opacity: 0.3; }
+    0% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+    50% { 
+        transform: scale(1.2); 
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
+    }
+    100% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
 }
 
 /* Welcome Popup */
@@ -4755,3 +4766,4 @@ button:disabled {
         font-size: 1rem;
     }
 }
+
