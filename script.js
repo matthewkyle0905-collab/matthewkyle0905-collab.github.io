@@ -4831,7 +4831,7 @@ const productDatabase = {
     description: 'Custom photo mouse pads for your desk. Perfect for office or home use. Non-slip rubber base and smooth surface for optimal mouse control.',
     icon: '🖱️',
     productType: 'mousepads'
-}
+},
     doublecards: {
         name: 'Double Cards',
         basePrice: 'Starts at ₱70',
@@ -5036,6 +5036,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
