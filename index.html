@@ -12,11 +12,27 @@
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">
-                <h1 class="logo">FOTOCENTER</h1>
-                <p class="logo-sub">Philippines</p>
-            </div>
+            <div class="nav-brand" onclick="navigateTo('home'); return false;" style="cursor: pointer;">
+    <h1 class="logo">FOTOCENTER</h1>
+    <p class="logo-sub">Philippines</p>
+</div>
 
+<!-- Hamburger Menu (NO HOME BUTTON) -->
+<div class="hamburger-menu" id="hamburgerMenu">
+    <button class="hamburger-icon">☰</button>
+    <div class="hamburger-dropdown" id="hamburgerDropdown">
+        <a href="#" onclick="navigateTo('photos'); return false;" class="dropdown-item">
+            <span class="dropdown-icon">✏️</span> Editor
+        </a>
+        <a href="#" onclick="navigateTo('shop'); return false;" class="dropdown-item">
+            <span class="dropdown-icon">🛍️</span> Shop
+        </a>
+        <a href="#" onclick="navigateTo('contact'); return false;" class="dropdown-item">
+            <span class="dropdown-icon">ℹ️</span> Info
+        </a>
+    </div>
+</div>
+            
             <!-- CART MODAL -->
             <div id="cartModal" class="modal">
                 <div class="modal-content cart-modal-content">
@@ -86,14 +102,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- NAV LINKS - Cart link REMOVED -->
-            <ul class="nav-links">
-                <li><a href="#" onclick="navigateTo('home'); return false;">Home</a></li>
-                <li><a href="#" onclick="navigateTo('photos'); return false;">Editor</a></li>
-                <li><a href="#" onclick="navigateTo('shop'); return false;">Shop</a></li>
-                <li><a href="#" onclick="navigateTo('contact'); return false;">Info</a></li>
-            </ul>
 
             <!-- SEARCH BAR -->
             <div class="search-container">
@@ -240,7 +248,7 @@
                 <div class="hero-content">
                     <h2>Welcome to FOTOCENTER PH</h2>
                     <p>Paper copies for your digital photos</p>
-                    <button class="cta-btn" onclick="navigateTo('photos'); return false;">Start Ordering</button>
+                    <button class="cta-btn" onclick="navigateTo('shop'); return false;">Start Ordering</button>
                 </div>
             </header>
 
@@ -812,3 +820,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
