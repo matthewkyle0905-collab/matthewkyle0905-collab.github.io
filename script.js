@@ -484,7 +484,7 @@ function updateAllPrices() {
         calculatePrice();
     }
 }
-
+/*
 // ============== PRINT OPTIONS CONFIGURATION ==============
 const printOptionsConfig = {
     photocards: [
@@ -514,7 +514,7 @@ const printOptionsConfig = {
         { value: "5x7", label: "5x7", price: "70.00" },
         { value: "8x10", label: "8x10", price: "95.00" }
     ]
-};
+}; */
 // ============== MODIFY EXISTING FUNCTIONS ==============
 
 // Override calculatePrice to use currency
@@ -5588,6 +5588,7 @@ window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
 window.openProductPage = openProductPage;
 window.closeWelcomePopup = closeWelcomePopup;
+
 
 
 
