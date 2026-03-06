@@ -4483,37 +4483,37 @@ class Slideshow {
       this.products = [
     {
         name: 'Photo Cards',
-        price: '₱600',
+        price: '₱25',
         image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
         desc: 'Create personalized greeting cards'
     },
     {
         name: 'Calendar',
-        price: '₱900',
+        price: '₱60',
         image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
         desc: 'Make your own custom calendar'
     },
     {
         name: 'Photo Book',
-        price: '₱1,500',
+        price: '₱120',
         image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
         desc: 'Premium hardcover photo books'
     },
     {
         name: 'Canvas',
-        price: '₱2,400',
+        price: '₱200',
         image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
         desc: 'Your favorite photo on canvas'
     },
     {
         name: 'Mouse Pads',
-        price: '₱480',
+        price: '₱45',
         image: 'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
         desc: 'Custom photo mouse pads'
     },
     {
         name: 'Double Cards',
-        price: '₱720',
+        price: '₱70',
         image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
         desc: 'Elegant folded greeting cards'
     }
@@ -4557,7 +4557,7 @@ class Slideshow {
                 <div class="slide-info">
                     <h3>${product.name}</h3>
                     <p>${product.desc}</p>
-                    <div class="slide-price">${product.price}</div>
+                    <div class="slide-price">For only ${product.price} !!!</div>
                 </div>
             `;
             this.track.appendChild(slide);
@@ -4815,11 +4815,11 @@ const productDatabase = {
    mousepads: {
     name: 'Mouse Pads',
     basePrice: 'Starts at ₱45',
-    mainImage: 'https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    mainImage: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=800&h=600&fit=crop',
     thumbnails: [
-        'https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-        'https://images.pexels.com/photos/3945665/pexels-photo-3945665.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-        'https://images.pexels.com/photos/3945668/pexels-photo-3945668.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop'
+        'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=200&h=200&fit=crop',
+        'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=200&h=200&fit=crop&flip=1',
+        'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=200&h=200&fit=crop&rotate=90'
     ],
     sizes: printOptionsConfig.mousepads,
     paperTypes: [
@@ -5036,6 +5036,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
