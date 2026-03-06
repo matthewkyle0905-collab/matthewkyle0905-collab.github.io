@@ -4673,6 +4673,110 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
+// ============== FIXED SLIDESHOW WITH WORKING IMAGES ==============
+
+// Slideshow data with working image URLs
+const slideshowProducts = [
+    {
+        id: 'slide-photocard',
+        name: 'Photo Cards',
+        price: '₱600',
+        image: 'https://drive.google.com/thumbnail?id=1TjeZ9cMDpV5cDO4kKbf2i5LAVRYmZMgB&sz=w400',
+        description: 'Create personalized greeting cards'
+    },
+    {
+        id: 'slide-calendar',
+        name: 'Calendar',
+        price: '₱900',
+        image: 'https://drive.google.com/thumbnail?id=1Vk4kCk5H7aBfQNIMfowj-zK5KaGVQT9f&sz=w400',
+        description: 'Make your own custom calendar'
+    },
+    {
+        id: 'slide-photobook',
+        name: 'Photo Book',
+        price: '₱1,500',
+        image: 'https://drive.google.com/thumbnail?id=1Mn4SxXIW1k7fAyOmetReCcbB8GlBNXzM&sz=w400',
+        description: 'Premium hardcover photo books'
+    },
+    {
+        id: 'slide-canvas',
+        name: 'Canvas',
+        price: '₱2,400',
+        image: 'https://drive.google.com/thumbnail?id=17kZoqDG1oYd01tNSSf189pWL9F2MeVWY&sz=w400',
+        description: 'Your favorite photo on canvas'
+    },
+    {
+        id: 'slide-mousepad',
+        name: 'Mouse Pads',
+        price: '₱480',
+        image: 'https://drive.google.com/thumbnail?id=18LKI-POXkcITgdWz66VAMmgnZzlABgWz&sz=w400',
+        description: 'Custom photo mouse pads'
+    },
+    {
+        id: 'slide-doublecards',
+        name: 'Double Cards',
+        price: '₱720',
+        image: 'https://drive.google.com/thumbnail?id=1MlBBcslwfzMmGJ7AuOQJy-UvM8aE5Oou&sz=w400',
+        description: 'Elegant folded greeting cards'
+    }
+];
+
+// Re-initialize slideshow with working images
+function initFixedSlideshow() {
+    console.log('Initializing fixed slideshow...');
+    const track = document.getElementById('slidesTrack');
+    const dotsContainer = document.getElementById('slideshowDots');
+    
+    if (!track) {
+        console.log('Track not found!');
+        return;
+    }
+    
+    // Clear existing content
+    track.innerHTML = '';
+    
+    // Add slides with images
+    slideshowProducts.forEach((product, index) => {
+        const slideDiv = document.createElement('div');
+        slideDiv.className = 'slide-card';
+        slideDiv.innerHTML = `
+            <div class="slide-image">
+                <img src="${product.image}" 
+                     alt="${product.name}" 
+                     loading="lazy"
+                     onerror="this.src='https://via.placeholder.com/300x200?text=${product.name}'">
+            </div>
+            <div class="slide-info">
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+                <div class="slide-price">${product.price}</div>
+            </div>
+        `;
+        track.appendChild(slideDiv);
+    });
+    
+    // Recreate dots
+    if (dotsContainer) {
+        dotsContainer.innerHTML = '';
+        slideshowProducts.forEach((_, index) => {
+            const dot = document.createElement('button');
+            dot.className = `dot ${index === 0 ? 'active' : ''}`;
+            dot.setAttribute('data-index', index);
+            dot.onclick = function() { goToSlide(index); };
+            dotsContainer.appendChild(dot);
+        });
+    }
+    
+    // Reset slide position
+    currentSlideIndex = 0;
+    updateSlidePosition();
+    
+    console.log('Slideshow fixed! Slides added:', slideshowProducts.length);
+}
+
+// Call this after page loads
+setTimeout(initFixedSlideshow, 500);
+
 
 // Make functions globally available
 window.renderCartPage = renderCartPage;
@@ -4695,6 +4799,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
