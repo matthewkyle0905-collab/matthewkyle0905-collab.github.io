@@ -4673,15 +4673,15 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-// ============== CORRECTED SLIDESHOW ==============
+// ============== FIXED SLIDESHOW ==============
 
 // Wait for page to fully load
 window.addEventListener('load', function() {
     console.log('Creating slideshow...');
-    createSimpleSlideshow();
+    createSlideshow();
 });
 
-function createSimpleSlideshow() {
+function createSlideshow() {
     const track = document.getElementById('slidesTrack');
     const dotsContainer = document.getElementById('slideshowDots');
     
@@ -4690,42 +4690,42 @@ function createSimpleSlideshow() {
         return;
     }
     
-    // Product data with FALLBACK images (using working URLs)
+    // Product data with working images
     const products = [
         {
             name: 'Photo Cards',
             price: '₱600',
-            image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?w=800&h=600&fit=crop',
             desc: 'Create personalized greeting cards'
         },
         {
             name: 'Calendar',
             price: '₱900',
-            image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?w=800&h=600&fit=crop',
             desc: 'Make your own custom calendar'
         },
         {
             name: 'Photo Book',
             price: '₱1,500',
-            image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?w=800&h=600&fit=crop',
             desc: 'Premium hardcover photo books'
         },
         {
             name: 'Canvas',
             price: '₱2,400',
-            image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?w=800&h=600&fit=crop',
             desc: 'Your favorite photo on canvas'
         },
         {
             name: 'Mouse Pads',
             price: '₱480',
-            image: 'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?w=800&h=600&fit=crop',
             desc: 'Custom photo mouse pads'
         },
         {
             name: 'Double Cards',
             price: '₱720',
-            image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?w=400&h=300&fit=crop',
+            image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?w=800&h=600&fit=crop',
             desc: 'Elegant folded greeting cards'
         }
     ];
@@ -4740,7 +4740,7 @@ function createSimpleSlideshow() {
                 <img src="${product.image}" 
                      alt="${product.name}" 
                      loading="lazy"
-                     onerror="this.src='https://via.placeholder.com/300x200?text=${product.name}'">
+                     onerror="this.src='https://via.placeholder.com/800x600?text=${product.name}'">
             </div>
             <div class="slide-info">
                 <h3>${product.name}</h3>
@@ -4767,15 +4767,17 @@ function createSimpleSlideshow() {
     let isPaused = false;
     let interval;
     
-    // Set to show 1 slide at a time
-    const slidesToShow = 1;
     const totalSlides = products.length;
     
-    // Set track width to show one slide
+    // Set track width
     track.style.width = `${totalSlides * 100}%`;
     
-    // Update slide positions
+    // Function to update slide position
     function updateSlidePosition(index) {
+        // Ensure index is within bounds
+        if (index < 0) index = totalSlides - 1;
+        if (index >= totalSlides) index = 0;
+        
         // Calculate percentage to move
         const movePercent = (index / totalSlides) * 100;
         track.style.transform = `translateX(-${movePercent}%)`;
@@ -4788,7 +4790,7 @@ function createSimpleSlideshow() {
         currentIndex = index;
     }
     
-    // Navigation functions
+    // Next slide function
     function nextSlide() {
         let newIndex = currentIndex + 1;
         if (newIndex >= totalSlides) {
@@ -4797,6 +4799,7 @@ function createSimpleSlideshow() {
         updateSlidePosition(newIndex);
     }
     
+    // Previous slide function
     function prevSlide() {
         let newIndex = currentIndex - 1;
         if (newIndex < 0) {
@@ -4805,21 +4808,24 @@ function createSimpleSlideshow() {
         updateSlidePosition(newIndex);
     }
     
+    // Go to specific slide
     function goToSlide(index) {
         updateSlidePosition(index);
     }
     
+    // Toggle pause
     function togglePause() {
         isPaused = !isPaused;
         const pauseBtn = document.getElementById('slideshowPause');
         if (pauseBtn) {
-            pauseBtn.textContent = isPaused ? '▶️' : '⏸️';
+            pauseBtn.innerHTML = isPaused ? '▶️ Play' : '⏸️ Pause';
         }
         
-        if (!isPaused) {
-            // Restart interval
+        if (isPaused) {
             clearInterval(interval);
-            interval = setInterval(nextSlide, 3000); // Change every 3 seconds
+        } else {
+            clearInterval(interval);
+            interval = setInterval(nextSlide, 4000); // Change every 4 seconds
         }
     }
     
@@ -4828,14 +4834,30 @@ function createSimpleSlideshow() {
     const nextBtn = document.getElementById('slideshowNext');
     const pauseBtn = document.getElementById('slideshowPause');
     
-    if (prevBtn) prevBtn.addEventListener('click', prevSlide);
-    if (nextBtn) nextBtn.addEventListener('click', nextSlide);
-    if (pauseBtn) pauseBtn.addEventListener('click', togglePause);
+    // Remove old listeners and add new ones
+    if (prevBtn) {
+        prevBtn.replaceWith(prevBtn.cloneNode(true));
+        document.getElementById('slideshowPrev').addEventListener('click', prevSlide);
+    }
+    
+    if (nextBtn) {
+        nextBtn.replaceWith(nextBtn.cloneNode(true));
+        document.getElementById('slideshowNext').addEventListener('click', nextSlide);
+    }
+    
+    if (pauseBtn) {
+        pauseBtn.replaceWith(pauseBtn.cloneNode(true));
+        document.getElementById('slideshowPause').addEventListener('click', togglePause);
+    }
     
     // Start auto-loop
-    interval = setInterval(nextSlide, 3000); // Change slide every 3 seconds
+    clearInterval(interval);
+    interval = setInterval(nextSlide, 4000); // Change slide every 4 seconds
     
-    console.log('Slideshow created with 1 slide view and auto-loop!');
+    // Set initial position
+    updateSlidePosition(0);
+    
+    console.log('Slideshow created successfully!');
 }
 
 // Make functions globally available
@@ -4859,6 +4881,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
