@@ -4851,7 +4851,7 @@ const productDatabase = {
         description: 'Elegant folded greeting cards for all special occasions. Perfect for invitations, thank you notes, or holiday greetings. Comes with matching envelopes.',
         icon: '🃏',
         productType: 'doublecards'
-    }
+    },
 };
 
 // Make slides clickable
@@ -5036,6 +5036,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
