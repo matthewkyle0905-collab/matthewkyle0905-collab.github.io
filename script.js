@@ -4840,8 +4840,7 @@ const productDatabase = {
             'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
             'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
             'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
-        ],
-        sizes: printOptionsConfig.doublecards,
+          sizes: printOptionsConfig.doublecards,
         paperTypes: [
             { name: 'Standard', price: '+₱0' },
             { name: 'Glossy', price: '+₱10' },
@@ -4851,7 +4850,7 @@ const productDatabase = {
         description: 'Elegant folded greeting cards for all special occasions. Perfect for invitations, thank you notes, or holiday greetings. Comes with matching envelopes.',
         icon: '🃏',
         productType: 'doublecards'
-    },
+    }
 };
 
 // Make slides clickable
@@ -5036,6 +5035,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
