@@ -2863,7 +2863,7 @@ function updateLoginStatus() {
     } else if (loginLink) {
         loginLink.textContent = 'Log in';
         loginLink.onclick = function () {
-            navigateTo('login');
+            openLoginModal();  
             return false;
         };
     }
@@ -4481,5 +4481,6 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
