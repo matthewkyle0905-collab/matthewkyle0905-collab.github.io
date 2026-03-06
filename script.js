@@ -7239,6 +7239,126 @@ function closeWelcomePopup() {
     if (popup) popup.remove();
 }
 
+// ============== FINAL FIXES - ADD AT THE VERY END OF YOUR JS FILE ==============
+
+// Force re-initialize hamburger menu with proper event handling
+(function fixHamburgerMenu() {
+    console.log('🔧 Fixing hamburger menu...');
+    
+    const hamburgerMenu = document.getElementById('hamburgerMenu');
+    const hamburgerIcon = document.querySelector('.hamburger-icon');
+    
+    if (hamburgerMenu && hamburgerIcon) {
+        // Remove all existing click listeners by cloning
+        const newIcon = hamburgerIcon.cloneNode(true);
+        hamburgerIcon.parentNode.replaceChild(newIcon, hamburgerIcon);
+        
+        // Add fresh click listener
+        newIcon.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            hamburgerMenu.classList.toggle('open');
+            console.log('Hamburger menu toggled:', hamburgerMenu.classList.contains('open'));
+        });
+        
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!hamburgerMenu.contains(e.target)) {
+                hamburgerMenu.classList.remove('open');
+            }
+        });
+        
+        console.log('✅ Hamburger menu fixed');
+    } else {
+        console.warn('❌ Hamburger menu elements not found');
+    }
+})();
+
+// Force slideshow to be clickable
+(function fixSlideshowClicks() {
+    console.log('🔧 Making slideshow clickable...');
+    
+    // Wait a bit for slideshow to initialize
+    setTimeout(() => {
+        const slides = document.querySelectorAll('.slide-card');
+        
+        if (slides.length > 0) {
+            slides.forEach((slide, index) => {
+                // Get product type from the slide content
+                const productTypes = ['photocards', 'calendar', 'photobook', 'canvas', 'mousepads', 'doublecards'];
+                const productType = productTypes[index % productTypes.length];
+                
+                // Remove existing listeners and add new ones
+                const newSlide = slide.cloneNode(true);
+                slide.parentNode.replaceChild(newSlide, slide);
+                
+                newSlide.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Slide clicked:', productType);
+                    
+                    // Navigate to product page
+                    navigateTo('product-page');
+                    
+                    // Load product details
+                    setTimeout(() => {
+                        if (typeof loadProductDetails === 'function') {
+                            loadProductDetails(productType);
+                        } else {
+                            console.warn('loadProductDetails not found');
+                        }
+                    }, 100);
+                });
+                
+                // Restore cursor style
+                newSlide.style.cursor = 'pointer';
+            });
+            
+            console.log(`✅ Made ${slides.length} slides clickable`);
+        } else {
+            console.warn('❌ No slides found to fix');
+        }
+    }, 1000); // Wait 1 second for slideshow to render
+})();
+
+// Force reinitialize on page navigation
+(function setupNavigationListener() {
+    const originalNavigateTo = window.navigateTo;
+    
+    if (typeof originalNavigateTo === 'function') {
+        window.navigateTo = function(pageId) {
+            // Call original function
+            originalNavigateTo(pageId);
+            
+            // Re-fix slideshow when returning to home
+            if (pageId === 'home') {
+                setTimeout(() => {
+                    // Re-attach click handlers to slides
+                    const slides = document.querySelectorAll('.slide-card');
+                    slides.forEach((slide, index) => {
+                        const productTypes = ['photocards', 'calendar', 'photobook', 'canvas', 'mousepads', 'doublecards'];
+                        const productType = productTypes[index % productTypes.length];
+                        
+                        slide.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            navigateTo('product-page');
+                            setTimeout(() => {
+                                if (typeof loadProductDetails === 'function') {
+                                    loadProductDetails(productType);
+                                }
+                            }, 100);
+                        });
+                    });
+                    console.log('🔄 Re-attached slideshow click handlers');
+                }, 500);
+            }
+        };
+        
+        console.log('✅ Navigation listener setup');
+    }
+})();
+
 window.renderCartPage = renderCartPage;
 window.updateCartItemQuantityFromCart = updateCartItemQuantityFromCart;
 window.processOrderFromCart = processOrderFromCart;
@@ -7261,6 +7381,7 @@ window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
 window.openProductPage = openProductPage;
 window.closeWelcomePopup = closeWelcomePopup;
+
 
 
 
