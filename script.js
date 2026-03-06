@@ -485,6 +485,36 @@ function updateAllPrices() {
     }
 }
 
+// ============== PRINT OPTIONS CONFIGURATION ==============
+const printOptionsConfig = {
+    photocards: [
+        { value: "4x6", label: "4x6", price: "25.00" },
+        { value: "5x7", label: "5x7", price: "35.00" },
+        { value: "8x10", label: "8x10", price: "50.00" }
+    ],
+    calendar: [
+        { value: "8x10", label: "8x10", price: "60.00" },
+        { value: "12x12", label: "12x12", price: "85.00" },
+        { value: "8.5x11", label: "8.5x11", price: "70.00" },
+        { value: "11x17", label: "11x17", price: "100.00" }
+    ],
+    photobook: [
+        { value: "8x8", label: "8x8", price: "120.00" },
+        { value: "11x8.5", label: "11x8.5", price: "150.00" }
+    ],
+    canvas: [
+        { value: "8x10", label: "8x10", price: "200.00" },
+        { value: "16x20", label: "16x20", price: "350.00" }
+    ],
+    mousepads: [
+        { value: "7x9", label: "7x9", price: "45.00" },
+        { value: "9x11", label: "9x11", price: "60.00" }
+    ],
+    doublecards: [
+        { value: "5x7", label: "5x7", price: "70.00" },
+        { value: "8x10", label: "8x10", price: "95.00" }
+    ]
+};
 // ============== MODIFY EXISTING FUNCTIONS ==============
 
 // Override calculatePrice to use currency
@@ -5558,6 +5588,7 @@ window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
 window.openProductPage = openProductPage;
 window.closeWelcomePopup = closeWelcomePopup;
+
 
 
 
