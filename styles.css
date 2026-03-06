@@ -4030,5 +4030,228 @@ button:disabled {
     margin-top: 0.1rem;
 }
 
+/* ============== SLIDESHOW STYLES (TASK 4) ============== */
+
+.slideshow-section {
+    padding: 2rem 0;
+    background-color: var(--primary);
+    border-bottom: 1px solid var(--border);
+}
+
+.slideshow-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 1rem 0;
+}
+
+.slides-wrapper {
+    overflow: hidden;
+    margin: 0 40px;
+}
+
+.slides-track {
+    display: flex;
+    transition: transform 0.5s ease;
+    gap: 1.5rem;
+}
+
+.slide-card {
+    flex: 0 0 calc(16.666% - 1.25rem);
+    min-width: 180px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.slide-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent);
+}
+
+.slide-image {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background: var(--secondary);
+}
+
+.slide-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.slide-card:hover .slide-image img {
+    transform: scale(1.05);
+}
+
+.slide-info {
+    padding: 1rem;
+    text-align: center;
+}
+
+.slide-info h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.slide-info p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.slide-price {
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 1.1rem;
+}
+
+/* Slideshow Arrows */
+.slideshow-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    background: transparent;
+    border: none;
+    font-size: 48px;
+    color: var(--accent);
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.slideshow-container:hover .slideshow-arrow {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.slideshow-arrow:hover {
+    color: var(--accent-hover);
+    transform: translateY(-50%) scale(1.2);
+}
+
+.arrow-left {
+    left: 0;
+}
+
+.arrow-right {
+    right: 0;
+}
+
+/* Slideshow Controls */
+.slideshow-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.slideshow-dots {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.dot.active {
+    background: var(--accent);
+    transform: scale(1.2);
+}
+
+.slideshow-pause {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: var(--transition);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.slideshow-pause:hover {
+    color: var(--accent);
+    background: var(--secondary);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .slide-card {
+        flex: 0 0 calc(25% - 1.125rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .slides-wrapper {
+        margin: 0 30px;
+    }
+    
+    .slide-card {
+        flex: 0 0 calc(33.333% - 1rem);
+    }
+    
+    .slideshow-arrow {
+        font-size: 36px;
+        width: 36px;
+        height: 36px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slides-wrapper {
+        margin: 0 20px;
+    }
+    
+    .slide-card {
+        flex: 0 0 calc(50% - 0.75rem);
+        min-width: 140px;
+    }
+    
+    .slide-image {
+        height: 140px;
+    }
+    
+    .slideshow-arrow {
+        font-size: 30px;
+        width: 30px;
+        height: 30px;
+    }
+    
+    .slideshow-controls {
+        gap: 1rem;
+    }
+}
 
 
