@@ -4728,6 +4728,292 @@ function setupHamburgerMenu() {
     console.log('✅ Hamburger menu initialized with 3 items (Editor, Shop, Info)');
 }
 
+// ============== PRODUCT DETAIL PAGE (TASK 4.5) ==============
+
+// Product database with all details
+const productDatabase = {
+    photocards: {
+        name: 'Photo Cards',
+        basePrice: '₱600',
+        mainImage: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.photocards,
+        paperTypes: [
+            { name: 'Standard', price: '+₱0' },
+            { name: 'Glossy', price: '+₱10' },
+            { name: 'Matte', price: '+₱15' },
+            { name: 'Premium', price: '+₱25' }
+        ],
+        description: 'Create personalized greeting cards for any occasion. Perfect for birthdays, holidays, or just to say thank you. Choose from various sizes and paper types to match your style.',
+        icon: '🖼️',
+        productType: 'photocards'
+    },
+    calendar: {
+        name: 'Calendar',
+        basePrice: '₱900',
+        mainImage: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.calendar,
+        paperTypes: [
+            { name: 'Standard', price: '+₱0' },
+            { name: 'Glossy', price: '+₱10' },
+            { name: 'Matte', price: '+₱15' },
+            { name: 'Premium', price: '+₱25' }
+        ],
+        description: 'Create personalized calendars with your favorite photos. Perfect for gifts or home decoration. Choose from desk, wall, or mini calendars to match your style.',
+        icon: '📅',
+        productType: 'calendar'
+    },
+    photobook: {
+        name: 'Photo Book',
+        basePrice: '₱1,500',
+        mainImage: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.photobook,
+        paperTypes: [
+            { name: 'Standard', price: '+₱0' },
+            { name: 'Glossy', price: '+₱10' },
+            { name: 'Matte', price: '+₱15' },
+            { name: 'Premium', price: '+₱25' }
+        ],
+        description: 'Premium hardcover photo books to collect your memories. Perfect for weddings, vacations, or family albums. Choose from various sizes and binding options.',
+        icon: '📘',
+        productType: 'photobook'
+    },
+    canvas: {
+        name: 'Canvas',
+        basePrice: '₱2,400',
+        mainImage: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.canvas,
+        paperTypes: [
+            { name: 'Standard', price: '+₱0' },
+            { name: 'Glossy', price: '+₱10' },
+            { name: 'Matte', price: '+₱15' },
+            { name: 'Premium', price: '+₱25' }
+        ],
+        description: 'Your favorite photo mounted on high-quality canvas. Gallery-wrapped and ready to hang. Perfect for home decor or special gifts.',
+        icon: '🖼️',
+        productType: 'canvas'
+    },
+    mousepads: {
+        name: 'Mouse Pads',
+        basePrice: '₱480',
+        mainImage: 'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/4492131/pexels-photo-4492131.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.mousepads,
+        paperTypes: [
+            { name: 'Standard', price: '+₱0' },
+            { name: 'Glossy', price: '+₱10' },
+            { name: 'Matte', price: '+₱15' },
+            { name: 'Premium', price: '+₱25' }
+        ],
+        description: 'Custom photo mouse pads for your desk. Perfect for office or home use. Non-slip rubber base and smooth surface for optimal mouse control.',
+        icon: '🖱️',
+        productType: 'mousepads'
+    },
+    doublecards: {
+        name: 'Double Cards',
+        basePrice: '₱720',
+        mainImage: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+        thumbnails: [
+            'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
+            'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&flip=1',
+            'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop&rotate=90'
+        ],
+        sizes: printOptionsConfig.doublecards,
+        paperTypes: [
+            { name: 'Standard', price: '+₱0' },
+            { name: 'Glossy', price: '+₱10' },
+            { name: 'Matte', price: '+₱15' },
+            { name: 'Premium', price: '+₱25' }
+        ],
+        description: 'Elegant folded greeting cards for all special occasions. Perfect for invitations, thank you notes, or holiday greetings. Comes with matching envelopes.',
+        icon: '🃏',
+        productType: 'doublecards'
+    }
+};
+
+// Make slides clickable
+function makeSlidesClickable() {
+    const slides = document.querySelectorAll('.slide-card');
+    slides.forEach((slide, index) => {
+        slide.style.cursor = 'pointer';
+        slide.addEventListener('click', function() {
+            const productTypes = ['photocards', 'calendar', 'photobook', 'canvas', 'mousepads', 'doublecards'];
+            openProductPage(productTypes[index]);
+        });
+    });
+}
+
+// Open product page
+function openProductPage(productType) {
+    navigateTo('product-page');
+    setTimeout(() => {
+        loadProductDetails(productType);
+    }, 100);
+}
+
+// Load product details
+function loadProductDetails(productType) {
+    const product = productDatabase[productType];
+    if (!product) return;
+    
+    // Set main image
+    document.getElementById('productMainImage').src = product.mainImage;
+    
+    // Set product name and price
+    document.getElementById('productName').textContent = product.name;
+    document.getElementById('productPrice').textContent = product.basePrice;
+    
+    // Set description
+    document.getElementById('productDescription').textContent = product.description;
+    
+    // Set icon
+    document.getElementById('productIcon').textContent = product.icon;
+    
+    // Load thumbnails
+    const thumbnailsContainer = document.getElementById('productThumbnails');
+    thumbnailsContainer.innerHTML = '';
+    product.thumbnails.forEach((thumb, index) => {
+        const thumbDiv = document.createElement('div');
+        thumbDiv.className = `thumbnail-item ${index === 0 ? 'active' : ''}`;
+        thumbDiv.innerHTML = `<img src="${thumb}" alt="Variation ${index + 1}">`;
+        thumbDiv.addEventListener('click', function() {
+            document.getElementById('productMainImage').src = thumb;
+            document.querySelectorAll('.thumbnail-item').forEach(item => item.classList.remove('active'));
+            this.classList.add('active');
+        });
+        thumbnailsContainer.appendChild(thumbDiv);
+    });
+    
+    // Load sizes
+    const sizesContainer = document.getElementById('productSizes');
+    sizesContainer.innerHTML = '';
+    product.sizes.forEach(size => {
+        const sizeDiv = document.createElement('div');
+        sizeDiv.className = 'size-item';
+        sizeDiv.innerHTML = `<span>${size.label}</span> <span>₱${size.price}</span>`;
+        sizesContainer.appendChild(sizeDiv);
+    });
+    
+    // Load paper types
+    const paperContainer = document.getElementById('productPaperTypes');
+    paperContainer.innerHTML = '';
+    product.paperTypes.forEach(paper => {
+        const paperDiv = document.createElement('div');
+        paperDiv.className = 'paper-item';
+        paperDiv.innerHTML = `<span>${paper.name}</span> <span>${paper.price}</span>`;
+        paperContainer.appendChild(paperDiv);
+    });
+    
+    // Store selected product for editor
+    document.getElementById('openEditorBtn').setAttribute('data-product', product.productType);
+}
+
+// Open editor with preselected product
+function openEditorWithProduct() {
+    const productType = document.getElementById('openEditorBtn').getAttribute('data-product');
+    
+    // Store in sessionStorage
+    sessionStorage.setItem('preselectedProduct', productType);
+    
+    // Navigate to editor
+    navigateTo('photos');
+    
+    // Show welcome popup
+    setTimeout(showWelcomePopup, 500);
+}
+
+// Show welcome popup
+function showWelcomePopup() {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'popup-overlay';
+    overlay.id = 'popupOverlay';
+    
+    // Create popup
+    const popup = document.createElement('div');
+    popup.className = 'welcome-popup';
+    popup.id = 'welcomePopup';
+    popup.innerHTML = `
+        <h3>🎉 Welcome to the Editor!</h3>
+        <p>Click on the blank top box to upload photos and start creating your masterpiece.</p>
+        <button onclick="closeWelcomePopup()">Got it!</button>
+    `;
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(popup);
+}
+
+// Close welcome popup
+function closeWelcomePopup() {
+    const overlay = document.getElementById('popupOverlay');
+    const popup = document.getElementById('welcomePopup');
+    if (overlay) overlay.remove();
+    if (popup) popup.remove();
+}
+
+// Check for preselected product when editor loads
+function checkPreselectedProduct() {
+    const preselected = sessionStorage.getItem('preselectedProduct');
+    if (preselected) {
+        // Select the product in dropdown
+        selectProduct(preselected);
+        
+        // Clear the storage
+        sessionStorage.removeItem('preselectedProduct');
+        
+        // Show welcome popup if not already shown
+        if (!document.getElementById('welcomePopup')) {
+            showWelcomePopup();
+        }
+    }
+}
+
+// Override navigateTo to check for editor
+const originalNavigateTo = window.navigateTo;
+window.navigateTo = function(pageId) {
+    originalNavigateTo(pageId);
+    if (pageId === 'photos') {
+        setTimeout(checkPreselectedProduct, 300);
+    }
+};
+
+// Add event listener to open editor button
+document.addEventListener('DOMContentLoaded', function() {
+    const editorBtn = document.getElementById('openEditorBtn');
+    if (editorBtn) {
+        editorBtn.addEventListener('click', openEditorWithProduct);
+    }
+    
+    // Make slides clickable after slideshow loads
+    setTimeout(makeSlidesClickable, 1000);
+});
+
+// Export functions
+window.openProductPage = openProductPage;
+window.closeWelcomePopup = closeWelcomePopup;
 
 // Make functions globally available
 window.renderCartPage = renderCartPage;
@@ -4750,6 +5036,7 @@ window.prevSlide = prevSlide;
 window.nextSlide = nextSlide;
 window.goToSlide = goToSlide;
 window.toggleSlideshowPause = toggleSlideshowPause;
+
 
 
 
