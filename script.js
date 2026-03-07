@@ -7397,6 +7397,90 @@ function makeSlidesClickable() {
     }
 })();
 
+// ============== EDITOR WELCOME POPUP FUNCTIONS ==============
+function showEditorWelcome(productType) {
+    const popup = document.getElementById('editorWelcomePopup');
+    if (!popup) {
+        console.error('Editor welcome popup not found');
+        return;
+    }
+    
+    // Update product name
+    const productNames = {
+        'photocards': 'Photo Cards',
+        'calendar': 'Calendar',
+        'photobook': 'Photo Book',
+        'canvas': 'Canvas',
+        'mousepads': 'Mouse Pads',
+        'doublecards': 'Double Cards'
+    };
+    
+    const nameEl = document.getElementById('welcomeProductName');
+    if (nameEl) {
+        nameEl.textContent = productNames[productType] || 'Photo Cards';
+    }
+    
+    // Show popup
+    popup.style.display = 'flex';
+    
+    // Auto-hide after 8 seconds
+    setTimeout(() => {
+        if (popup.style.display === 'flex') {
+            popup.style.display = 'none';
+        }
+    }, 8000);
+}
+
+function closeEditorWelcome() {
+    const popup = document.getElementById('editorWelcomePopup');
+    if (popup) {
+        popup.style.display = 'none';
+    }
+}
+
+// ============== SHOW WELCOME FOR BOTH WAYS ==============
+(function setupEditorWelcome() {
+    console.log('🔧 Setting up editor welcome popup...');
+    
+    // Way 1: Through slideshow (already have this in your code)
+    // Make sure your openEditorBtn click handler calls showEditorWelcome
+    
+    // Way 2: Through hamburger menu
+    document.addEventListener('click', function(e) {
+        // Check if clicked on Editor in hamburger menu
+        const isHamburgerEditor = e.target.closest('.hamburger-dropdown') && 
+                                  (e.target.textContent.includes('Editor') || 
+                                   e.target.closest('[onclick*="photos"]'));
+        
+        if (isHamburgerEditor) {
+            console.log('📸 Editor opened via hamburger menu');
+            
+            // Wait for editor page to load
+            setTimeout(() => {
+                const photosPage = document.getElementById('photos');
+                if (photosPage && photosPage.classList.contains('active')) {
+                    // Get current product (default to photocards)
+                    let currentProduct = 'photocards';
+                    
+                    // Try to get from active dropdown
+                    const activeItem = document.querySelector('.dropdown-item.active');
+                    if (activeItem) {
+                        currentProduct = activeItem.getAttribute('data-product') || 'photocards';
+                    }
+                    
+                    showEditorWelcome(currentProduct);
+                }
+            }, 1000);
+        }
+    });
+    
+    console.log('✅ Editor welcome popup ready for both entry methods');
+})();
+
+// Make functions global
+window.showEditorWelcome = showEditorWelcome;
+window.closeEditorWelcome = closeEditorWelcome;
+
 // Keep all your existing global functions
 window.prevSlide = function() { if (window.slideshow) window.slideshow.prevSlide(); };
 window.nextSlide = function() { if (window.slideshow) window.slideshow.nextSlide(); };
@@ -7420,5 +7504,6 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
