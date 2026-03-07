@@ -7299,48 +7299,103 @@ function makeSlidesClickable() {
     });
 }
 
-// ============== QUICK FIX FOR OPEN IN EDITOR ==============
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('open-editor-btn') || e.target.id === 'openEditorBtn') {
-        e.preventDefault();
-        console.log('🎯 Open in Editor clicked');
+// ============== WORKING FIX FOR OPEN IN EDITOR ==============
+(function fixOpenInEditor() {
+    console.log('🔧 Setting up Open in Editor button...');
+    
+    function attachEditorListener() {
+        const editorBtn = document.getElementById('openEditorBtn');
         
-        // Get product type from the button's data attribute or from the page
-        let productType = e.target.getAttribute('data-product');
-        
-        // If no data-product, try to get from the product name
-        if (!productType) {
-            const productName = document.getElementById('productName')?.textContent || '';
-            if (productName.includes('Photo Cards')) productType = 'photocards';
-            else if (productName.includes('Calendar')) productType = 'calendar';
-            else if (productName.includes('Photo Book')) productType = 'photobook';
-            else if (productName.includes('Canvas')) productType = 'canvas';
-            else if (productName.includes('Mouse Pads')) productType = 'mousepads';
-            else if (productName.includes('Double Cards')) productType = 'doublecards';
-            else productType = 'photocards'; // default
+        if (editorBtn) {
+            console.log('✅ Found Open in Editor button');
+            
+            // Remove any existing listeners by cloning
+            const newBtn = editorBtn.cloneNode(true);
+            editorBtn.parentNode.replaceChild(newBtn, editorBtn);
+            
+            // Add working click listener
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('🎯 OPEN IN EDITOR CLICKED!');
+                
+                // Get product type from data attribute
+                const productType = this.getAttribute('data-product') || 'photocards';
+                console.log('📦 Product type:', productType);
+                
+                // Navigate to photos page
+                navigateTo('photos');
+                
+                // Wait for photos page to load
+                setTimeout(() => {
+                    console.log('📸 Photos page loaded, selecting product...');
+                    
+                    // Method 1: Use selectProduct function
+                    if (typeof selectProduct === 'function') {
+                        selectProduct(productType);
+                        console.log('✅ selectProduct called with:', productType);
+                    }
+                    
+                    // Method 2: Update the badge
+                    const badge = document.getElementById('currentProductBadge');
+                    if (badge) {
+                        const icons = {
+                            'photocards': '🖼️',
+                            'calendar': '📅', 
+                            'photobook': '📘',
+                            'canvas': '🖼️',
+                            'mousepads': '🖱️',
+                            'doublecards': '🃏'
+                        };
+                        const names = {
+                            'photocards': 'Photo Cards',
+                            'calendar': 'Calendar',
+                            'photobook': 'Photo Book',
+                            'canvas': 'Canvas',
+                            'mousepads': 'Mouse Pads',
+                            'doublecards': 'Double Cards'
+                        };
+                        badge.innerHTML = `<span class="badge-text">${icons[productType] || '📷'} ${names[productType] || productType}</span>`;
+                    }
+                    
+                    // Method 3: Update print options
+                    if (typeof updatePrintOptions === 'function') {
+                        updatePrintOptions(productType);
+                    }
+                    
+                }, 800);
+                
+                return false;
+            });
+            
+            console.log('✅ Open in Editor button is now working!');
+            return true;
         }
-        
-        console.log('📦 Product type:', productType);
-        
-        // Navigate to photos page
-        navigateTo('photos');
-        
-        // Select the product in the editor
-        setTimeout(() => {
-            if (typeof selectProduct === 'function') {
-                selectProduct(productType);
-            } else {
-                console.warn('selectProduct function not found');
-                // Try to find and click the product in dropdown
-                const productBtn = document.querySelector(`.dropdown-item[data-product="${productType}"]`);
-                if (productBtn) {
-                    productBtn.click();
+        return false;
+    }
+    
+    // Try immediately
+    if (!attachEditorListener()) {
+        // If button not found, wait for it
+        console.log('⏳ Waiting for Open in Editor button...');
+        const observer = new MutationObserver(function(mutations) {
+            if (document.getElementById('openEditorBtn')) {
+                if (attachEditorListener()) {
+                    observer.disconnect();
                 }
             }
-        }, 500);
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Also try after 2 seconds
+        setTimeout(attachEditorListener, 2000);
     }
-});
-
+})();
 
 // Keep all your existing global functions
 window.prevSlide = function() { if (window.slideshow) window.slideshow.prevSlide(); };
@@ -7365,4 +7420,5 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
