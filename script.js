@@ -7299,6 +7299,49 @@ function makeSlidesClickable() {
     });
 }
 
+// ============== QUICK FIX FOR OPEN IN EDITOR ==============
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('open-editor-btn') || e.target.id === 'openEditorBtn') {
+        e.preventDefault();
+        console.log('🎯 Open in Editor clicked');
+        
+        // Get product type from the button's data attribute or from the page
+        let productType = e.target.getAttribute('data-product');
+        
+        // If no data-product, try to get from the product name
+        if (!productType) {
+            const productName = document.getElementById('productName')?.textContent || '';
+            if (productName.includes('Photo Cards')) productType = 'photocards';
+            else if (productName.includes('Calendar')) productType = 'calendar';
+            else if (productName.includes('Photo Book')) productType = 'photobook';
+            else if (productName.includes('Canvas')) productType = 'canvas';
+            else if (productName.includes('Mouse Pads')) productType = 'mousepads';
+            else if (productName.includes('Double Cards')) productType = 'doublecards';
+            else productType = 'photocards'; // default
+        }
+        
+        console.log('📦 Product type:', productType);
+        
+        // Navigate to photos page
+        navigateTo('photos');
+        
+        // Select the product in the editor
+        setTimeout(() => {
+            if (typeof selectProduct === 'function') {
+                selectProduct(productType);
+            } else {
+                console.warn('selectProduct function not found');
+                // Try to find and click the product in dropdown
+                const productBtn = document.querySelector(`.dropdown-item[data-product="${productType}"]`);
+                if (productBtn) {
+                    productBtn.click();
+                }
+            }
+        }, 500);
+    }
+});
+
+
 // Keep all your existing global functions
 window.prevSlide = function() { if (window.slideshow) window.slideshow.prevSlide(); };
 window.nextSlide = function() { if (window.slideshow) window.slideshow.nextSlide(); };
@@ -7322,3 +7365,4 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
