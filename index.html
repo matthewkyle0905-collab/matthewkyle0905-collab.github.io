@@ -712,6 +712,40 @@
         </div>
     </div>
 
+    <!-- EDITOR WELCOME POPUP - ADDED HERE -->
+    <div id="editorWelcomePopup" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <span class="close-modal" onclick="closeEditorWelcome()">&times;</span>
+            <div class="modal-icon" style="font-size: 4rem; margin-bottom: 1rem;">🎨</div>
+            <h3 style="color: var(--accent); margin-bottom: 1rem;">Welcome to the Photo Editor!</h3>
+            <div style="margin: 1.5rem 0; text-align: left;">
+                <p style="margin-bottom: 1rem; font-size: 1.1rem;">✨ <strong>Here's how to get started:</strong></p>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="background: var(--accent); color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold;">1</span>
+                        <span><strong>Upload your images</strong> by clicking the upload box above</span>
+                    </li>
+                    <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="background: var(--accent); color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold;">2</span>
+                        <span><strong>Select a photo</strong> from the gallery below</span>
+                    </li>
+                    <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="background: var(--accent); color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold;">3</span>
+                        <span><strong>Edit your photo</strong> using the tools on the right</span>
+                    </li>
+                    <li style="margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="background: var(--accent); color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold;">4</span>
+                        <span><strong>Add to cart</strong> when you're done!</span>
+                    </li>
+                </ul>
+            </div>
+            <p style="color: var(--text-muted); font-style: italic; margin: 1rem 0;">You're currently editing: <strong id="welcomeProductName">Photo Cards</strong></p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="closeEditorWelcome()" class="modal-btn continue-btn" style="background: var(--accent); color: white; padding: 0.75rem 2rem; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Got it, let's start!</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
