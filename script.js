@@ -5312,7 +5312,7 @@ function makeSlidesClickable() {
                         console.log('✅ selectProduct called with:', productType);
                     }
                     
-                    // Method 2: Update the badge
+                                       // Method 2: Update the badge
                     const badge = document.getElementById('currentProductBadge');
                     if (badge) {
                         const icons = {
@@ -5322,7 +5322,7 @@ function makeSlidesClickable() {
                             'canvas': '🖼️',
                             'mousepads': '🖱️',
                             'doublecards': '🃏'
-                        }; // ← Added closing brace and semicolon
+                        }; // ← Added this missing closing brace and semicolon
                         
                         const names = {
                             'photocards': 'Photo Cards',
@@ -5528,6 +5528,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
