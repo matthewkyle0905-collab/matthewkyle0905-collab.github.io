@@ -5327,8 +5327,7 @@ function makeSlidesClickable() {
                             'canvas': '🖼️',
                             'mousepads': '🖱️',
                             'doublecards': '🃏'
-                        };
-                        const names = {
+                                     const names = {
                             'photocards': 'Photo Cards',
                             'calendar': 'Calendar',
                             'photobook': 'Photo Book',
@@ -5337,7 +5336,6 @@ function makeSlidesClickable() {
                             'doublecards': 'Double Cards'
                         };
                         badge.innerHTML = `<span class="badge-text">${icons[productType] || '📷'} ${names[productType] || productType}</span>`;
-                    }
                     
                     // Method 3: Update print options
                     if (typeof updatePrintOptions === 'function') {
@@ -5533,5 +5531,6 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
