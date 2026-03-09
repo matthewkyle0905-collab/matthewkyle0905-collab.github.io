@@ -2102,9 +2102,11 @@ function selectLanguage(lang) {
     
     
     // Update UI
+    // Update UI
     updateLanguageButton();
     updateAllText();
     updateAllPrices();
+    updatePrintOptionsPrices();
     
     // Close dropdown
     document.getElementById('languageDropdown').classList.remove('open');
@@ -2176,6 +2178,26 @@ window.formatPrice = function(usdPrice) {
     }
 };
 
+// ============== UPDATE PRINT OPTIONS PRICES ==============
+function updatePrintOptionsPrices() {
+    console.log('💰 Updating print options prices for currency:', currentLanguage?.currency);
+    
+    // Update all size price spans
+    document.querySelectorAll('.size-price[data-usd]').forEach(el => {
+        const usdPrice = parseFloat(el.getAttribute('data-usd'));
+        if (!isNaN(usdPrice)) {
+            el.textContent = window.formatPrice(usdPrice);
+        }
+    });
+    
+    // Update paper type prices if they have data-usd
+    document.querySelectorAll('.paper-price[data-usd]').forEach(el => {
+        const usdPrice = parseFloat(el.getAttribute('data-usd'));
+        if (!isNaN(usdPrice)) {
+            el.textContent = window.formatPrice(usdPrice);
+        }
+    });
+}
 
 // ============== MODIFY EXISTING PRODUCT DATA ==============
 
@@ -7558,6 +7580,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
