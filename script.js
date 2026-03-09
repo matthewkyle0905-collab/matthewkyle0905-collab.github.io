@@ -1332,6 +1332,9 @@ document.addEventListener('DOMContentLoaded', function () {
     setupFaqScroll();
     setupChatKeyboard();
     setupDropdownMenu();
+    initLanguageDropdown();
+
+
 
     const cartBtn = document.querySelector('.cart-btn');
     if (cartBtn) {
@@ -5529,6 +5532,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
