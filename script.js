@@ -4469,7 +4469,8 @@ function updateProductBadge(productType) {
 
 // ============== UPDATED PRODUCT SELECTION FUNCTION ==============
 function selectProduct(type) {
-    currentProduct = type;
+    currentProduct = type;              // Update local variable
+    window.currentProduct = type;
 
     document.querySelectorAll('.product-btn').forEach(b => {
         b.classList.toggle('active', b.getAttribute('data-product') === type);
@@ -7506,6 +7507,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
