@@ -4505,7 +4505,7 @@ function updateQuantity(change) {
     calculatePrice();
 }
 
-window.calculatePrice = function() {
+window.calculatePrice = function calculatePrice() {
     console.log('💰 Calculating price in USD...');
     
     // Get current product
@@ -7506,6 +7506,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
