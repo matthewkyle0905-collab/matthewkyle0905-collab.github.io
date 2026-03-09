@@ -2812,6 +2812,7 @@ const calendarProducts = [
 
 // ============== TEMPLATE CONFIGURATION ==============
 let currentProduct = 'photocards'; // Default product
+window.currentProduct = currentProduct;  // ← ADD THIS LINE
 let templateImage = null;
 const templates = {
     calendar: null,
@@ -7468,6 +7469,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
