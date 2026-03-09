@@ -2018,6 +2018,8 @@ const languages = [
 
 // Default language (US English)
 let currentLanguage = JSON.parse(localStorage.getItem('selectedLanguage')) || languages[0];
+window.currentLanguage = currentLanguage; // ← ADD THIS LINE
+
 
 // ============== PRINT OPTIONS CONFIGURATION ==============
 const printOptionsConfig = {
@@ -2093,10 +2095,11 @@ function initLanguageDropdown() {
     updateLanguageButton();
 }
 
-// Select language
 function selectLanguage(lang) {
     currentLanguage = lang;
+    window.currentLanguage = lang; // ← ADD THIS LINE
     localStorage.setItem('selectedLanguage', JSON.stringify(lang));
+    
     
     // Update UI
     updateLanguageButton();
@@ -7555,6 +7558,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
