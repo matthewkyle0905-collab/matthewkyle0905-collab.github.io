@@ -4505,72 +4505,94 @@ function updateQuantity(change) {
     calculatePrice();
 }
 
-// ============== FIXED CALCULATE PRICE FUNCTION (USD BASE) ==============
-window.calculatePrice = function() {
+function() {
     console.log('💰 Calculating price in USD...');
     
     // Get current product
     const productType = window.currentProduct || 'photocards';
+    console.log('1. Product type:', productType);
     
     // Get selected size
     const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
-    let basePriceUSD = 0.45; // Default USD price (was 25 PHP ≈ $0.45)
+    console.log('2. Selected size element:', selectedSize);
+    
+    let basePriceUSD = 0.45; // Default USD price
     
     if (selectedSize) {
         const sizeValue = selectedSize.value;
+        console.log('3. Size value:', sizeValue);
+        
         if (sizeValue === 'custom') {
             const width = parseFloat(document.getElementById('customWidth')?.value) || 8;
             const height = parseFloat(document.getElementById('customHeight')?.value) || 10;
             const area = width * height;
-            basePriceUSD = Math.max(0.45, Math.round(area * 0.009 * 100) / 100); // USD calculation
+            basePriceUSD = Math.max(0.45, Math.round(area * 0.009 * 100) / 100);
+            console.log('4. Custom size calculation:', {width, height, area, basePriceUSD});
         } else {
             // Get price from config based on current product
             const options = window.printOptionsConfig?.[productType] || window.printOptionsConfig?.photocards || [];
+            console.log('4. Options for this product:', options);
+            
             const option = options.find(opt => opt.value === sizeValue);
-            // Convert PHP prices from config to USD (assuming 1 PHP = 0.018 USD)
+            console.log('5. Found option:', option);
+            
             basePriceUSD = option ? parseFloat(option.price) * 0.018 : 0.45;
+            console.log('6. Calculated basePriceUSD:', basePriceUSD);
+        }
+    } else {
+        console.log('3. No size selected, using default');
+    }
+    
+    console.log('7. Final basePriceUSD before paper:', basePriceUSD);
+    
+    // Get paper type price
+    let paperUpgradeUSD = 0;
+    const selectedPaper = document.querySelector('input[name="paperType"]:checked');
+    console.log('8. Selected paper:', selectedPaper);
+    
+    if (selectedPaper) {
+        const paperValue = selectedPaper.value;
+        console.log('9. Paper value:', paperValue);
+        
+        switch(paperValue) {
+            case 'glossy': paperUpgradeUSD = 0.18; console.log('10. Glossy selected'); break;
+            case 'matte': paperUpgradeUSD = 0.27; console.log('10. Matte selected'); break;
+            case 'premium': paperUpgradeUSD = 0.45; console.log('10. Premium selected'); break;
+            default: paperUpgradeUSD = 0; console.log('10. Standard selected');
         }
     }
     
-    // Get paper type price
-let paperUpgradeUSD = 0;
-const selectedPaper = document.querySelector('input[name="paperType"]:checked');
-console.log('🔍 Selected paper element:', selectedPaper);
-console.log('🔍 Selected paper value:', selectedPaper?.value);
-
-if (selectedPaper) {
-    const paperValue = selectedPaper.value;
-    console.log('🔍 Paper value:', paperValue);
-    
-    switch(paperValue) {
-        case 'glossy': 
-            paperUpgradeUSD = 0.18; 
-            console.log('✅ Glossy selected: $0.18');
-            break;
-        case 'matte': 
-            paperUpgradeUSD = 0.27; 
-            console.log('✅ Matte selected: $0.27');
-            break;
-        case 'premium': 
-            paperUpgradeUSD = 0.45; 
-            console.log('✅ Premium selected: $0.45');
-            break;
-        default: 
-            paperUpgradeUSD = 0; 
-            console.log('✅ Standard selected: $0.00');
-    }
-} else {
-    console.log('⚠️ No paper selected, defaulting to 0');
-}
-console.log('🔍 Final paperUpgradeUSD:', paperUpgradeUSD);
-    
     // Get quantity
     const quantity = parseInt(document.getElementById('quantityDisplay')?.textContent || '1');
+    console.log('11. Quantity:', quantity);
     
     const priceBeforeQuantity = basePriceUSD + paperUpgradeUSD;
     const totalPriceUSD = priceBeforeQuantity * quantity;
     
-    console.log(`📏 Base: $${basePriceUSD.toFixed(2)}, 📄 Paper: $${paperUpgradeUSD.toFixed(2)}, 🔢 Qty: ${quantity}, 💰 Total: $${totalPriceUSD.toFixed(2)}`);
+    console.log(`12. 📏 Base: $${basePriceUSD.toFixed(2)}, 📄 Paper: $${paperUpgradeUSD.toFixed(2)}, 🔢 Qty: ${quantity}, 💰 Total: $${totalPriceUSD.toFixed(2)}`);
+    
+    // Update attributes
+    document.getElementById('basePrice')?.setAttribute('data-usd', basePriceUSD);
+    document.getElementById('paperUpgradePrice')?.setAttribute('data-usd', paperUpgradeUSD);
+    document.getElementById('quantityMultiplier')?.setAttribute('data-usd', priceBeforeQuantity * quantity);
+    document.getElementById('advancedTotalPrice')?.setAttribute('data-usd', totalPriceUSD);
+    document.getElementById('finalPrice')?.setAttribute('data-usd', totalPriceUSD);
+    
+    // Format display
+    if (typeof window.formatPrice === 'function') {
+        document.getElementById('basePrice').textContent = window.formatPrice(basePriceUSD);
+        document.getElementById('paperUpgradePrice').textContent = window.formatPrice(paperUpgradeUSD);
+        document.getElementById('quantityMultiplier').textContent = window.formatPrice(priceBeforeQuantity * quantity);
+        document.getElementById('advancedTotalPrice').textContent = window.formatPrice(totalPriceUSD);
+        document.getElementById('finalPrice').textContent = window.formatPrice(totalPriceUSD);
+    } else {
+        document.getElementById('basePrice').textContent = `$${basePriceUSD.toFixed(2)}`;
+        document.getElementById('paperUpgradePrice').textContent = `$${paperUpgradeUSD.toFixed(2)}`;
+        document.getElementById('quantityMultiplier').textContent = `$${(priceBeforeQuantity * quantity).toFixed(2)}`;
+        document.getElementById('advancedTotalPrice').textContent = `$${totalPriceUSD.toFixed(2)}`;
+        document.getElementById('finalPrice').textContent = `$${totalPriceUSD.toFixed(2)}`;
+    }
+}
     
     // Update data-usd attributes (instead of data-php)
     document.getElementById('basePrice')?.setAttribute('data-usd', basePriceUSD);
@@ -7494,6 +7516,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
