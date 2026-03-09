@@ -7480,6 +7480,49 @@ function closeEditorWelcome() {
     console.log('✅ Editor welcome popup ready for both entry methods');
 })();
 
+
+// ============== FIX DROPDOWN MENU ON HAMBURGER ENTRY ==============
+(function fixDropdownOnHamburger() {
+    console.log('🔧 Setting up dropdown menu fix...');
+    
+    // Function to initialize dropdown
+    function initDropdownIfNeeded() {
+        const photosPage = document.getElementById('photos');
+        if (photosPage && photosPage.classList.contains('active')) {
+            console.log('📸 Photos page active, setting up dropdown...');
+            if (typeof setupDropdownMenu === 'function') {
+                setupDropdownMenu();
+                window.dropdownInitialized = true;
+            }
+        }
+    }
+    
+    // Run when page changes
+    const originalNavigateTo = window.navigateTo;
+    if (typeof originalNavigateTo === 'function') {
+        window.navigateTo = function(pageId) {
+            originalNavigateTo(pageId);
+            if (pageId === 'photos') {
+                setTimeout(initDropdownIfNeeded, 300);
+            }
+        };
+    }
+    
+    // Also run on hamburger menu clicks
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('[onclick*="photos"]') || 
+            (e.target.closest('.hamburger-dropdown') && e.target.textContent.includes('Editor'))) {
+            setTimeout(initDropdownIfNeeded, 500);
+        }
+    });
+    
+    // Run now just in case
+    setTimeout(initDropdownIfNeeded, 1000);
+    
+    console.log('✅ Dropdown menu fix applied');
+})();
+
+
 // Make functions global
 window.showEditorWelcome = showEditorWelcome;
 window.closeEditorWelcome = closeEditorWelcome;
@@ -7507,6 +7550,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
