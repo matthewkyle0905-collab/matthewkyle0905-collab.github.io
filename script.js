@@ -2107,6 +2107,7 @@ function selectLanguage(lang) {
     updateAllText();
     updateAllPrices();
     updatePrintOptionsPrices();
+    updateSlideshowPrices();
     
     // Close dropdown
     document.getElementById('languageDropdown').classList.remove('open');
@@ -2477,7 +2478,7 @@ class Slideshow {
                 <div class="slide-info">
                     <h3>${product.name}</h3>
                     <p>${product.desc}</p>
-                    <div class="slide-price" data-php="${product.pricePHP}">For only ${formatPrice(product.pricePHP)} !!!</div>
+                    <div class="slide-price" data-php="${product.pricePHP}">For only ${formatPrice(product.pricePHP * 0.018)} !!!</div>
                 </div>
             `;
             this.track.appendChild(slide);
@@ -7506,6 +7507,19 @@ function closeEditorWelcome() {
 })();
 
 
+// ============== UPDATE SLIDESHOW PRICES ==============
+function updateSlideshowPrices() {
+    console.log('Updating slideshow prices...');
+    document.querySelectorAll('.slide-price[data-php]').forEach(el => {
+        const phpPrice = parseFloat(el.getAttribute('data-php'));
+        if (!isNaN(phpPrice)) {
+            const usdPrice = phpPrice * 0.018;
+            el.textContent = `For only ${window.formatPrice(usdPrice)} !!!`;
+        }
+    });
+}
+
+
 // ============== ULTIMATE DROPDOWN FIX ==============
 (function ultimateDropdownFix() {
     console.log('🔧 Applying ultimate dropdown fix...');
@@ -7580,6 +7594,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
