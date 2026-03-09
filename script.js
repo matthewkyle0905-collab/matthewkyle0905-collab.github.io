@@ -2174,65 +2174,6 @@ window.formatPrice = function(usdPrice) {
 };
 
 
-// ============== MODIFY EXISTING FUNCTIONS ==============
-
-// Override calculatePrice to use currency
-const originalCalculatePrice = window.calculatePrice || function() {};
-window.calculatePrice = function() {
-    if (originalCalculatePrice) originalCalculatePrice();
-    
-    // Convert displayed prices to current currency
-    document.querySelectorAll('#basePrice, #paperUpgradePrice, #quantityMultiplier, #advancedTotalPrice, #finalPrice').forEach(el => {
-        const phpPrice = parseFloat(el.getAttribute('data-php'));
-        if (!isNaN(phpPrice)) {
-            el.textContent = formatPrice(phpPrice);
-        }
-    });
-};
-
-// Override updatePrintOptions to add data-php attributes
-const originalUpdatePrintOptions = window.updatePrintOptions;
-window.updatePrintOptions = function(productType) {
-    if (originalUpdatePrintOptions) originalUpdatePrintOptions(productType);
-    
-    // Add data-php attributes to size prices
-    document.querySelectorAll('.size-price').forEach(el => {
-        const priceText = el.textContent.replace(/[^0-9.]/g, '');
-        const phpPrice = parseFloat(priceText);
-        if (!isNaN(phpPrice)) {
-            el.setAttribute('data-php', phpPrice);
-            el.textContent = formatPrice(phpPrice);
-        }
-    });
-};
-
-// Override renderCartPage to format prices
-const originalRenderCartPage = window.renderCartPage;
-window.renderCartPage = function() {
-    if (originalRenderCartPage) originalRenderCartPage();
-    
-    // Format cart item prices
-    document.querySelectorAll('.cart-item-price').forEach(el => {
-        const priceText = el.textContent.replace(/[^0-9.]/g, '');
-        const phpPrice = parseFloat(priceText);
-        if (!isNaN(phpPrice)) {
-            el.setAttribute('data-php', phpPrice);
-            el.textContent = formatPrice(phpPrice);
-        }
-    });
-    
-    // Format cart total
-    const cartTotal = document.getElementById('cartTotalSelected');
-    if (cartTotal) {
-        const priceText = cartTotal.textContent.replace(/[^0-9.]/g, '');
-        const phpPrice = parseFloat(priceText);
-        if (!isNaN(phpPrice)) {
-            cartTotal.setAttribute('data-php', phpPrice);
-            cartTotal.textContent = formatPrice(phpPrice);
-        }
-    }
-};
-
 // ============== MODIFY EXISTING PRODUCT DATA ==============
 
 // Update productDatabase to use PHP base prices
@@ -7527,6 +7468,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
