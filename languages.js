@@ -571,7 +571,7 @@ const languages = [
             'loading_cart': 'Laddar varukorg...',
             'back': 'Tillbaka'
         }
-    }
+    },
 
 
         // ===== NORWEGIAN =====
@@ -2260,3 +2260,4 @@ const languages = [
 // Default language (US English)
 let currentLanguage = languages[0];
 window.currentLanguage = currentLanguage;
+
