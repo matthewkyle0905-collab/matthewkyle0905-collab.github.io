@@ -1,8 +1,3 @@
-// ============== LANGUAGE SYSTEM ==============
-// Current language (default from languages.js)
-let currentLanguage = languages[0]; // US English default
-window.currentLanguage = currentLanguage;
-
 // Initialize language dropdown
 function initLanguageDropdown() {
     const languageBtn = document.getElementById('languageBtn');
@@ -5531,6 +5526,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
