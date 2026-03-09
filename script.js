@@ -2049,7 +2049,7 @@ const printOptionsConfig = {
         { value: "8x10", label: "8x10", price: "95.00" }
     ]
 }; 
-
+window.printOptionsConfig = printOptionsConfig;
 // ============== LANGUAGE FUNCTIONS ==============
 
 // Initialize language dropdown
@@ -7506,6 +7506,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
