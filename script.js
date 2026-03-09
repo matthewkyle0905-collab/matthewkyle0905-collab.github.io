@@ -2144,36 +2144,34 @@ function convertPrice(phpPrice) {
 }
 
 // Get formatted price with symbol
-function formatPrice(phpPrice) {
-    return `${currentLanguage.symbol}${convertPrice(phpPrice)}`;
-}
-
-// Update all prices on the page
-function updateAllPrices() {
-    // Update elements with data-php attribute
-    document.querySelectorAll('[data-php]').forEach(element => {
-        const phpPrice = parseFloat(element.getAttribute('data-php'));
-        if (!isNaN(phpPrice)) {
-            element.textContent = formatPrice(phpPrice);
-        }
-    });
+// ============== FORMAT PRICE FUNCTION (USD to Selected Currency) ==============
+window.formatPrice = function(usdPrice) {
+    // Get current language/currency (default to USD if not set)
+    const lang = window.currentLanguage || { 
+        symbol: '$', 
+        rate: 1, 
+        currency: 'USD' 
+    };
     
-    // Update slideshow prices (special handling)
-    document.querySelectorAll('.slide-price').forEach(el => {
-        const phpPrice = parseFloat(el.getAttribute('data-php'));
-        if (phpPrice) {
-            el.textContent = `For only ${formatPrice(phpPrice)} !!!`;
-        }
-    });
+    // Convert USD to target currency
+    const convertedPrice = usdPrice * lang.rate;
     
-    // Update cart totals
-    updateCartUI();
-    
-    // Update editor prices
-    if (typeof calculatePrice === 'function') {
-        calculatePrice();
+    // Format based on currency
+    switch(lang.currency) {
+        case 'USD':
+            return `$${convertedPrice.toFixed(2)}`;
+        case 'EUR':
+            return `€${convertedPrice.toFixed(2)}`;
+        case 'GBP':
+            return `£${convertedPrice.toFixed(2)}`;
+        case 'SEK':
+        case 'NOK':
+        case 'DKK':
+            return `${convertedPrice.toFixed(2)} kr`;
+        default:
+            return `${lang.symbol}${convertedPrice.toFixed(2)}`;
     }
-}
+};
 
 
 // ============== MODIFY EXISTING FUNCTIONS ==============
@@ -4565,53 +4563,78 @@ function updateQuantity(change) {
     calculatePrice();
 }
 
-// Calculate price based on all options
-function calculatePrice() {
+// ============== FIXED CALCULATE PRICE FUNCTION (USD BASE) ==============
+window.calculatePrice = function() {
+    console.log('💰 Calculating price in USD...');
+    
+    // Get current product
+    const productType = window.currentProduct || 'photocards';
+    
     // Get selected size
     const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
-    let basePrice = 25;
+    let basePriceUSD = 0.45; // Default USD price (was 25 PHP ≈ $0.45)
     
     if (selectedSize) {
         const sizeValue = selectedSize.value;
         if (sizeValue === 'custom') {
-            const width = parseFloat(document.getElementById('customWidth').value) || 8;
-            const height = parseFloat(document.getElementById('customHeight').value) || 10;
+            const width = parseFloat(document.getElementById('customWidth')?.value) || 8;
+            const height = parseFloat(document.getElementById('customHeight')?.value) || 10;
             const area = width * height;
-            basePrice = Math.max(25, Math.round(area * 0.5));
+            basePriceUSD = Math.max(0.45, Math.round(area * 0.009 * 100) / 100); // USD calculation
         } else {
             // Get price from config based on current product
-            const productType = currentProduct || 'photocards';
-            const options = printOptionsConfig[productType] || printOptionsConfig.photocards;
+            const options = window.printOptionsConfig?.[productType] || window.printOptionsConfig?.photocards || [];
             const option = options.find(opt => opt.value === sizeValue);
-            basePrice = option ? parseFloat(option.price) : 25;
+            // Convert PHP prices from config to USD (assuming 1 PHP = 0.018 USD)
+            basePriceUSD = option ? parseFloat(option.price) * 0.018 : 0.45;
         }
     }
     
     // Get paper type price
-    let paperUpgrade = 0;
+    let paperUpgradeUSD = 0;
     const selectedPaper = document.querySelector('input[name="paperType"]:checked');
     if (selectedPaper) {
         const paperValue = selectedPaper.value;
         switch(paperValue) {
-            case 'glossy': paperUpgrade = 10; break;
-            case 'matte': paperUpgrade = 15; break;
-            case 'premium': paperUpgrade = 25; break;
-            default: paperUpgrade = 0;
+            case 'glossy': paperUpgradeUSD = 0.18; break; // 10 PHP → $0.18
+            case 'matte': paperUpgradeUSD = 0.27; break;  // 15 PHP → $0.27
+            case 'premium': paperUpgradeUSD = 0.45; break; // 25 PHP → $0.45
+            default: paperUpgradeUSD = 0;
         }
     }
     
-    const priceBeforeQuantity = basePrice + paperUpgrade;
-    const totalPrice = priceBeforeQuantity * currentQuantity;
+    // Get quantity
+    const quantity = parseInt(document.getElementById('quantityDisplay')?.textContent || '1');
     
-    // Update display
-    document.getElementById('basePrice').textContent = `₱${basePrice.toFixed(2)}`;
-    document.getElementById('paperUpgradePrice').textContent = `₱${paperUpgrade.toFixed(2)}`;
-    document.getElementById('quantityMultiplier').textContent = `₱${(priceBeforeQuantity * currentQuantity).toFixed(2)}`;
-    document.getElementById('advancedTotalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
-    document.getElementById('finalPrice').textContent = `₱${totalPrice.toFixed(2)}`;
+    const priceBeforeQuantity = basePriceUSD + paperUpgradeUSD;
+    const totalPriceUSD = priceBeforeQuantity * quantity;
     
-    basePricePerUnit = basePrice;
-}
+    console.log(`📏 Base: $${basePriceUSD.toFixed(2)}, 📄 Paper: $${paperUpgradeUSD.toFixed(2)}, 🔢 Qty: ${quantity}, 💰 Total: $${totalPriceUSD.toFixed(2)}`);
+    
+    // Update data-usd attributes (instead of data-php)
+    document.getElementById('basePrice')?.setAttribute('data-usd', basePriceUSD);
+    document.getElementById('paperUpgradePrice')?.setAttribute('data-usd', paperUpgradeUSD);
+    document.getElementById('quantityMultiplier')?.setAttribute('data-usd', priceBeforeQuantity * quantity);
+    document.getElementById('advancedTotalPrice')?.setAttribute('data-usd', totalPriceUSD);
+    document.getElementById('finalPrice')?.setAttribute('data-usd', totalPriceUSD);
+    
+    // Format with current currency (if other currency selected, convert from USD)
+    if (typeof window.formatPrice === 'function') {
+        // formatPrice should now expect USD values and convert to selected currency
+        document.getElementById('basePrice').textContent = window.formatPrice(basePriceUSD);
+        document.getElementById('paperUpgradePrice').textContent = window.formatPrice(paperUpgradeUSD);
+        document.getElementById('quantityMultiplier').textContent = window.formatPrice(priceBeforeQuantity * quantity);
+        document.getElementById('advancedTotalPrice').textContent = window.formatPrice(totalPriceUSD);
+        document.getElementById('finalPrice').textContent = window.formatPrice(totalPriceUSD);
+    } else {
+        // Fallback to USD
+        document.getElementById('basePrice').textContent = `$${basePriceUSD.toFixed(2)}`;
+        document.getElementById('paperUpgradePrice').textContent = `$${paperUpgradeUSD.toFixed(2)}`;
+        document.getElementById('quantityMultiplier').textContent = `$${(priceBeforeQuantity * quantity).toFixed(2)}`;
+        document.getElementById('advancedTotalPrice').textContent = `$${totalPriceUSD.toFixed(2)}`;
+        document.getElementById('finalPrice').textContent = `$${totalPriceUSD.toFixed(2)}`;
+    }
+};
 
 // Handle when size is selected
 function onSizeSelect() {
@@ -7504,6 +7527,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
