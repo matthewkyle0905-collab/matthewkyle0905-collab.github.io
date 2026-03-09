@@ -5288,63 +5288,64 @@ function makeSlidesClickable() {
             const newBtn = editorBtn.cloneNode(true);
             editorBtn.parentNode.replaceChild(newBtn, editorBtn);
             
-            // Add working click listener
-            newBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                console.log('🎯 OPEN IN EDITOR CLICKED!');
-                
-                // Get product type from data attribute
-                const productType = this.getAttribute('data-product') || 'photocards';
-                console.log('📦 Product type:', productType);
-                
-                // Navigate to photos page
-                navigateTo('photos');
-                
-                // Wait for photos page to load
-                setTimeout(() => {
-                    console.log('📸 Photos page loaded, selecting product...');
-                    
-                    // Method 1: Use selectProduct function
-                    if (typeof selectProduct === 'function') {
-                        selectProduct(productType);
-                        console.log('✅ selectProduct called with:', productType);
-                    }
-                    
-                                       // Method 2: Update the badge
-                    const badge = document.getElementById('currentProductBadge');
-                    if (badge) {
-                        const icons = {
-                            'photocards': '🖼️',
-                            'calendar': '📅', 
-                            'photobook': '📘',
-                            'canvas': '🖼️',
-                            'mousepads': '🖱️',
-                            'doublecards': '🃏'
-                        }; // ← Added this missing closing brace and semicolon
-                        
-                        const names = {
-                            'photocards': 'Photo Cards',
-                            'calendar': 'Calendar',
-                            'photobook': 'Photo Book',
-                            'canvas': 'Canvas',
-                            'mousepads': 'Mouse Pads',
-                            'doublecards': 'Double Cards'
-                        };
-                        badge.innerHTML = `<span class="badge-text">${icons[productType] || '📷'} ${names[productType] || productType}</span>`;
-} // ✅ Close the if (badge) block
+           // Add working click listener
+newBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('🎯 OPEN IN EDITOR CLICKED!');
+    
+    // Get product type from data attribute
+    const productType = this.getAttribute('data-product') || 'photocards';
+    console.log('📦 Product type:', productType);
+    
+    // Navigate to photos page
+    navigateTo('photos');
+    
+    // Wait for photos page to load
+    setTimeout(() => {
+        console.log('📸 Photos page loaded, selecting product...');
+        
+        // Method 1: Use selectProduct function
+        if (typeof selectProduct === 'function') {
+            selectProduct(productType);
+            console.log('✅ selectProduct called with:', productType);
+        }
+        
+        // Method 2: Update the badge
+        const badge = document.getElementById('currentProductBadge');
+        if (badge) {
+            const icons = {
+                'photocards': '🖼️',
+                'calendar': '📅',
+                'photobook': '📘',
+                'canvas': '🖼️',
+                'mousepads': '🖱️',
+                'doublecards': '🃏'
+            };
+            
+            const names = {
+                'photocards': 'Photo Cards',
+                'calendar': 'Calendar',
+                'photobook': 'Photo Book',
+                'canvas': 'Canvas',
+                'mousepads': 'Mouse Pads',
+                'doublecards': 'Double Cards'
+            };
+            
+            badge.innerHTML = `<span class="badge-text">${icons[productType] || '📷'} ${names[productType] || productType}</span>`;
+        } // ✅ close the if (badge) block here
 
-// Method 3: Update print options
-if (typeof updatePrintOptions === 'function') {
-    updatePrintOptions(productType);
-}
+        // Method 3: Update print options
+        if (typeof updatePrintOptions === 'function') {
+            updatePrintOptions(productType);
+        }
+        
+    }, 800);
+    
+    return false;
+});
 
-                    
-                }, 800);
-                
-                return false;
-            });
             
             console.log('✅ Open in Editor button is now working!');
             return true;
@@ -5530,6 +5531,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
