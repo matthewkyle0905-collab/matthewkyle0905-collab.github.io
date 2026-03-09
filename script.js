@@ -4607,7 +4607,6 @@ function onSizeSelect() {
 function updatePrintOptions(productType) {
     console.log('Updating print options for:', productType);
     const container = document.getElementById('sizeOptionsContainer');
-    console.log('Container found:', container);
     
     if (!container) {
         console.error('Size options container not found!');
@@ -4619,11 +4618,13 @@ function updatePrintOptions(productType) {
     
     let html = '';
     options.forEach(opt => {
+        // Convert PHP price to USD (1 PHP = 0.018 USD)
+        const usdPrice = (parseFloat(opt.price) * 0.018).toFixed(2);
         html += `
             <label class="print-size-btn small">
                 <input type="radio" name="advancedPrintSize" value="${opt.value}" onchange="onSizeSelect()">
                 <span class="size-label">${opt.value}"</span>
-                <span class="size-price">₱${opt.price}</span>
+                <span class="size-price" data-usd="${usdPrice}">$${usdPrice}</span>
             </label>
         `;
     });
@@ -4637,7 +4638,6 @@ function updatePrintOptions(productType) {
     `;
     
     container.innerHTML = html;
-    console.log('Container updated with:', html);
     
     // Select first option by default
     const firstRadio = container.querySelector('input[type="radio"]');
@@ -4646,8 +4646,14 @@ function updatePrintOptions(productType) {
     }
     
     // Update unit display
-    updateUnitDisplay();
-    calculatePrice();
+    if (typeof updateUnitDisplay === 'function') {
+        updateUnitDisplay();
+    }
+    
+    // Calculate price
+    if (typeof calculatePrice === 'function') {
+        calculatePrice();
+    }
 }
 
 // Initialize print options
@@ -7469,6 +7475,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
