@@ -110,6 +110,7 @@
                        class="search-input" 
                        id="searchInput"
                        placeholder="canvas prints..."
+                       data-i18n="search_placeholder"
                        autocomplete="off">
             </div>
 
@@ -550,11 +551,11 @@
                                                 <div style="display: flex; gap: 1rem;">
                                                     <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
                                                         <input type="radio" name="unitSelector" value="cm" onchange="changeUnit('cm')">
-                                                        <span>cm</span>
+                                                        <span data-i18n="cm">cm</span>
                                                     </label>
                                                     <label style="display: flex; align-items: center; gap: 0.3rem; cursor: pointer;">
                                                         <input type="radio" name="unitSelector" value="mm" onchange="changeUnit('mm')">
-                                                        <span>mm</span>
+                                                        <span data-i18n="mm">mm</span>
                                                     </label>
                                                 </div>
                                             </div>
@@ -825,8 +826,7 @@
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
-    <script src="script.js"></script>
     <script src="languages.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
-
