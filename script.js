@@ -1,6 +1,134 @@
+// ============== LANGUAGE SYSTEM ==============
+// Current language (default from languages.js)
+let currentLanguage = languages[0]; // US English default
+window.currentLanguage = currentLanguage;
 
+// Initialize language dropdown
+function initLanguageDropdown() {
+    const languageBtn = document.getElementById('languageBtn');
+    const languageMenu = document.getElementById('languageMenu');
+    const languageDropdown = document.getElementById('languageDropdown');
+    
+    if (!languageBtn || !languageMenu) return;
+    
+    // Populate menu with all languages
+    languageMenu.innerHTML = '';
+    languages.forEach(lang => {
+        const item = document.createElement('div');
+        item.className = `language-item ${lang.code === currentLanguage.code ? 'active' : ''}`;
+        item.setAttribute('data-language', lang.code);
+        item.innerHTML = `
+            <span class="flag-icon">${lang.flag}</span>
+            <span class="language-name">${lang.name}</span>
+            <span class="currency-code">${lang.currency}</span>
+            <span class="currency-symbol">${lang.symbol}</span>
+        `;
+        item.addEventListener('click', () => selectLanguage(lang));
+        languageMenu.appendChild(item);
+    });
+    
+    // Toggle dropdown
+    languageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        languageDropdown.classList.toggle('open');
+    });
+    
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!languageDropdown.contains(e.target)) {
+            languageDropdown.classList.remove('open');
+        }
+    });
+    
+    // Update button display
+    updateLanguageButton();
+}
 
+// Select language
+function selectLanguage(lang) {
+    console.log('Changing language to:', lang.code);
+    
+    currentLanguage = lang;
+    window.currentLanguage = lang;
+    localStorage.setItem('selectedLanguage', JSON.stringify(lang));
+    
+    // Update UI
+    updateLanguageButton();
+    updateAllText();
+    updateAllPrices();
+    
+    // Update active state in dropdown
+    document.querySelectorAll('.language-item').forEach(item => {
+        item.classList.toggle('active', item.getAttribute('data-language') === lang.code);
+    });
+    
+    // Close dropdown
+    document.getElementById('languageDropdown').classList.remove('open');
+}
 
+// Update language button
+function updateLanguageButton() {
+    const btn = document.getElementById('languageBtn');
+    if (!btn) return;
+    
+    btn.innerHTML = `
+        <span class="flag-icon">${currentLanguage.flag}</span>
+        <span class="language-name">${currentLanguage.name}</span>
+        <span class="currency-code">${currentLanguage.currency}</span>
+        <span class="dropdown-arrow">▼</span>
+    `;
+}
+
+// Update all text on the page
+function updateAllText() {
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (currentLanguage?.translations?.[key]) {
+            element.textContent = currentLanguage.translations[key];
+        }
+    });
+}
+
+// Format price in current currency
+function formatPrice(usdPrice) {
+    const convertedPrice = usdPrice * currentLanguage.rate;
+    
+    // Handle different currency formats
+    switch(currentLanguage.currency) {
+        case 'USD':
+            return `$${convertedPrice.toFixed(2)}`;
+        case 'GBP':
+            return `£${convertedPrice.toFixed(2)}`;
+        case 'EUR':
+            return `€${convertedPrice.toFixed(2)}`;
+        case 'SEK':
+        case 'NOK':
+        case 'DKK':
+            return `${convertedPrice.toFixed(2)} kr`;
+        default:
+            return `${currentLanguage.symbol}${convertedPrice.toFixed(2)}`;
+    }
+}
+
+// Update all prices on the page
+function updateAllPrices() {
+    // Update elements with data-usd attribute
+    document.querySelectorAll('[data-usd]').forEach(element => {
+        const usdPrice = parseFloat(element.getAttribute('data-usd'));
+        if (!isNaN(usdPrice)) {
+            element.textContent = formatPrice(usdPrice);
+        }
+    });
+    
+    // Update slideshow prices (special case)
+    document.querySelectorAll('.slide-price[data-php]').forEach(el => {
+        const phpPrice = parseFloat(el.getAttribute('data-php'));
+        if (!isNaN(phpPrice)) {
+            const usdPrice = phpPrice * 0.018;
+            el.textContent = `For only ${formatPrice(usdPrice)} !!!`;
+        }
+    });
+}
 
 
 // ============== PRINT OPTIONS CONFIGURATION ==============
@@ -5401,6 +5529,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
