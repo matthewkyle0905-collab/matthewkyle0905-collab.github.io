@@ -2454,8 +2454,6 @@ document.getElementById('paperUpgradePrice').textContent = `$${paperUpgradeUSD.t
 document.getElementById('quantityMultiplier').textContent = `$${(priceBeforeQuantity * quantity).toFixed(2)}`;
 document.getElementById('advancedTotalPrice').textContent = `$${totalPriceUSD.toFixed(2)}`;
 document.getElementById('finalPrice').textContent = `$${totalPriceUSD.toFixed(2)}`;
-    }
-
 
 // Handle when size is selected
 function onSizeSelect() {
@@ -5403,6 +5401,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
