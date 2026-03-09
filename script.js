@@ -7481,25 +7481,29 @@ function closeEditorWelcome() {
 })();
 
 
-// ============== FORCE DROPDOWN TO WORK ==============
-(function forceDropdownToWork() {
-    console.log('🔧 Force fixing dropdown menu...');
+// ============== ULTIMATE DROPDOWN FIX ==============
+(function ultimateDropdownFix() {
+    console.log('🔧 Applying ultimate dropdown fix...');
     
-    function attachDropdownHandler() {
+    // Function to fix dropdown
+    function fixDropdown() {
         const btn = document.getElementById('productDropdownBtn');
         const menu = document.getElementById('productDropdownMenu');
         
         if (btn && menu) {
-            // Remove any existing listeners by cloning
+            console.log('✅ Found dropdown elements, attaching handler...');
+            
+            // Remove all existing handlers by cloning
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
             
-            // Add fresh click handler
+            // Attach new handler directly
             newBtn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 menu.classList.toggle('show');
                 console.log('Dropdown toggled:', menu.classList.contains('show'));
+                return false;
             };
             
             // Close when clicking outside
@@ -7509,32 +7513,21 @@ function closeEditorWelcome() {
                 }
             });
             
-            console.log('✅ Dropdown force-fixed');
             return true;
         }
         return false;
     }
     
-    // Try immediately
-    if (!attachDropdownHandler()) {
-        // If buttons not found, wait and retry
-        const observer = new MutationObserver(function() {
-            if (attachDropdownHandler()) {
-                observer.disconnect();
-            }
-        });
-        
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-        
-        // Also retry after delays
-        setTimeout(attachDropdownHandler, 500);
-        setTimeout(attachDropdownHandler, 1000);
-    }
+    // Try multiple times
+    let attempts = 0;
+    const interval = setInterval(function() {
+        attempts++;
+        if (fixDropdown() || attempts > 10) {
+            clearInterval(interval);
+            console.log('✅ Dropdown fix completed after', attempts, 'attempts');
+        }
+    }, 500);
 })();
-
 // Make functions global
 window.showEditorWelcome = showEditorWelcome;
 window.closeEditorWelcome = closeEditorWelcome;
@@ -7562,6 +7555,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
