@@ -4533,17 +4533,36 @@ window.calculatePrice = function() {
     }
     
     // Get paper type price
-    let paperUpgradeUSD = 0;
-    const selectedPaper = document.querySelector('input[name="paperType"]:checked');
-    if (selectedPaper) {
-        const paperValue = selectedPaper.value;
-        switch(paperValue) {
-            case 'glossy': paperUpgradeUSD = 0.18; break; // 10 PHP → $0.18
-            case 'matte': paperUpgradeUSD = 0.27; break;  // 15 PHP → $0.27
-            case 'premium': paperUpgradeUSD = 0.45; break; // 25 PHP → $0.45
-            default: paperUpgradeUSD = 0;
-        }
+let paperUpgradeUSD = 0;
+const selectedPaper = document.querySelector('input[name="paperType"]:checked');
+console.log('🔍 Selected paper element:', selectedPaper);
+console.log('🔍 Selected paper value:', selectedPaper?.value);
+
+if (selectedPaper) {
+    const paperValue = selectedPaper.value;
+    console.log('🔍 Paper value:', paperValue);
+    
+    switch(paperValue) {
+        case 'glossy': 
+            paperUpgradeUSD = 0.18; 
+            console.log('✅ Glossy selected: $0.18');
+            break;
+        case 'matte': 
+            paperUpgradeUSD = 0.27; 
+            console.log('✅ Matte selected: $0.27');
+            break;
+        case 'premium': 
+            paperUpgradeUSD = 0.45; 
+            console.log('✅ Premium selected: $0.45');
+            break;
+        default: 
+            paperUpgradeUSD = 0; 
+            console.log('✅ Standard selected: $0.00');
     }
+} else {
+    console.log('⚠️ No paper selected, defaulting to 0');
+}
+console.log('🔍 Final paperUpgradeUSD:', paperUpgradeUSD);
     
     // Get quantity
     const quantity = parseInt(document.getElementById('quantityDisplay')?.textContent || '1');
@@ -7475,6 +7494,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
