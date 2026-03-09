@@ -5322,7 +5322,9 @@ function makeSlidesClickable() {
                             'canvas': '🖼️',
                             'mousepads': '🖱️',
                             'doublecards': '🃏'
-                                     const names = {
+                        }; // ← Added closing brace and semicolon
+                        
+                        const names = {
                             'photocards': 'Photo Cards',
                             'calendar': 'Calendar',
                             'photobook': 'Photo Book',
@@ -5526,6 +5528,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
