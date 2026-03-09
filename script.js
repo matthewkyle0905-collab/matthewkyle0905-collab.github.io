@@ -7481,47 +7481,59 @@ function closeEditorWelcome() {
 })();
 
 
-// ============== FIX DROPDOWN MENU ON HAMBURGER ENTRY ==============
-(function fixDropdownOnHamburger() {
-    console.log('🔧 Setting up dropdown menu fix...');
+// ============== FORCE DROPDOWN TO WORK ==============
+(function forceDropdownToWork() {
+    console.log('🔧 Force fixing dropdown menu...');
     
-    // Function to initialize dropdown
-    function initDropdownIfNeeded() {
-        const photosPage = document.getElementById('photos');
-        if (photosPage && photosPage.classList.contains('active')) {
-            console.log('📸 Photos page active, setting up dropdown...');
-            if (typeof setupDropdownMenu === 'function') {
-                setupDropdownMenu();
-                window.dropdownInitialized = true;
-            }
+    function attachDropdownHandler() {
+        const btn = document.getElementById('productDropdownBtn');
+        const menu = document.getElementById('productDropdownMenu');
+        
+        if (btn && menu) {
+            // Remove any existing listeners by cloning
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            // Add fresh click handler
+            newBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                menu.classList.toggle('show');
+                console.log('Dropdown toggled:', menu.classList.contains('show'));
+            };
+            
+            // Close when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!menu.contains(e.target) && !newBtn.contains(e.target)) {
+                    menu.classList.remove('show');
+                }
+            });
+            
+            console.log('✅ Dropdown force-fixed');
+            return true;
         }
+        return false;
     }
     
-    // Run when page changes
-    const originalNavigateTo = window.navigateTo;
-    if (typeof originalNavigateTo === 'function') {
-        window.navigateTo = function(pageId) {
-            originalNavigateTo(pageId);
-            if (pageId === 'photos') {
-                setTimeout(initDropdownIfNeeded, 300);
+    // Try immediately
+    if (!attachDropdownHandler()) {
+        // If buttons not found, wait and retry
+        const observer = new MutationObserver(function() {
+            if (attachDropdownHandler()) {
+                observer.disconnect();
             }
-        };
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Also retry after delays
+        setTimeout(attachDropdownHandler, 500);
+        setTimeout(attachDropdownHandler, 1000);
     }
-    
-    // Also run on hamburger menu clicks
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('[onclick*="photos"]') || 
-            (e.target.closest('.hamburger-dropdown') && e.target.textContent.includes('Editor'))) {
-            setTimeout(initDropdownIfNeeded, 500);
-        }
-    });
-    
-    // Run now just in case
-    setTimeout(initDropdownIfNeeded, 1000);
-    
-    console.log('✅ Dropdown menu fix applied');
 })();
-
 
 // Make functions global
 window.showEditorWelcome = showEditorWelcome;
@@ -7550,6 +7562,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
