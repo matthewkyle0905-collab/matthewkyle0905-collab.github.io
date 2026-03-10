@@ -1377,9 +1377,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize cart hover
     initCartHover();
     
-     // Initialize select all checkbox
+        // Initialize select all checkbox
     initSelectAll();
-});
+
     // ============== FIX: FORCE ATTACH DELETE SELECTED BUTTON LISTENER ==============
     const deleteBtn = document.getElementById('deleteSelectedBtn');
     if (deleteBtn) {
@@ -1394,6 +1394,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.warn('⚠️ Delete Selected button not found');
     }
     // ============== END FIX ==============
+}); 
 
 function updateCartBadgeOnLoad() {
     const badge = document.getElementById('cartCount');
@@ -5549,3 +5550,4 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
