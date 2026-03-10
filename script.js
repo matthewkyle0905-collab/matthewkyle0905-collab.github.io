@@ -1,17 +1,21 @@
-// ============== LANGUAGE SYSTEM ==============
+/// ============== LANGUAGE SYSTEM ==============
 // Get currentLanguage from languages.js (loaded first)
-let currentLanguage = window.currentLanguage || { 
-    code: 'us', 
-    name: 'English (US)', 
-    flag: '🇺🇸', 
-    currency: 'USD', 
-    symbol: '$', 
-    rate: 1,
-    translations: {}
-};
+if (typeof window.currentLanguage === 'undefined') {
+    // Only create if it doesn't exist
+    window.currentLanguage = { 
+        code: 'us', 
+        name: 'English (US)', 
+        flag: '🇺🇸', 
+        currency: 'USD', 
+        symbol: '$', 
+        rate: 1,
+        translations: {}
+    };
+}
 
-// Make it globally available
-window.currentLanguage = currentLanguage;
+// Use the existing or newly created currentLanguage
+let currentLanguage = window.currentLanguage;
+
 
 // Initialize language dropdown
 function initLanguageDropdown() {
@@ -5546,6 +5550,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
