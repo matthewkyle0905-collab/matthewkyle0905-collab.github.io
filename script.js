@@ -1,7 +1,6 @@
-/// ============== LANGUAGE SYSTEM ==============
+// ============== LANGUAGE SYSTEM ==============
 // Get currentLanguage from languages.js (loaded first)
 if (typeof window.currentLanguage === 'undefined') {
-    // Only create if it doesn't exist
     window.currentLanguage = { 
         code: 'us', 
         name: 'English (US)', 
@@ -13,9 +12,7 @@ if (typeof window.currentLanguage === 'undefined') {
     };
 }
 
-// Use the existing or newly created currentLanguage
 let currentLanguage = window.currentLanguage;
-
 
 // Initialize language dropdown
 function initLanguageDropdown() {
@@ -25,13 +22,11 @@ function initLanguageDropdown() {
     
     if (!languageBtn || !languageMenu) return;
     
-    // Check if languages exists
     if (typeof languages === 'undefined') {
         console.error('languages not defined! Make sure languages.js loads first.');
         return;
     }
     
-    // Populate menu with all languages
     languageMenu.innerHTML = '';
     languages.forEach(lang => {
         const item = document.createElement('div');
@@ -47,23 +42,38 @@ function initLanguageDropdown() {
         languageMenu.appendChild(item);
     });
     
-    // Toggle dropdown
     languageBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         languageDropdown.classList.toggle('open');
     });
     
-    // Close when clicking outside
     document.addEventListener('click', (e) => {
         if (!languageDropdown.contains(e.target)) {
             languageDropdown.classList.remove('open');
         }
     });
     
-    // Update button display
     updateLanguageButton();
 }
-// Update language button
+
+function selectLanguage(lang) {
+    currentLanguage = lang;
+    window.currentLanguage = lang;
+    
+    document.querySelectorAll('.language-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-language') === lang.code) {
+            item.classList.add('active');
+        }
+    });
+    
+    updateLanguageButton();
+    updateAllText();
+    updateAllPrices();
+    
+    localStorage.setItem('preferredLanguage', lang.code);
+}
+
 function updateLanguageButton() {
     const btn = document.getElementById('languageBtn');
     if (!btn) return;
@@ -76,7 +86,6 @@ function updateLanguageButton() {
     `;
 }
 
-// Update all text on the page
 function updateAllText() {
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
@@ -86,11 +95,9 @@ function updateAllText() {
     });
 }
 
-// Format price in current currency
 function formatPrice(usdPrice) {
     const convertedPrice = usdPrice * currentLanguage.rate;
     
-    // Handle different currency formats
     switch(currentLanguage.currency) {
         case 'USD':
             return `$${convertedPrice.toFixed(2)}`;
@@ -107,9 +114,7 @@ function formatPrice(usdPrice) {
     }
 }
 
-// Update all prices on the page
 function updateAllPrices() {
-    // Update elements with data-usd attribute (editor page)
     document.querySelectorAll('[data-usd]').forEach(element => {
         const usdPrice = parseFloat(element.getAttribute('data-usd'));
         if (!isNaN(usdPrice)) {
@@ -117,7 +122,6 @@ function updateAllPrices() {
         }
     });
     
-    // Update elements with data-php attribute (product page)
     document.querySelectorAll('[data-php]').forEach(element => {
         const phpPrice = parseFloat(element.getAttribute('data-php'));
         if (!isNaN(phpPrice)) {
@@ -126,7 +130,6 @@ function updateAllPrices() {
         }
     });
     
-    // Update slideshow prices (special case)
     document.querySelectorAll('.slide-price[data-php]').forEach(el => {
         const phpPrice = parseFloat(el.getAttribute('data-php'));
         if (!isNaN(phpPrice)) {
@@ -168,13 +171,11 @@ const printOptionsConfig = {
 }; 
 window.printOptionsConfig = printOptionsConfig;
 
-// ============== MODIFY EXISTING PRODUCT DATA ==============
-
-// Update productDatabase to use PHP base prices
+// ============== PRODUCT DATABASE ==============
 const productDatabase = {
     photocards: {
         name: 'Photo Cards',
-        basePricePHP: 25, // PHP price
+        basePricePHP: 25,
         mainImage: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -294,37 +295,27 @@ const productDatabase = {
     }
 };
 
-// ============== MODIFY LOAD PRODUCT DETAILS ==============
-
+// ============== LOAD PRODUCT DETAILS ==============
 function loadProductDetails(productType) {
     const product = productDatabase[productType];
     if (!product) return;
     
-    // Set main image
     document.getElementById('productMainImage').src = product.mainImage;
-    
-    // Set product name
     document.getElementById('productName').textContent = product.name;
     
-    // Set product price with currency conversion
     const priceElement = document.getElementById('productPrice');
     const productUsdPrice = (product.basePricePHP * 0.018).toFixed(2);
     priceElement.setAttribute('data-usd', productUsdPrice);
     priceElement.textContent = `$${productUsdPrice}`;
     
-    // Set description
     document.getElementById('productDescription').textContent = product.description;
-    
-    // Set icon
     document.getElementById('productIcon').textContent = product.icon;
 
-    // Set description with translation
     const descriptionElement = document.getElementById('productDescription');
     const descriptionKey = `product_${productType}_desc`;
     descriptionElement.setAttribute('data-i18n', descriptionKey);
     descriptionElement.textContent = currentLanguage.translations[descriptionKey] || product.description;
     
-    // Load thumbnails
     const thumbnailsContainer = document.getElementById('productThumbnails');
     thumbnailsContainer.innerHTML = '';
     product.thumbnails.forEach((thumb, index) => {
@@ -339,7 +330,6 @@ function loadProductDetails(productType) {
         thumbnailsContainer.appendChild(thumbDiv);
     });
     
-    // Load sizes
     const sizesContainer = document.getElementById('productSizes');
     sizesContainer.innerHTML = '';
     product.sizes.forEach(size => {
@@ -351,7 +341,6 @@ function loadProductDetails(productType) {
         sizesContainer.appendChild(sizeDiv);
     });
     
-    // Load paper types
     const paperContainer = document.getElementById('productPaperTypes');
     paperContainer.innerHTML = '';
     product.paperTypes.forEach(paper => {
@@ -362,15 +351,13 @@ function loadProductDetails(productType) {
         paperContainer.appendChild(paperDiv);
     });
     
-    // Store selected product for editor
     document.getElementById('openEditorBtn').setAttribute('data-product', product.productType);
     
     updateAllText();
     updateAllPrices();
 }
 
-// ============== MODIFY SLIDESHOW ==============
-
+// ============== SLIDESHOW CLASS ==============
 class Slideshow {
     constructor() {
         this.track = document.getElementById('slidesTrack');
@@ -383,45 +370,15 @@ class Slideshow {
         this.totalSlides = 0;
         this.isPaused = false;
         this.interval = null;
-        this.autoPlayDelay = 5000; // 5 seconds
+        this.autoPlayDelay = 5000;
         
         this.products = [
-            {
-                name: 'Photo Cards',
-                pricePHP: 25,
-                image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
-                desc: 'Create personalized greeting cards'
-            },
-            {
-                name: 'Calendar',
-                pricePHP: 60,
-                image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
-                desc: 'Make your own custom calendar'
-            },
-            {
-                name: 'Photo Book',
-                pricePHP: 120,
-                image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
-                desc: 'Premium hardcover photo books'
-            },
-            {
-                name: 'Canvas',
-                pricePHP: 200,
-                image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
-                desc: 'Your favorite photo on canvas'
-            },
-            {
-                name: 'Mouse Pads',
-                pricePHP: 45,
-                image: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=1260&h=750&fit=crop',
-                desc: 'Custom photo mouse pads'
-            },
-            {
-                name: 'Double Cards',
-                pricePHP: 70,
-                image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop',
-                desc: 'Elegant folded greeting cards'
-            }
+            { name: 'Photo Cards', pricePHP: 25, image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Create personalized greeting cards' },
+            { name: 'Calendar', pricePHP: 60, image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Make your own custom calendar' },
+            { name: 'Photo Book', pricePHP: 120, image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Premium hardcover photo books' },
+            { name: 'Canvas', pricePHP: 200, image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Your favorite photo on canvas' },
+            { name: 'Mouse Pads', pricePHP: 45, image: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=1260&h=750&fit=crop', desc: 'Custom photo mouse pads' },
+            { name: 'Double Cards', pricePHP: 70, image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Elegant folded greeting cards' }
         ];
         this.init();
     }
@@ -566,88 +523,7 @@ class Slideshow {
     }
 }
 
-// ============== INITIALIZATION ==============
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize existing functions
-    if (typeof displayHomeProducts === 'function') displayHomeProducts();
-    if (typeof setupPhotoEditor === 'function') setupPhotoEditor();
-    if (typeof setupNavHighlight === 'function') setupNavHighlight();
-    if (typeof setupDragAndDrop === 'function') setupDragAndDrop();
-    if (typeof setupEventListeners === 'function') setupEventListeners();
-    if (typeof initPhotoMode === 'function') initPhotoMode();
-    if (typeof updateLoginStatus === 'function') updateLoginStatus();
-    if (typeof updateCartUI === 'function') updateCartUI();
-    if (typeof setupFaqScroll === 'function') setupFaqScroll();
-    if (typeof setupChatKeyboard === 'function') setupChatKeyboard();
-    if (typeof setupDropdownMenu === 'function') setupDropdownMenu();
-    
-    const cartBtn = document.querySelector('.cart-btn');
-    if (cartBtn) {
-        cartBtn.onclick = function(e) {
-            e.preventDefault();
-            navigateTo('cart-page');
-        };
-    }
-    
-    if (typeof renderShopProducts === 'function') renderShopProducts();
-    if (typeof renderReviews === 'function') renderReviews();
-    if (typeof updateCartBadgeOnLoad === 'function') updateCartBadgeOnLoad();
-    if (typeof loadChatHistory === 'function') loadChatHistory();
-    if (typeof updateUndoRedoButtons === 'function') updateUndoRedoButtons();
-    
-    setTimeout(() => {
-        if (typeof selectProduct === 'function') selectProduct('photocards');
-    }, 500);
-    
-    if (typeof initPrintOptions === 'function') initPrintOptions();
-    if (typeof initializeGoogleApi === 'function') initializeGoogleApi();
-    if (typeof initCartHover === 'function') initCartHover();
-    if (typeof initSelectAll === 'function') initSelectAll();
-    
-    const deleteBtn = document.getElementById('deleteSelectedBtn');
-    if (deleteBtn) {
-        deleteBtn.onclick = null;
-        deleteBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('🗑️ Delete Selected button clicked');
-            if (typeof deleteSelectedItems === 'function') deleteSelectedItems();
-        });
-    }
-    
-    
-    // Initialize slideshow
-    setTimeout(() => {
-        new Slideshow();
-    }, 100);
-    
-    // Initialize hamburger menu
-    if (typeof setupHamburgerMenu === 'function') setupHamburgerMenu();
-    
-    // Make slides clickable
-    setTimeout(() => {
-        if (typeof makeSlidesClickable === 'function') makeSlidesClickable();
-    }, 1000);
-});
-
-// ============== KEEP ALL YOUR EXISTING FUNCTIONS BELOW ==============
-// Copy and paste all your existing functions here:
-// - Sample products data
-// - Product icons mapping
-// - Calendar products data
-// - Print options configuration
-// - Unit conversion functions
-// - Cart management functions
-// - Photo editor functions
-// - Crop tool functions
-// - Google Drive functions
-// - etc.
-
-// [PASTE ALL YOUR EXISTING CODE HERE]
-
-// Make functions globally available
-
-// Sample products data
+// ============== SAMPLE PRODUCTS DATA ==============
 const products = [
     { id: 1, name: "Photo Cards", price: "₱600", image: "https://i5.walmartimages.com/seo/48-Pack-Photo-Frame-Cards-with-Envelopes-Notecards-for-4x6-Picture-Insert-Ivory_5339c47e-9e2e-4d17-bbcc-46da7d0288fb.88480b050f2d7e488cd5a07e5e90cfb5.jpeg", description: "Create personalized greeting cards with your best photos" },
     { id: 2, name: "Calendar", price: "₱900", image: "https://th.bing.com/th/id/OIP.YCkmc4EOofxjfXtluhXq-gHaFj?w=284&h=213&c=7&r=0&o=7&pid=1.7&rm=3", description: "Make your own calendar with your favorite photos" },
@@ -657,7 +533,6 @@ const products = [
     { id: 6, name: "Double Cards", price: "₱720", image: "https://framkallning.fotocenter.se/templates2/categories/FOLDEDCARDS/mobile_image.png", description: "Elegant greetings for all special occasions" },
 ];
 
-// Product icons mapping
 const productIcons = {
     'photocards': '🖼️',
     'calendar': '📅',
@@ -678,139 +553,23 @@ const productDisplayNames = {
 
 // ============== CALENDAR PRODUCTS DATA ==============
 const calendarProducts = [
-    // Desk Calendars (3 samples)
-    {
-        id: 101,
-        type: 'desk',
-        name: "Classic Wooden Desk Calendar",
-        price: "₱ 850.00",
-        image: "https://images.unsplash.com/photo-1585241645928-1f7aeb8bb6c7?w=400&h=300&fit=crop",
-        description: "Elegant wooden base with monthly tear-off pages",
-        features: ["Wooden Stand", "Tear-off Pages", "8x10 inches"],
-        badge: "Best Seller"
-    },
-    {
-        id: 102,
-        type: 'desk',
-        name: "Modern Acrylic Desk Calendar",
-        price: "₱ 950.00",
-        image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop",
-        description: "Sleek acrylic stand with minimalist design",
-        features: ["Acrylic Stand", "Modern Design", "12x12 inches"],
-        badge: "Modern"
-    },
-    {
-        id: 103,
-        type: 'desk',
-        name: "Magnetic Cube Calendar",
-        price: "₱ 750.00",
-        image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w-400&h=300&fit=crop",
-        description: "Rotating cube design with monthly magnets",
-        features: ["Magnetic Cubes", "Rotating Design", "Compact Size"],
-        badge: "Interactive"
-    },
-
-    // Wall Calendars (3 samples)
-    {
-        id: 104,
-        type: 'wall',
-        name: "Landscape Wall Calendar",
-        price: "₱ 650.00",
-        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
-        description: "Beautiful nature photography for each month",
-        features: ["12 Landscape Photos", "Spiral Bound", "11x17 inches"],
-        badge: "Nature"
-    },
-    {
-        id: 105,
-        type: 'wall',
-        name: "Family Photo Wall Calendar",
-        price: "₱ 700.00",
-        image: "https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=400&h=300&fit=crop",
-        description: "Perfect for displaying family memories all year",
-        features: ["Custom Photos", "Family Themed", "12x12 inches"],
-        badge: "Family"
-    },
-    {
-        id: 106,
-        type: 'wall',
-        name: "Art Illustration Calendar",
-        price: "₱ 800.00",
-        image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop",
-        description: "Unique artwork for each month by local artists",
-        features: ["Original Art", "Premium Paper", "8.5x11 inches"],
-        badge: "Artistic"
-    },
-
-    // Mini Calendars (3 samples)
-    {
-        id: 107,
-        type: 'mini',
-        name: "Magnetic Fridge Calendar",
-        price: "₱ 350.00",
-        image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop",
-        description: "Small magnetic calendar perfect for your refrigerator",
-        features: ["Magnetic Back", "Monthly View", "5x7 inches"],
-        badge: "Practical"
-    },
-    {
-        id: 108,
-        type: 'mini',
-        name: "Credit Card Pocket Calendar",
-        price: "₱ 250.00",
-        image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400&h=300&fit=crop",
-        description: "Ultra-thin calendar that fits in your wallet",
-        features: ["Credit Card Size", "12 Months", "Plastic Coated"],
-        badge: "Portable"
-    },
-    {
-        id: 109,
-        type: 'mini',
-        name: "Sticky Note Calendar",
-        price: "₱ 450.00",
-        image: "https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop",
-        description: "Monthly sticky notes you can write on",
-        features: ["Writeable Surface", "12 Month Pads", "Desktop Design"],
-        badge: "Functional"
-    },
-
-    // Photo Calendars (3 samples)
-    {
-        id: 110,
-        type: 'photo',
-        name: "12-Photo Custom Calendar",
-        price: "₱ 900.00",
-        image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=300&fit=crop",
-        description: "One special photo for each month of the year",
-        features: ["12 Custom Photos", "Premium Glossy", "Wire-O Bound"],
-        badge: "Personalized"
-    },
-    {
-        id: 111,
-        type: 'photo',
-        name: "Photo Collage Calendar",
-        price: "₱ 1,100.00",
-        image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop",
-        description: "Multiple photos per month in beautiful layouts",
-        features: ["Collage Layouts", "Hard Cover", "12x12 inches"],
-        badge: "Deluxe"
-    },
-    {
-        id: 112,
-        type: 'photo',
-        name: "Baby's 1st Year Calendar",
-        price: "₱ 1,200.00",
-        image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=300&fit=crop",
-        description: "Special calendar to track baby's milestones",
-        features: ["Baby Themed", "Milestone Stickers", "Premium Binding"],
-        badge: "Baby"
-    }
+    { id: 101, type: 'desk', name: "Classic Wooden Desk Calendar", price: "₱ 850.00", image: "https://images.unsplash.com/photo-1585241645928-1f7aeb8bb6c7?w=400&h=300&fit=crop", description: "Elegant wooden base with monthly tear-off pages", features: ["Wooden Stand", "Tear-off Pages", "8x10 inches"], badge: "Best Seller" },
+    { id: 102, type: 'desk', name: "Modern Acrylic Desk Calendar", price: "₱ 950.00", image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop", description: "Sleek acrylic stand with minimalist design", features: ["Acrylic Stand", "Modern Design", "12x12 inches"], badge: "Modern" },
+    { id: 103, type: 'desk', name: "Magnetic Cube Calendar", price: "₱ 750.00", image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w-400&h=300&fit=crop", description: "Rotating cube design with monthly magnets", features: ["Magnetic Cubes", "Rotating Design", "Compact Size"], badge: "Interactive" },
+    { id: 104, type: 'wall', name: "Landscape Wall Calendar", price: "₱ 650.00", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop", description: "Beautiful nature photography for each month", features: ["12 Landscape Photos", "Spiral Bound", "11x17 inches"], badge: "Nature" },
+    { id: 105, type: 'wall', name: "Family Photo Wall Calendar", price: "₱ 700.00", image: "https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=400&h=300&fit=crop", description: "Perfect for displaying family memories all year", features: ["Custom Photos", "Family Themed", "12x12 inches"], badge: "Family" },
+    { id: 106, type: 'wall', name: "Art Illustration Calendar", price: "₱ 800.00", image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop", description: "Unique artwork for each month by local artists", features: ["Original Art", "Premium Paper", "8.5x11 inches"], badge: "Artistic" },
+    { id: 107, type: 'mini', name: "Magnetic Fridge Calendar", price: "₱ 350.00", image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop", description: "Small magnetic calendar perfect for your refrigerator", features: ["Magnetic Back", "Monthly View", "5x7 inches"], badge: "Practical" },
+    { id: 108, type: 'mini', name: "Credit Card Pocket Calendar", price: "₱ 250.00", image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400&h=300&fit=crop", description: "Ultra-thin calendar that fits in your wallet", features: ["Credit Card Size", "12 Months", "Plastic Coated"], badge: "Portable" },
+    { id: 109, type: 'mini', name: "Sticky Note Calendar", price: "₱ 450.00", image: "https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop", description: "Monthly sticky notes you can write on", features: ["Writeable Surface", "12 Month Pads", "Desktop Design"], badge: "Functional" },
+    { id: 110, type: 'photo', name: "12-Photo Custom Calendar", price: "₱ 900.00", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=300&fit=crop", description: "One special photo for each month of the year", features: ["12 Custom Photos", "Premium Glossy", "Wire-O Bound"], badge: "Personalized" },
+    { id: 111, type: 'photo', name: "Photo Collage Calendar", price: "₱ 1,100.00", image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop", description: "Multiple photos per month in beautiful layouts", features: ["Collage Layouts", "Hard Cover", "12x12 inches"], badge: "Deluxe" },
+    { id: 112, type: 'photo', name: "Baby's 1st Year Calendar", price: "₱ 1,200.00", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=300&fit=crop", description: "Special calendar to track baby's milestones", features: ["Baby Themed", "Milestone Stickers", "Premium Binding"], badge: "Baby" }
 ];
 
-
 // ============== TEMPLATE CONFIGURATION ==============
-let currentProduct = 'photocards'; // Default product
-window.currentProduct = currentProduct;  // ← ADD THIS LINE
+let currentProduct = 'photocards';
+window.currentProduct = currentProduct;
 let templateImage = null;
 const templates = {
     calendar: null,
@@ -822,13 +581,11 @@ const templates = {
 };
 
 // ============== UNIT CONVERSION ==============
-let currentUnit = 'inches'; // Default unit (always inches first)
+let currentUnit = 'inches';
 
-// Conversion functions
 function convertSize(sizeInInches, targetUnit) {
     if (!sizeInInches) return '';
     
-    // Parse the size string (e.g., "4x6")
     const parts = sizeInInches.split('x');
     if (parts.length !== 2) return sizeInInches;
     
@@ -856,15 +613,12 @@ function getUnitSymbol(unit) {
     }
 }
 
-// Update unit display
 function updateUnitDisplay() {
     const container = document.getElementById('sizeOptionsContainer');
     if (!container) return;
     
     const sizeLabels = container.querySelectorAll('.size-label');
     const sizePriceSpans = container.querySelectorAll('.size-price');
-    
-    // Get all size values from the radio inputs
     const radioInputs = container.querySelectorAll('input[name="advancedPrintSize"]');
     
     radioInputs.forEach((radio, index) => {
@@ -875,15 +629,12 @@ function updateUnitDisplay() {
         const sizePrice = sizePriceSpans[index];
         
         if (sizeLabel) {
-            // Main label stays in inches
             sizeLabel.innerHTML = sizeValue + '"';
             
-            // Add converted size below if unit is not inches
             if (currentUnit !== 'inches') {
                 const convertedSize = convertSize(sizeValue, currentUnit);
                 const unitSymbol = getUnitSymbol(currentUnit);
                 
-                // Check if converted size already exists
                 let convertedSpan = sizeLabel.parentElement.querySelector('.converted-size');
                 if (!convertedSpan) {
                     convertedSpan = document.createElement('span');
@@ -895,7 +646,6 @@ function updateUnitDisplay() {
                 }
                 convertedSpan.textContent = `${convertedSize}${unitSymbol}`;
             } else {
-                // Remove converted size if inches is selected
                 const convertedSpan = sizeLabel.parentElement.querySelector('.converted-size');
                 if (convertedSpan) {
                     convertedSpan.remove();
@@ -904,11 +654,9 @@ function updateUnitDisplay() {
         }
     });
     
-    // Update custom size inputs
     updateCustomSizeUnit();
 }
 
-// Update custom size inputs based on selected unit
 function updateCustomSizeUnit() {
     const widthInput = document.getElementById('customWidth');
     const heightInput = document.getElementById('customHeight');
@@ -916,37 +664,31 @@ function updateCustomSizeUnit() {
     
     if (!widthInput || !heightInput || !unitSelect) return;
     
-    // Store current values in inches for conversion
     const currentWidthInInches = parseFloat(widthInput.getAttribute('data-inches') || widthInput.value);
     const currentHeightInInches = parseFloat(heightInput.getAttribute('data-inches') || heightInput.value);
     
     if (currentUnit === 'inches') {
-        // Show inches
         widthInput.value = currentWidthInInches;
         heightInput.value = currentHeightInInches;
         unitSelect.value = 'inches';
     } else if (currentUnit === 'cm') {
-        // Convert to cm
         widthInput.value = (currentWidthInInches * 2.54).toFixed(1);
         heightInput.value = (currentHeightInInches * 2.54).toFixed(1);
         unitSelect.value = 'cm';
     } else if (currentUnit === 'mm') {
-        // Convert to mm
         widthInput.value = Math.round(currentWidthInInches * 25.4);
         heightInput.value = Math.round(currentHeightInInches * 25.4);
-        unitSelect.value = 'cm'; // Keep as cm in select but values are in mm
+        unitSelect.value = 'cm';
     }
     
-    // Store inches value for future conversions
     widthInput.setAttribute('data-inches', currentWidthInInches);
     heightInput.setAttribute('data-inches', currentHeightInInches);
 }
 
-// Handle unit change
 function changeUnit(unit) {
     currentUnit = unit;
     updateUnitDisplay();
-    calculatePrice(); // Recalculate price if needed
+    calculatePrice();
 }
 
 function getEventClient(e) {
@@ -954,32 +696,12 @@ function getEventClient(e) {
     return e;
 }
 
-// Initialize navigation highlight and attach handlers
-function setupNavHighlight() {
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', function (e) {
-            const onclick = this.getAttribute('onclick') || '';
-            const m = onclick.match(/'([^']+)'/);
-            if (m && m[1]) {
-                updateNavHighlight(m[1]);
-            }
-        });
-    });
-
-    const activePage = document.querySelector('.page.active');
-    if (activePage && activePage.id) {
-        updateNavHighlight(activePage.id);
-    } else {
-        updateNavHighlight('home');
-    }
-}
-
-// Enhanced Shopping Cart System
+// ============== SHOPPING CART ==============
 let shoppingCart = JSON.parse(localStorage.getItem('fotocenterCart')) || [];
 let undoStack = [];
 let redoStack = [];
 
-// Photo Editor Variables
+// ============== PHOTO EDITOR VARIABLES ==============
 let uploadedImages = [];
 let currentImageIndex = -1;
 let originalImages = [];
@@ -987,11 +709,10 @@ let canvas = null;
 let ctx = null;
 let currentFilter = 'none';
 
-// Calendar Variables
+// ============== CALENDAR VARIABLES ==============
 let calendarImages = [];
 let calendarCurrentImageIndex = -1;
 
-// Image adjustments
 let adjustments = {
     brightness: 100,
     contrast: 100,
@@ -1024,7 +745,7 @@ const cropTool = {
     imageHeight: 0
 };
 
-// Enhanced Photo Editor Features
+// ============== EDITOR FEATURES ==============
 const editorFeatures = {
     filters: {
         none: '',
@@ -1038,7 +759,6 @@ const editorFeatures = {
         lomo: 'contrast(120%) saturate(120%) brightness(110%)',
         dreamy: 'contrast(90%) brightness(110%) saturate(150%)'
     },
-
     textOverlay: {
         active: false,
         text: 'Add Text',
@@ -1050,7 +770,7 @@ const editorFeatures = {
     }
 };
 
-// AI Chat Widget with intelligent responses
+// ============== CHAT AI ==============
 const chatAI = {
     responses: {
         greeting: ["Hello! 👋 How can I help you with your photo printing needs today?", "Hi there! Welcome to FOTOCENTER. What can I assist you with?"],
@@ -1097,7 +817,7 @@ const chatAI = {
     }
 };
 
-// ============== ENTER KEY SUPPORT FOR CHAT ==============
+// ============== CHAT FUNCTIONS ==============
 function setupChatKeyboard() {
     const chatInput = document.getElementById('chatInput');
 
@@ -1122,7 +842,6 @@ function setupChatKeyboard() {
     }
 }
 
-// ============== SEND MESSAGE FUNCTION ==============
 function sendMessage() {
     const input = document.getElementById('chatInput');
 
@@ -1152,9 +871,7 @@ function sendMessage() {
         if (window.socket && window.socket.connected) {
             try {
                 window.socket.emit('message', { sender: 'bot', text: response, time: new Date().toLocaleTimeString() });
-            } catch (e) {
-                // ignore
-            }
+            } catch (e) {}
         }
     }, 1000);
 
@@ -1165,7 +882,6 @@ function sendMessage() {
     }, 50);
 }
 
-// ============== ADD MESSAGE FUNCTION ==============
 function addMessage(text, sender) {
     const messages = document.getElementById('chatMessages');
     if (!messages) return;
@@ -1216,7 +932,7 @@ function loadChatHistory() {
     }
 }
 
-// Cart management functions
+// ============== CART MANAGEMENT ==============
 function updateCartStorage() {
     localStorage.setItem('fotocenterCart', JSON.stringify(shoppingCart));
 }
@@ -1336,66 +1052,6 @@ function proceedToCheckout() {
     closeCartModal();
 }
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function () {
-    displayHomeProducts();
-    setupPhotoEditor();
-    setupNavHighlight();
-    setupDragAndDrop();
-    setupEventListeners();
-    initPhotoMode();
-    updateLoginStatus();
-    updateCartUI();
-    setupFaqScroll();
-    setupChatKeyboard();
-    setupDropdownMenu();
-
-    const cartBtn = document.querySelector('.cart-btn');
-    if (cartBtn) {
-        cartBtn.onclick = function(e) {
-            e.preventDefault();
-            navigateTo('cart-page');
-        };
-    }
-
-    renderShopProducts();
-    renderReviews();
-    updateCartBadgeOnLoad();
-    loadChatHistory();
-    updateUndoRedoButtons();
-
-    setTimeout(() => {
-        selectProduct('photocards');
-    }, 500);
-    
-    // Initialize print options
-    initPrintOptions();
-    
-    // Initialize Google API
-    initializeGoogleApi();
-    
-    // Initialize cart hover
-    initCartHover();
-    
-        // Initialize select all checkbox
-    initSelectAll();
-
-    // ============== FIX: FORCE ATTACH DELETE SELECTED BUTTON LISTENER ==============
-    const deleteBtn = document.getElementById('deleteSelectedBtn');
-    if (deleteBtn) {
-        deleteBtn.onclick = null;
-        deleteBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('🗑️ Delete Selected button clicked');
-            deleteSelectedItems();
-        });
-        console.log('✅ Delete button listener attached');
-    } else {
-        console.warn('⚠️ Delete Selected button not found');
-    }
-    // ============== END FIX ==============
-}); 
-
 function updateCartBadgeOnLoad() {
     const badge = document.getElementById('cartCount');
     if (badge) {
@@ -1438,7 +1094,7 @@ function convertPriceToSEK(priceStr) {
     return `${(php * rate).toFixed(2)} kr`;
 }
 
-// Reviews
+// ============== REVIEWS ==============
 const reviews = [
     { name: 'Maria', product: 'Photo Book', rating: 5, text: 'Beautiful quality and fast delivery!' },
     { name: 'Jon', product: 'Canvas', rating: 4, text: 'Great colors, slightly longer shipping.' },
@@ -1478,7 +1134,7 @@ function nextReview() {
     updateReviewVisibility();
 }
 
-// LOGIN modal handlers
+// ============== LOGIN MODAL ==============
 function openLoginModal() {
     const modal = document.getElementById('loginModal');
     if (modal) {
@@ -1516,7 +1172,6 @@ function simulateSocialLogin(provider) {
     updateLoginStatus();
 }
 
-// When opening chat, personalize
 function toggleChat() {
     const chatBox = document.getElementById('chatBox');
     const chatMessages = document.getElementById('chatMessages');
@@ -1562,7 +1217,6 @@ function toggleChat() {
     }
 }
 
-// Placeholder for backend chat connection (Node/Socket.io)
 function initChatBackend() {
     try {
         if (typeof io === 'undefined') {
@@ -1603,8 +1257,6 @@ function initChatBackend() {
         console.warn('Chat backend init failed', e);
     }
 }
-
-initChatBackend();
 
 function displayHomeProducts() {
     const productsContainer = document.getElementById('products');
@@ -1741,7 +1393,6 @@ function updateNavHighlight(pageId) {
     });
 }
 
-// Photo Mode Switching
 function switchPhotoMode(mode) {
     const uploadModeBtn = document.getElementById('uploadModeBtn');
     const printModeBtn = document.getElementById('printModeBtn');
@@ -1764,7 +1415,7 @@ function switchPhotoMode(mode) {
     }
 }
 
-// Setup Photo Editor
+// ============== PHOTO EDITOR SETUP ==============
 function setupPhotoEditor() {
     canvas = document.getElementById('photoCanvas');
     if (!canvas) return;
@@ -1861,7 +1512,6 @@ function setupSliders() {
     });
 }
 
-// Drag and Drop
 function setupDragAndDrop() {
     const dropArea = document.getElementById('dropArea');
     const fileInput = document.getElementById('photoInput');
@@ -2061,7 +1711,6 @@ function updateSliderValues() {
     });
 }
 
-// Image Editing Functions
 function adjustBrightness(amount) {
     adjustments.brightness = Math.max(0, Math.min(200, adjustments.brightness + amount));
     updateSliderValues();
@@ -2179,7 +1828,6 @@ function saveCurrentAdjustments() {
     }
 }
 
-// ============== FIXED UNDO/REDO SYSTEM ==============
 function pushSnapshotForCurrentImage() {
     if (currentImageIndex === -1 || !canvas) return;
 
@@ -2323,7 +1971,6 @@ function updateUndoRedoButtons() {
     console.log(`🔄 Undo: ${canUndo ? 'enabled' : 'disabled'}, Redo: ${canRedo ? 'enabled' : 'disabled'}`);
 }
 
-// ============== FIXED DRAWIMAGE FUNCTION ==============
 function drawImage() {
     if (currentImageIndex === -1 || !canvas || !ctx) return;
 
@@ -2389,8 +2036,6 @@ function drawImage() {
             ctx.restore();
         }
 
-        // WATERMARK REMOVED
-
         if (cropTool.active) {
             console.log('✂️ Crop active, updating handles');
             setTimeout(() => {
@@ -2402,7 +2047,7 @@ function drawImage() {
     img.src = image.original;
 }
 
-// ============== DROPDOWN MENU FUNCTIONS ==============
+// ============== DROPDOWN MENU ==============
 function setupDropdownMenu() {
     const dropdownBtn = document.getElementById('productDropdownBtn');
     const dropdownMenu = document.getElementById('productDropdownMenu');
@@ -2465,9 +2110,8 @@ function updateProductBadge(productType) {
     }
 }
 
-// ============== UPDATED PRODUCT SELECTION FUNCTION ==============
 function selectProduct(type) {
-    currentProduct = type;              // Update local variable
+    currentProduct = type;
     window.currentProduct = type;
 
     document.querySelectorAll('.product-btn').forEach(b => {
@@ -2476,7 +2120,6 @@ function selectProduct(type) {
 
     updateProductBadge(type);
     
-    // Update print options based on selected product
     updatePrintOptions(type);
 
     if (templates[type]) {
@@ -2491,13 +2134,10 @@ function selectProduct(type) {
     }
 }
 
-// ============== NEW PRINT OPTIONS FUNCTIONS ==============
-
-// Global variables for print options
+// ============== PRINT OPTIONS ==============
 let currentQuantity = 1;
 let basePricePerUnit = 25;
 
-// Update quantity
 function updateQuantity(change) {
     currentQuantity = Math.max(1, currentQuantity + change);
     document.getElementById('quantityDisplay').textContent = currentQuantity;
@@ -2507,15 +2147,13 @@ function updateQuantity(change) {
 window.calculatePrice = function calculatePrice() {
     console.log('💰 Calculating price in USD...');
     
-    // Get current product
     const productType = window.currentProduct || 'photocards';
     console.log('1. Product type:', productType);
     
-    // Get selected size
     const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
     console.log('2. Selected size element:', selectedSize);
     
-    let basePriceUSD = 0.45; // Default USD price
+    let basePriceUSD = 0.45;
     
     if (selectedSize) {
         const sizeValue = selectedSize.value;
@@ -2528,7 +2166,6 @@ window.calculatePrice = function calculatePrice() {
             basePriceUSD = Math.max(0.45, Math.round(area * 0.009 * 100) / 100);
             console.log('4. Custom size calculation:', {width, height, area, basePriceUSD});
         } else {
-            // Get price from config based on current product
             const options = window.printOptionsConfig?.[productType] || window.printOptionsConfig?.photocards || [];
             console.log('4. Options for this product:', options);
             
@@ -2544,7 +2181,6 @@ window.calculatePrice = function calculatePrice() {
     
     console.log('7. Final basePriceUSD before paper:', basePriceUSD);
     
-    // Get paper type price
     let paperUpgradeUSD = 0;
     const selectedPaper = document.querySelector('input[name="paperType"]:checked');
     console.log('8. Selected paper element:', selectedPaper);
@@ -2576,7 +2212,6 @@ window.calculatePrice = function calculatePrice() {
     }
     console.log('12. Final paperUpgradeUSD:', paperUpgradeUSD);
     
-    // Get quantity
     const quantity = parseInt(document.getElementById('quantityDisplay')?.textContent || '1');
     console.log('13. Quantity:', quantity);
     
@@ -2585,7 +2220,6 @@ window.calculatePrice = function calculatePrice() {
     
     console.log(`14. 📏 Base: $${basePriceUSD.toFixed(2)}, 📄 Paper: $${paperUpgradeUSD.toFixed(2)}, 🔢 Qty: ${quantity}, 💰 Total: $${totalPriceUSD.toFixed(2)}`);
     
-    // Update data-usd attributes
     document.getElementById('basePrice')?.setAttribute('data-usd', basePriceUSD);
     document.getElementById('paperUpgradePrice')?.setAttribute('data-usd', paperUpgradeUSD);
     document.getElementById('quantityMultiplier')?.setAttribute('data-usd', priceBeforeQuantity * quantity);
@@ -2593,7 +2227,6 @@ window.calculatePrice = function calculatePrice() {
     document.getElementById('finalPrice')?.setAttribute('data-usd', totalPriceUSD);
     
 
-// Format with current currency
 document.getElementById('basePrice').textContent = formatPrice(basePriceUSD);
 document.getElementById('paperUpgradePrice').textContent = formatPrice(paperUpgradeUSD);
 document.getElementById('quantityMultiplier').textContent = formatPrice(priceBeforeQuantity * quantity);
@@ -2601,7 +2234,6 @@ document.getElementById('advancedTotalPrice').textContent = formatPrice(totalPri
 document.getElementById('finalPrice').textContent = formatPrice(totalPriceUSD);
 }
     
-// Handle when size is selected
 function onSizeSelect() {
     const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
     if (!selectedSize) return;
@@ -2614,7 +2246,6 @@ function onSizeSelect() {
         document.getElementById('customHeight').disabled = false;
         document.getElementById('customUnit').disabled = false;
         
-        // Update custom size with current unit
         updateCustomSizeUnit();
     } else {
         customSizeContainer.style.display = 'none';
@@ -2626,7 +2257,6 @@ function onSizeSelect() {
     calculatePrice();
 }
 
-// Update print options based on selected product
 function updatePrintOptions(productType) {
     console.log('Updating print options for:', productType);
     const container = document.getElementById('sizeOptionsContainer');
@@ -2641,7 +2271,6 @@ function updatePrintOptions(productType) {
     
     let html = '';
     options.forEach(opt => {
-        // Convert PHP price to USD (1 PHP = 0.018 USD)
         const usdPrice = (parseFloat(opt.price) * 0.018).toFixed(2);
         html += `
             <label class="print-size-btn small">
@@ -2652,7 +2281,6 @@ function updatePrintOptions(productType) {
         `;
     });
     
-    // Add custom option
     html += `
         <label class="print-size-btn small custom">
             <input type="radio" name="advancedPrintSize" value="custom" onchange="onSizeSelect()">
@@ -2662,32 +2290,26 @@ function updatePrintOptions(productType) {
     
     container.innerHTML = html;
     
-    // Select first option by default
     const firstRadio = container.querySelector('input[type="radio"]');
     if (firstRadio) {
         firstRadio.checked = true;
     }
     
-    // Update unit display
     if (typeof updateUnitDisplay === 'function') {
         updateUnitDisplay();
     }
     
-    // Calculate price
     if (typeof calculatePrice === 'function') {
         calculatePrice();
     }
 }
 
-// Initialize print options
 function initPrintOptions() {
-    // Set up listeners for custom size inputs
     const advancedInputs = ['customWidth', 'customHeight', 'customUnit'];
     advancedInputs.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
             element.addEventListener('input', function() {
-                // Store inches value when manually changed
                 if (currentUnit === 'inches') {
                     this.setAttribute('data-inches', this.value);
                 }
@@ -2696,46 +2318,37 @@ function initPrintOptions() {
         }
     });
     
-    // Set up paper type listeners
     document.querySelectorAll('input[name="paperType"]').forEach(radio => {
         radio.addEventListener('change', calculatePrice);
     });
     
-    // Initial update
     updatePrintOptions(currentProduct || 'photocards');
 }
 
-// ============== UPDATED ADD TO CART FUNCTION ==============
 window.addPhotoToCart = function() {
     if (uploadedImages.length === 0) {
         alert('Please upload at least one photo first.');
         return;
     }
     
-    // Get print options
     let size, price, paperType = 'standard', sizeMode = 'fill', isCustom = false;
     let customWidth = null, customHeight = null, customUnit = 'inches';
     
-    // Get sizeMode from radio buttons
     const sizeModeRadio = document.querySelector('input[name="sizeMode"]:checked');
     sizeMode = sizeModeRadio ? sizeModeRadio.value : 'fill';
     
-    // Get paper type from radio buttons
     const paperTypeRadio = document.querySelector('input[name="paperType"]:checked');
     paperType = paperTypeRadio ? paperTypeRadio.value : 'standard';
     
-    // Get selected size
     const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
     size = selectedSize ? selectedSize.value : '4x6';
     
     if (size === 'custom') {
         isCustom = true;
-        // Always store in inches
         const widthInput = document.getElementById('customWidth');
         const heightInput = document.getElementById('customHeight');
         const unitSelect = document.getElementById('customUnit');
         
-        // Convert to inches if needed
         if (currentUnit === 'cm') {
             customWidth = (parseFloat(widthInput.value) / 2.54).toFixed(2);
             customHeight = (parseFloat(heightInput.value) / 2.54).toFixed(2);
@@ -2753,20 +2366,16 @@ window.addPhotoToCart = function() {
     
     price = document.getElementById('advancedTotalPrice').textContent;
     
-    // Get the actual product name from currentProduct
     const productName = productDisplayNames[currentProduct] || 'Photo';
     
-    // Store ONLY thumbnails
     const photosData = uploadedImages.map(img => ({
         name: img.name,
         thumbnail: img.src,
     }));
     
-    // Calculate total price (base price × photo count)
     const basePrice = parseFloat(price.toString().replace('₱', '')) || 0;
     const totalPrice = basePrice * uploadedImages.length;
     
-    // Create cart item with ONLY thumbnail data
     const cartItem = {
         id: 'photo-' + Date.now(),
         type: 'photo',
@@ -2792,10 +2401,8 @@ window.addPhotoToCart = function() {
         selected: true
     };
     
-    // Add to cart
     addToCart(cartItem);
     
-    // Reset editor
     uploadedImages = [];
     currentImageIndex = -1;
     updateImageGallery();
@@ -2816,7 +2423,7 @@ window.addPhotoToCart = function() {
     console.log('✨ Editor reset complete! Cart has thumbnails only');
 };
 
-// ============== CROP TOOL FUNCTIONS ==============
+// ============== CROP TOOL ==============
 function setupCropHandles() {
     console.log('setupCropHandles called');
     if (!canvas) {
@@ -3182,7 +2789,6 @@ function hideCropControls() {
     }
 }
 
-// ============== FIXED APPLY CROP FUNCTION ==============
 function applyCrop() {
     if (currentImageIndex === -1 || !cropTool.active) return;
 
@@ -3232,7 +2838,6 @@ function cancelCrop() {
     drawImage();
 }
 
-// Text overlay functionality
 function toggleTextOverlay() {
     editorFeatures.textOverlay.active = !editorFeatures.textOverlay.active;
     if (editorFeatures.textOverlay.active) {
@@ -3346,7 +2951,6 @@ function updateText() {
     drawImage();
 }
 
-// Add red-eye reduction simulation
 function reduceRedEye() {
     if (currentImageIndex === -1) return;
 
@@ -3389,7 +2993,6 @@ function reduceRedEye() {
     img.src = image.original;
 }
 
-// Add auto-enhance feature
 function autoEnhance() {
     if (currentImageIndex === -1) return;
 
@@ -3433,7 +3036,6 @@ function downloadImage() {
     link.click();
 }
 
-// Modal Functions
 function showSuccessModal() {
     const modal = document.getElementById('successModal');
     if (modal) {
@@ -3448,7 +3050,6 @@ function closeModal() {
     }
 }
 
-// Setup Event Listeners
 function setupEventListeners() {
     const modal = document.getElementById('successModal');
     if (modal) {
@@ -3480,7 +3081,6 @@ function initPhotoMode() {
     switchPhotoMode('upload');
 }
 
-// Login and Authentication Functions
 function handleLogin(event) {
     event.preventDefault();
     const email = document.getElementById('loginEmail').value;
@@ -3545,7 +3145,6 @@ function updateLoginStatus() {
     }
 }
 
-// FAQ Functions
 function selectFaqQuestion(type) {
     let question = '';
     let answer = '';
@@ -3592,7 +3191,6 @@ function selectFaqQuestion(type) {
     }, 500);
 }
 
-// Setup FAQ scroll functionality
 function setupFaqScroll() {
     const faqScrollContainer = document.querySelector('.faq-scroll-container');
     const leftIndicator = document.querySelector('.faq-scroll-indicator.left');
@@ -3997,7 +3595,6 @@ function getCalendarBestFor(type) {
     return bestFor[type] || 'General use';
 }
 
-// For Cards section (simplified version of the photo editor)
 function switchCardsMode(mode) {
     const uploadBtn = document.getElementById('cardsUploadModeBtn');
     const productsBtn = document.getElementById('cardsProductsModeBtn');
@@ -4046,7 +3643,6 @@ function displayCardsProducts() {
     `).join('');
 }
 
-// Simplified card editor functions
 function adjustCardsBrightness(amount) {
     alert('Card editor would work similarly to photo editor. Full implementation would be similar to adjustBrightness()');
 }
@@ -4125,20 +3721,15 @@ function getCardPriceForSize(size) {
     return prices[size] || 150.00;
 }
 
-// ============== SEARCH BAR FUNCTIONS ==============
-
-// Store last search query
+// ============== SEARCH BAR ==============
 let lastSearchQuery = localStorage.getItem('lastSearch') || 'canvas prints...';
 
-// Initialize search bar
 function initSearchBar() {
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) return;
     
-    // Set placeholder to last search
     searchInput.placeholder = lastSearchQuery;
     
-    // Handle Enter key
     searchInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -4146,13 +3737,11 @@ function initSearchBar() {
             if (query) {
                 performSearch(query);
             } else {
-                // If empty, just go to shop
                 navigateTo('shop');
             }
         }
     });
     
-    // Handle search icon click
     const searchIcon = document.querySelector('.search-icon');
     if (searchIcon) {
         searchIcon.addEventListener('click', function() {
@@ -4163,31 +3752,26 @@ function initSearchBar() {
         });
     }
     
-    console.log('Search bar initialized'); // Debug
+    console.log('Search bar initialized');
 }
 
-// Perform search
 function performSearch(query) {
-    console.log('Performing search for:', query); // Debug
+    console.log('Performing search for:', query);
     
     if (!query) return;
     
-    // Save to localStorage
     localStorage.setItem('lastSearch', query);
     document.getElementById('searchInput').placeholder = query;
     
-    // Navigate to shop page
     navigateTo('shop');
     
-    // Small delay to ensure shop page is loaded
     setTimeout(() => {
         filterProducts(query);
     }, 300);
 }
 
-// Filter products based on search query
 function filterProducts(query) {
-    console.log('Filtering products for:', query); // Debug
+    console.log('Filtering products for:', query);
     
     const shopGrid = document.getElementById('shopProductsGrid');
     if (!shopGrid) {
@@ -4195,7 +3779,6 @@ function filterProducts(query) {
         return;
     }
     
-    // Make sure products are rendered
     if (!shopGrid.hasChildNodes() || shopGrid.children.length === 0) {
         console.log('No products in grid, rendering first...');
         renderShopProducts();
@@ -4211,11 +3794,9 @@ function filterProducts(query) {
     const searchTerm = query.toLowerCase();
     let matchCount = 0;
     
-    // Remove any existing no-results message
     const existingNoResults = shopGrid.querySelector('.no-results-message');
     if (existingNoResults) existingNoResults.remove();
     
-    // Show search results info
     const searchInfo = document.getElementById('searchResultsInfo');
     const searchText = document.getElementById('searchResultsText');
     
@@ -4223,34 +3804,28 @@ function filterProducts(query) {
         searchInfo.style.display = 'flex';
     }
     
-    // Loop through all product cards
     productCards.forEach(card => {
         const title = card.querySelector('h3, h4')?.textContent.toLowerCase() || '';
         const desc = card.querySelector('.product-desc, p')?.textContent.toLowerCase() || '';
         const priceText = card.querySelector('.price')?.textContent.toLowerCase() || '';
         
-        // Check if search term matches
         if (title.includes(searchTerm) || desc.includes(searchTerm) || priceText.includes(searchTerm)) {
-            // Match found - highlight
             card.classList.add('search-highlight');
             card.classList.remove('search-dim');
             matchCount++;
-            console.log('Match found:', title); // Debug
+            console.log('Match found:', title);
         } else {
-            // No match - dim with blur
             card.classList.add('search-dim');
             card.classList.remove('search-highlight');
         }
     });
     
-    console.log('Total matches:', matchCount); // Debug
+    console.log('Total matches:', matchCount);
     
-    // Update results count
     if (searchText) {
         searchText.innerHTML = `Found <span>${matchCount}</span> result${matchCount !== 1 ? 's' : ''} for: <span>"${query}"</span>`;
     }
     
-    // If no matches, show message
     if (matchCount === 0) {
         const noResults = document.createElement('div');
         noResults.className = 'no-results-message';
@@ -4264,54 +3839,44 @@ function filterProducts(query) {
     }
 }
 
-// Clear search
 function clearSearch() {
-    console.log('Clearing search'); // Debug
+    console.log('Clearing search');
     
     const shopGrid = document.getElementById('shopProductsGrid');
     if (!shopGrid) return;
     
-    // Remove search classes
     shopGrid.querySelectorAll('.product-card').forEach(card => {
         card.classList.remove('search-highlight', 'search-dim');
     });
     
-    // Remove no-results message
     const noResults = shopGrid.querySelector('.no-results-message');
     if (noResults) noResults.remove();
     
-    // Hide search info
     const searchInfo = document.getElementById('searchResultsInfo');
     if (searchInfo) {
         searchInfo.style.display = 'none';
     }
     
-    // Clear input
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.value = '';
     }
 }
 
-// Make functions globally available
 window.performSearch = performSearch;
 window.clearSearch = clearSearch;
 
-// ============== FIXED GOOGLE DRIVE ORDER PROCESSING ==============
-
-// Google Drive Configuration
+// ============== GOOGLE DRIVE ORDER PROCESSING ==============
 const CLIENT_ID = '758191937461-epcuq05oanl0cq8oedgj5pt32h79nojr.apps.googleusercontent.com';
 const API_KEY = 'AIzaSyA0_S5lH8BwyvekzmG2s5qxt0_MAmLKOiM';
 const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
-// Order tracking
 let tokenClient;
 let gapiInited = false;
 let gisInited = false;
 let rootFolderId = null;
 
-// Initialize Google API
 function initializeGoogleApi() {
     gapi.load('client', async () => {
         await gapi.client.init({
@@ -4337,7 +3902,6 @@ function maybeEnableButtons() {
     }
 }
 
-// Helper: Convert base64 to binary blob
 function base64ToBlob(base64, mimeType) {
     const byteCharacters = atob(base64);
     const byteNumbers = new Array(byteCharacters.length);
@@ -4348,7 +3912,6 @@ function base64ToBlob(base64, mimeType) {
     return new Blob([byteArray], {type: mimeType});
 }
 
-// Find or create the C8FOCENTER/orders folder structure
 async function getOrCreateOrdersFolder() {
     try {
         const response = await gapi.client.drive.files.list({
@@ -4382,7 +3945,6 @@ async function getOrCreateOrdersFolder() {
     }
 }
 
-// Create folder in Google Drive
 async function createDriveFolder(folderName, parentId = null) {
     const metadata = {
         name: folderName,
@@ -4400,7 +3962,6 @@ async function createDriveFolder(folderName, parentId = null) {
     return response.result;
 }
 
-// Upload file to Google Drive
 async function uploadFileToDrive(fileName, content, folderId) {
     const boundary = '-------' + Date.now();
     const delimiter = '\r\n--' + boundary + '\r\n';
@@ -4458,7 +4019,6 @@ async function uploadFileToDrive(fileName, content, folderId) {
     }
 }
 
-// Generate Condition.txt
 function generateConditionFile(orderData) {
     let content = `[OutDevice]\n    DeviceName= SP-1500sRGB\n\n`;
     content += `[ImageList]\n    ImageCnt=${orderData.photos.length}\n`;
@@ -4480,7 +4040,6 @@ function generateConditionFile(orderData) {
     return content;
 }
 
-// Generate End.txt
 function generateEndFile(orderData) {
     return `[Order Complete]
     OrderID=${orderData.orderId}
@@ -4492,7 +4051,6 @@ function generateEndFile(orderData) {
     `;
 }
 
-// Generate OrderReceipt.txt
 function generateReceiptFile(orderData) {
     const filenameCount = {};
     
@@ -4554,7 +4112,6 @@ function generateReceiptFile(orderData) {
     return receipt;
 }
 
-// Get user's order count
 function getUserOrderCount(username) {
     const key = `orderCount_${username}`;
     let count = parseInt(localStorage.getItem(key) || '0');
@@ -4563,23 +4120,10 @@ function getUserOrderCount(username) {
     return count;
 }
 
-// Generate unique order ID
 function generateOrderId() {
     return 'ORD-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
 }
 
-// Initialize Google API on page load
-document.addEventListener('DOMContentLoaded', function() {
-    initializeGoogleApi();
-    
-    const orderBtn = document.getElementById('completeOrderBtn');
-    if (orderBtn) orderBtn.disabled = true;
-});
-
-// Make functions globally available
-window.initializeGoogleApi = initializeGoogleApi;
-
-// ============== COPY ORDER NUMBER FUNCTION ==============
 function copyOrderNumber() {
     const orderMessage = document.getElementById('orderSuccessMessage').innerText;
     const match = orderMessage.match(/Order Number: ([^\n]+)/);
@@ -4599,12 +4143,9 @@ function copyOrderNumber() {
     }
 }
 
-// Make function globally available
 window.copyOrderNumber = copyOrderNumber;
 
 // ============== CART PAGE FUNCTIONS ==============
-
-// Initialize select all checkbox
 function initSelectAll() {
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     if (selectAllCheckbox) {
@@ -4618,7 +4159,6 @@ function initSelectAll() {
     }
 }
 
-// Render cart page items with photo count badge and clickable preview
 function renderCartPage() {
     const container = document.getElementById('cartItemsContainer');
     if (!container) return;
@@ -4711,9 +4251,6 @@ function renderCartPage() {
     updateCartSelection();
 }
 
-// ============== PHOTO PREVIEW MODAL ==============
-
-// Show photo preview modal for a cart item
 function showPhotoPreview(itemIndex) {
     const item = shoppingCart[itemIndex];
     
@@ -4774,7 +4311,6 @@ function showPhotoPreview(itemIndex) {
     previewModal.style.display = 'flex';
 }
 
-// Update main preview image
 function updatePreviewMainImage() {
     const photos = window.currentPreviewPhotos;
     const index = window.currentPreviewPhotoIndex;
@@ -4795,7 +4331,6 @@ function updatePreviewMainImage() {
     });
 }
 
-// Navigate to previous photo
 function prevPreviewPhoto() {
     if (window.currentPreviewPhotoIndex > 0) {
         window.currentPreviewPhotoIndex--;
@@ -4803,7 +4338,6 @@ function prevPreviewPhoto() {
     }
 }
 
-// Navigate to next photo
 function nextPreviewPhoto() {
     if (window.currentPreviewPhotoIndex < window.currentPreviewPhotos.length - 1) {
         window.currentPreviewPhotoIndex++;
@@ -4811,7 +4345,6 @@ function nextPreviewPhoto() {
     }
 }
 
-// Jump to specific photo
 function jumpToPreviewPhoto(index) {
     if (index >= 0 && index < window.currentPreviewPhotos.length) {
         window.currentPreviewPhotoIndex = index;
@@ -4819,7 +4352,6 @@ function jumpToPreviewPhoto(index) {
     }
 }
 
-// Close preview modal
 function closePhotoPreview() {
     const modal = document.getElementById('photoPreviewModal');
     if (modal) {
@@ -4827,7 +4359,6 @@ function closePhotoPreview() {
     }
 }
 
-// Update cart selection UI
 function updateCartSelection() {
     const selectAll = document.getElementById('selectAllCheckbox');
     const selectedCount = shoppingCart.filter(item => item.selected).length;
@@ -4857,7 +4388,6 @@ function updateCartSelection() {
     document.getElementById('cartTotalSelected').textContent = `₱${total.toFixed(2)}`;
 }
 
-// Select all items
 function selectAllItems(checked) {
     shoppingCart.forEach(item => {
         item.selected = checked;
@@ -4866,14 +4396,12 @@ function selectAllItems(checked) {
     renderCartPage();
 }
 
-// Update quantity from cart page
 function updateCartItemQuantityFromCart(index, change) {
     updateCartItemQuantity(index, change);
     renderCartPage();
     updateCartHover();
 }
 
-// Delete selected items function
 function deleteSelectedItems() {
     console.log('🗑️ DeleteSelectedItems called');
     const beforeCount = shoppingCart.length;
@@ -4887,7 +4415,6 @@ function deleteSelectedItems() {
     updateCartHover();
 }
 
-// FIXED: Process order from cart - handles multi-photo products
 async function processOrderFromCart() {
     const selectedItems = shoppingCart.filter(item => item.selected);
     
@@ -5072,9 +4599,7 @@ async function processOrderFromCart() {
     }
 }
 
-// ============== CART HOVER DROPDOWN FUNCTIONS ==============
-
-// Initialize cart hover
+// ============== CART HOVER DROPDOWN ==============
 function initCartHover() {
     const cartWrapper = document.querySelector('.cart-hover-wrapper');
     if (cartWrapper) {
@@ -5084,7 +4609,6 @@ function initCartHover() {
     }
 }
 
-// Update cart hover dropdown
 function updateCartHover() {
     const dropdown = document.getElementById('cartHoverDropdown');
     if (!dropdown) return;
@@ -5131,7 +4655,6 @@ function updateCartHover() {
     dropdown.innerHTML = itemsHtml;
 }
 
-// Force update cart hover on any cart change
 function forceCartUpdate() {
     updateCartUI();
     updateCartHover();
@@ -5140,12 +4663,7 @@ function forceCartUpdate() {
     }
 }
 
-// ============== HAMBURGER MENU FUNCTIONALITY (TASK 3) ==============
-
-document.addEventListener('DOMContentLoaded', function() {
-    setupHamburgerMenu();
-});
-
+// ============== HAMBURGER MENU ==============
 function setupHamburgerMenu() {
     const hamburgerMenu = document.getElementById('hamburgerMenu');
     const hamburgerIcon = document.querySelector('.hamburger-icon');
@@ -5153,20 +4671,17 @@ function setupHamburgerMenu() {
     
     if (!hamburgerMenu || !hamburgerIcon || !hamburgerDropdown) return;
     
-    // Toggle menu on icon click
     hamburgerIcon.addEventListener('click', function(e) {
         e.stopPropagation();
         hamburgerMenu.classList.toggle('open');
     });
     
-    // Close menu when clicking outside
     document.addEventListener('click', function(e) {
         if (!hamburgerMenu.contains(e.target)) {
             hamburgerMenu.classList.remove('open');
         }
     });
     
-    // Close menu when mouse leaves dropdown (with delay)
     let timeoutId;
     
     hamburgerDropdown.addEventListener('mouseenter', function() {
@@ -5179,7 +4694,6 @@ function setupHamburgerMenu() {
         }, 300);
     });
     
-    // Close menu when clicking a menu item
     const menuItems = hamburgerDropdown.querySelectorAll('.dropdown-item');
     menuItems.forEach(item => {
         item.addEventListener('click', function() {
@@ -5190,70 +4704,7 @@ function setupHamburgerMenu() {
     console.log('✅ Hamburger menu initialized with 3 items (Editor, Shop, Info)');
 }
 
-// ============== SLIDESHOW HELPER FUNCTIONS ==============
-function prevSlide() {
-    const slideshow = document.querySelector('.slideshow-container');
-    if (slideshow && slideshow.__component) {
-        slideshow.__component.prevSlide();
-    }
-}
-
-function nextSlide() {
-    const slideshow = document.querySelector('.slideshow-container');
-    if (slideshow && slideshow.__component) {
-        slideshow.__component.nextSlide();
-    }
-}
-
-function goToSlide(index) {
-    const slideshow = document.querySelector('.slideshow-container');
-    if (slideshow && slideshow.__component) {
-        slideshow.__component.goToSlide(index);
-    }
-}
-
-function toggleSlideshowPause() {
-    const slideshow = document.querySelector('.slideshow-container');
-    if (slideshow && slideshow.__component) {
-        slideshow.__component.togglePause();
-    }
-}
-
-function openProductPage(productType) {
-    navigateTo('product-page');
-    setTimeout(() => {
-        loadProductDetails(productType);
-    }, 100);
-}
-
-function closeWelcomePopup() {
-    const overlay = document.getElementById('popupOverlay');
-    const popup = document.getElementById('welcomePopup');
-    if (overlay) overlay.remove();
-    if (popup) popup.remove();
-}
-
-// ============== SIMPLE WORKING FIX - REPLACE EVERYTHING FROM HERE ==============
-
-// Initialize everything when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize slideshow
-    setTimeout(() => {
-        if (typeof Slideshow === 'function' && !window.slideshowInitialized) {
-            window.slideshow = new Slideshow();
-            window.slideshowInitialized = true;
-            console.log('✅ Slideshow initialized');
-        }
-    }, 500);
-    
-    // Make slides clickable
-    setTimeout(makeSlidesClickable, 1500);
-    
-    // Setup hamburger menu
-    setupSimpleHamburger();
-});
-
-// Simple hamburger menu that works
+// ============== SIMPLE WORKING FIXES ==============
 function setupSimpleHamburger() {
     const menu = document.getElementById('hamburgerMenu');
     const icon = document.querySelector('.hamburger-icon');
@@ -5265,7 +4716,6 @@ function setupSimpleHamburger() {
             menu.classList.toggle('open');
         };
         
-        // Close when clicking outside
         document.addEventListener('click', function(e) {
             if (!menu.contains(e.target)) {
                 menu.classList.remove('open');
@@ -5274,7 +4724,6 @@ function setupSimpleHamburger() {
     }
 }
 
-// Make slides clickable
 function makeSlidesClickable() {
     const slides = document.querySelectorAll('.slide-card');
     const products = ['photocards', 'calendar', 'photobook', 'canvas', 'mousepads', 'doublecards'];
@@ -5293,7 +4742,6 @@ function makeSlidesClickable() {
     });
 }
 
-// ============== WORKING FIX FOR OPEN IN EDITOR ==============
 (function fixOpenInEditor() {
     console.log('🔧 Setting up Open in Editor button...');
     
@@ -5303,35 +4751,28 @@ function makeSlidesClickable() {
         if (editorBtn) {
             console.log('✅ Found Open in Editor button');
             
-            // Remove any existing listeners by cloning
             const newBtn = editorBtn.cloneNode(true);
             editorBtn.parentNode.replaceChild(newBtn, editorBtn);
             
-           // Add working click listener
-newBtn.addEventListener('click', function(e) {
+           newBtn.addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
     
     console.log('🎯 OPEN IN EDITOR CLICKED!');
     
-    // Get product type from data attribute
     const productType = this.getAttribute('data-product') || 'photocards';
     console.log('📦 Product type:', productType);
     
-    // Navigate to photos page
     navigateTo('photos');
     
-    // Wait for photos page to load
     setTimeout(() => {
         console.log('📸 Photos page loaded, selecting product...');
         
-        // Method 1: Use selectProduct function
         if (typeof selectProduct === 'function') {
             selectProduct(productType);
             console.log('✅ selectProduct called with:', productType);
         }
         
-        // Method 2: Update the badge
         const badge = document.getElementById('currentProductBadge');
         if (badge) {
             const icons = {
@@ -5353,12 +4794,13 @@ newBtn.addEventListener('click', function(e) {
             };
             
             badge.innerHTML = `<span class="badge-text">${icons[productType] || '📷'} ${names[productType] || productType}</span>`;
-        } // ✅ close the if (badge) block here
+        }
 
-        // Method 3: Update print options
         if (typeof updatePrintOptions === 'function') {
             updatePrintOptions(productType);
         }
+        
+        showEditorWelcome(productType);
         
     }, 800);
     
@@ -5372,9 +4814,7 @@ newBtn.addEventListener('click', function(e) {
         return false;
     }
     
-    // Try immediately
     if (!attachEditorListener()) {
-        // If button not found, wait for it
         console.log('⏳ Waiting for Open in Editor button...');
         const observer = new MutationObserver(function(mutations) {
             if (document.getElementById('openEditorBtn')) {
@@ -5389,12 +4829,11 @@ newBtn.addEventListener('click', function(e) {
             subtree: true
         });
         
-        // Also try after 2 seconds
         setTimeout(attachEditorListener, 2000);
     }
 })();
 
-// ============== EDITOR WELCOME POPUP FUNCTIONS ==============
+// ============== EDITOR WELCOME POPUP ==============
 function showEditorWelcome(productType) {
     const popup = document.getElementById('editorWelcomePopup');
     if (!popup) {
@@ -5402,7 +4841,6 @@ function showEditorWelcome(productType) {
         return;
     }
     
-    // Update product name
     const productNames = {
         'photocards': 'Photo Cards',
         'calendar': 'Calendar',
@@ -5417,10 +4855,8 @@ function showEditorWelcome(productType) {
         nameEl.textContent = productNames[productType] || 'Photo Cards';
     }
     
-    // Show popup
     popup.style.display = 'flex';
     
-    // Auto-hide after 8 seconds
     setTimeout(() => {
         if (popup.style.display === 'flex') {
             popup.style.display = 'none';
@@ -5435,16 +4871,10 @@ function closeEditorWelcome() {
     }
 }
 
-// ============== SHOW WELCOME FOR BOTH WAYS ==============
 (function setupEditorWelcome() {
     console.log('🔧 Setting up editor welcome popup...');
     
-    // Way 1: Through slideshow (already have this in your code)
-    // Make sure your openEditorBtn click handler calls showEditorWelcome
-    
-    // Way 2: Through hamburger menu
     document.addEventListener('click', function(e) {
-        // Check if clicked on Editor in hamburger menu
         const isHamburgerEditor = e.target.closest('.hamburger-dropdown') && 
                                   (e.target.textContent.includes('Editor') || 
                                    e.target.closest('[onclick*="photos"]'));
@@ -5452,14 +4882,11 @@ function closeEditorWelcome() {
         if (isHamburgerEditor) {
             console.log('📸 Editor opened via hamburger menu');
             
-            // Wait for editor page to load
             setTimeout(() => {
                 const photosPage = document.getElementById('photos');
                 if (photosPage && photosPage.classList.contains('active')) {
-                    // Get current product (default to photocards)
                     let currentProduct = 'photocards';
                     
-                    // Try to get from active dropdown
                     const activeItem = document.querySelector('.dropdown-item.active');
                     if (activeItem) {
                         currentProduct = activeItem.getAttribute('data-product') || 'photocards';
@@ -5474,13 +4901,10 @@ function closeEditorWelcome() {
     console.log('✅ Editor welcome popup ready for both entry methods');
 })();
 
-
-
 // ============== ULTIMATE DROPDOWN FIX ==============
 (function ultimateDropdownFix() {
     console.log('🔧 Applying ultimate dropdown fix...');
     
-    // Function to fix dropdown
     function fixDropdown() {
         const btn = document.getElementById('productDropdownBtn');
         const menu = document.getElementById('productDropdownMenu');
@@ -5488,11 +4912,9 @@ function closeEditorWelcome() {
         if (btn && menu) {
             console.log('✅ Found dropdown elements, attaching handler...');
             
-            // Remove all existing handlers by cloning
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
             
-            // Attach new handler directly
             newBtn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -5501,7 +4923,6 @@ function closeEditorWelcome() {
                 return false;
             };
             
-            // Close when clicking outside
             document.addEventListener('click', function(e) {
                 if (!menu.contains(e.target) && !newBtn.contains(e.target)) {
                     menu.classList.remove('show');
@@ -5513,7 +4934,6 @@ function closeEditorWelcome() {
         return false;
     }
     
-    // Try multiple times
     let attempts = 0;
     const interval = setInterval(function() {
         attempts++;
@@ -5523,11 +4943,10 @@ function closeEditorWelcome() {
         }
     }, 500);
 })();
-// Make functions global
+
+// ============== GLOBAL FUNCTIONS ==============
 window.showEditorWelcome = showEditorWelcome;
 window.closeEditorWelcome = closeEditorWelcome;
-
-// Keep all your existing global functions
 window.prevSlide = function() { if (window.slideshow) window.slideshow.prevSlide(); };
 window.nextSlide = function() { if (window.slideshow) window.slideshow.nextSlide(); };
 window.goToSlide = function(i) { if (window.slideshow) window.slideshow.goToSlide(i); };
@@ -5551,3 +4970,81 @@ window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
 
+// ============== INITIALIZATION ==============
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM Content Loaded - Initializing...');
+    
+    // Initialize language dropdown
+    if (typeof initLanguageDropdown === 'function') {
+        initLanguageDropdown();
+    }
+    
+    // Initialize existing functions
+    if (typeof displayHomeProducts === 'function') displayHomeProducts();
+    if (typeof setupPhotoEditor === 'function') setupPhotoEditor();
+    if (typeof setupNavHighlight === 'function') setupNavHighlight();
+    if (typeof setupDragAndDrop === 'function') setupDragAndDrop();
+    if (typeof setupEventListeners === 'function') setupEventListeners();
+    if (typeof initPhotoMode === 'function') initPhotoMode();
+    if (typeof updateLoginStatus === 'function') updateLoginStatus();
+    if (typeof updateCartUI === 'function') updateCartUI();
+    if (typeof setupFaqScroll === 'function') setupFaqScroll();
+    if (typeof setupChatKeyboard === 'function') setupChatKeyboard();
+    if (typeof setupDropdownMenu === 'function') setupDropdownMenu();
+    
+    const cartBtn = document.querySelector('.cart-btn');
+    if (cartBtn) {
+        cartBtn.onclick = function(e) {
+            e.preventDefault();
+            navigateTo('cart-page');
+        };
+    }
+    
+    if (typeof renderShopProducts === 'function') renderShopProducts();
+    if (typeof renderReviews === 'function') renderReviews();
+    if (typeof updateCartBadgeOnLoad === 'function') updateCartBadgeOnLoad();
+    if (typeof loadChatHistory === 'function') loadChatHistory();
+    if (typeof updateUndoRedoButtons === 'function') updateUndoRedoButtons();
+    
+    setTimeout(() => {
+        if (typeof selectProduct === 'function') selectProduct('photocards');
+    }, 500);
+    
+    if (typeof initPrintOptions === 'function') initPrintOptions();
+    if (typeof initializeGoogleApi === 'function') initializeGoogleApi();
+    if (typeof initCartHover === 'function') initCartHover();
+    if (typeof initSelectAll === 'function') initSelectAll();
+    if (typeof initSearchBar === 'function') initSearchBar();
+    
+    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    if (deleteBtn) {
+        deleteBtn.onclick = null;
+        deleteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🗑️ Delete Selected button clicked');
+            if (typeof deleteSelectedItems === 'function') deleteSelectedItems();
+        });
+    }
+    
+    // Initialize slideshow
+    setTimeout(() => {
+        if (typeof Slideshow === 'function' && !window.slideshowInitialized) {
+            window.slideshow = new Slideshow();
+            window.slideshowInitialized = true;
+            console.log('✅ Slideshow initialized');
+        }
+    }, 500);
+    
+    // Initialize hamburger menu
+    if (typeof setupHamburgerMenu === 'function') setupHamburgerMenu();
+    
+    // Make slides clickable
+    setTimeout(() => {
+        if (typeof makeSlidesClickable === 'function') makeSlidesClickable();
+    }, 1000);
+    
+    // Initialize chat backend
+    initChatBackend();
+    
+    console.log('✅ All initializations complete!');
+});
