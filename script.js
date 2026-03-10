@@ -306,8 +306,9 @@ function loadProductDetails(productType) {
     
     // Set product price with currency conversion
     const priceElement = document.getElementById('productPrice');
-    priceElement.setAttribute('data-php', product.basePricePHP);
-    priceElement.textContent = `$${(product.basePricePHP * 0.018).toFixed(2)}`;
+    const productUsdPrice = (product.basePricePHP * 0.018).toFixed(2);
+    priceElement.setAttribute('data-usd', productUsdPrice);
+    priceElement.textContent = `$${productUsdPrice}`;
     
     // Set description
     document.getElementById('productDescription').textContent = product.description;
@@ -335,9 +336,10 @@ function loadProductDetails(productType) {
     sizesContainer.innerHTML = '';
     product.sizes.forEach(size => {
         const phpPrice = parseFloat(size.price);
+        const usdPrice = (phpPrice * 0.018).toFixed(2);
         const sizeDiv = document.createElement('div');
         sizeDiv.className = 'size-item';
-        sizeDiv.innerHTML = `<span>${size.label}</span> <span data-php="${phpPrice}">$${(phpPrice * 0.018).toFixed(2)}</span>`;
+        sizeDiv.innerHTML = `<span data-i18n="size_${size.value}">${size.label}</span> <span data-usd="${usdPrice}">$${usdPrice}</span>`;
         sizesContainer.appendChild(sizeDiv);
     });
     
@@ -347,7 +349,8 @@ function loadProductDetails(productType) {
     product.paperTypes.forEach(paper => {
         const paperDiv = document.createElement('div');
         paperDiv.className = 'paper-item';
-        paperDiv.innerHTML = `<span>${paper.name}</span> <span data-php="${paper.pricePHP}">+$${(paper.pricePHP * 0.018).toFixed(2)}</span>`;
+        const usdPrice = (paper.pricePHP * 0.018).toFixed(2);
+        paperDiv.innerHTML = `<span>${paper.name}</span> <span data-usd="${usdPrice}">+$${usdPrice}</span>`;
         paperContainer.appendChild(paperDiv);
     });
     
@@ -356,8 +359,6 @@ function loadProductDetails(productType) {
     
     updateAllText();
     updateAllPrices();
-    
-    
 }
 
 // ============== MODIFY SLIDESHOW ==============
@@ -5544,5 +5545,6 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
