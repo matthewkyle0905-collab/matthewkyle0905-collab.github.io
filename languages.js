@@ -2101,13 +2101,12 @@ const languages = [
             'back': 'Indietro',
             
             
-            'product_photocards_desc': 'Crea biglietti d\'auguri personalizzati per ogni occasione. Perfetto per compleanni, festività o semplicemente per dire grazie. Scegli tra varie dimensioni e tipi di carta che si adattano al tuo stile.',
-            'product_calendar_desc': 'Crea calendari personalizzati con le tue foto preferite. Perfetto come regalo o per la decorazione della casa. Scegli tra calendari da tavolo, da parete o mini che si adattano al tuo stile.',
-            'product_photobook_desc': 'Fotolibri rilegati di alta qualità per raccogliere i tuoi ricordi. Perfetto per matrimoni, vacanze o album di famiglia. Scegli tra varie dimensioni e opzioni di rilegatura.',
-            'product_canvas_desc': 'La tua foto preferita montata su tela di alta qualità. Tesa in stile galleria e pronta da appendere. Perfetto per l\'arredamento della casa o regali speciali.',
-            'product_mousepads_desc': 'Tappetini per mouse fotografici personalizzati per la tua scrivania. Perfetto per l\'ufficio o l\'uso domestico. Base in gomma antiscivolo e superficie liscia per un controllo ottimale del mouse.',
-            'product_doublecards_desc': 'Eleganti biglietti d\'auguri pieghevoli per tutte le occasioni speciali. Perfetto per inviti, biglietti di ringraziamento o auguri di Natale. Viene fornito con buste abbinate.'
-
+        'product_photocards_desc': 'Crea biglietti d\'auguri personalizzati per ogni occasione. Perfetto per compleanni, festività o semplicemente per dire grazie. Scegli tra varie dimensioni e tipi di carta che si adattano al tuo stile.',
+        'product_calendar_desc': 'Crea calendari personalizzati con le tue foto preferite. Perfetto come regalo o per la decorazione della casa. Scegli tra calendari da tavolo, da parete o mini che si adattano al tuo stile.',
+        'product_photobook_desc': 'Fotolibri rilegati di alta qualità per raccogliere i tuoi ricordi. Perfetto per matrimoni, vacanze o album di famiglia. Scegli tra varie dimensioni e opzioni di rilegatura.',
+        'product_canvas_desc': 'La tua foto preferita montata su tela di alta qualità. Tesa in stile galleria e pronta da appendere. Perfetto per l\'arredamento della casa o regali speciali.',
+        'product_mousepads_desc': 'Tappetini per mouse fotografici personalizzati per la tua scrivania. Perfetto per l\'ufficio o l\'uso domestico. Base in gomma antiscivolo e superficie liscia per un controllo ottimale del mouse.',
+        'product_doublecards_desc': 'Eleganti biglietti d\'auguri pieghevoli per tutte le occasioni speciali. Perfetto per inviti, biglietti di ringraziamento o auguri di Natale. Viene fornito con buste abbinate.'
             
         }
     },
@@ -2335,6 +2334,7 @@ const languages = [
 // Default language (US English)
 let currentLanguage = languages[0];
 window.currentLanguage = currentLanguage;
+
 
 
 
