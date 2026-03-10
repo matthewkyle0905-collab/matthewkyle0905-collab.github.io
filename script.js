@@ -1,3 +1,18 @@
+// ============== LANGUAGE SYSTEM ==============
+// Get currentLanguage from languages.js (loaded first)
+let currentLanguage = window.currentLanguage || { 
+    code: 'us', 
+    name: 'English (US)', 
+    flag: '🇺🇸', 
+    currency: 'USD', 
+    symbol: '$', 
+    rate: 1,
+    translations: {}
+};
+
+// Make it globally available
+window.currentLanguage = currentLanguage;
+
 // Initialize language dropdown
 function initLanguageDropdown() {
     const languageBtn = document.getElementById('languageBtn');
@@ -5,6 +20,12 @@ function initLanguageDropdown() {
     const languageDropdown = document.getElementById('languageDropdown');
     
     if (!languageBtn || !languageMenu) return;
+    
+    // Check if languages exists
+    if (typeof languages === 'undefined') {
+        console.error('languages not defined! Make sure languages.js loads first.');
+        return;
+    }
     
     // Populate menu with all languages
     languageMenu.innerHTML = '';
@@ -38,29 +59,6 @@ function initLanguageDropdown() {
     // Update button display
     updateLanguageButton();
 }
-
-// Select language
-function selectLanguage(lang) {
-    console.log('Changing language to:', lang.code);
-    
-    currentLanguage = lang;
-    window.currentLanguage = lang;
-    localStorage.setItem('selectedLanguage', JSON.stringify(lang));
-    
-    // Update UI
-    updateLanguageButton();
-    updateAllText();
-    updateAllPrices();
-    
-    // Update active state in dropdown
-    document.querySelectorAll('.language-item').forEach(item => {
-        item.classList.toggle('active', item.getAttribute('data-language') === lang.code);
-    });
-    
-    // Close dropdown
-    document.getElementById('languageDropdown').classList.remove('open');
-}
-
 // Update language button
 function updateLanguageButton() {
     const btn = document.getElementById('languageBtn');
@@ -1347,7 +1345,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setupFaqScroll();
     setupChatKeyboard();
     setupDropdownMenu();
-    initLanguageDropdown();
+    ();
 
 
 
@@ -5551,6 +5549,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
