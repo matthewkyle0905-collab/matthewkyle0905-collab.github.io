@@ -315,6 +315,12 @@ function loadProductDetails(productType) {
     
     // Set icon
     document.getElementById('productIcon').textContent = product.icon;
+
+    // Set description with translation
+    const descriptionElement = document.getElementById('productDescription');
+    const descriptionKey = `product_${productType}_desc`;
+    descriptionElement.setAttribute('data-i18n', descriptionKey);
+    descriptionElement.textContent = currentLanguage.translations[descriptionKey] || product.description;
     
     // Load thumbnails
     const thumbnailsContainer = document.getElementById('productThumbnails');
@@ -5545,6 +5551,7 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
 
 
