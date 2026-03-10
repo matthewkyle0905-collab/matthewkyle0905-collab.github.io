@@ -107,10 +107,19 @@ function formatPrice(usdPrice) {
 
 // Update all prices on the page
 function updateAllPrices() {
-    // Update elements with data-usd attribute
+    // Update elements with data-usd attribute (editor page)
     document.querySelectorAll('[data-usd]').forEach(element => {
         const usdPrice = parseFloat(element.getAttribute('data-usd'));
         if (!isNaN(usdPrice)) {
+            element.textContent = formatPrice(usdPrice);
+        }
+    });
+    
+    // Update elements with data-php attribute (product page)
+    document.querySelectorAll('[data-php]').forEach(element => {
+        const phpPrice = parseFloat(element.getAttribute('data-php'));
+        if (!isNaN(phpPrice)) {
+            const usdPrice = phpPrice * 0.018;
             element.textContent = formatPrice(usdPrice);
         }
     });
@@ -124,7 +133,6 @@ function updateAllPrices() {
         }
     });
 }
-
 
 // ============== PRINT OPTIONS CONFIGURATION ==============
 const printOptionsConfig = {
@@ -5536,4 +5544,5 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
 
