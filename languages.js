@@ -1664,7 +1664,7 @@ const languages = [
             'back': 'Terug',
 
             'product_photocards_desc': 'Maak gepersonaliseerde wenskaarten voor elke gelegenheid. Perfect voor verjaardagen, feestdagen of gewoon om dankjewel te zeggen. Kies uit verschillende formaten en papiersoorten die bij uw stijl passen.',
-            'product_calendar_desc': 'Maak gepersonaliseerde kalenders met uw favoriete foto's. Perfect als cadeau of voor thuisdecoratie. Kies uit bureau-, wand- of minikalenders die bij uw stijl passen.',
+            'product_calendar_desc': 'Maak gepersonaliseerde kalenders met uw favoriete foto\'s. Perfect als cadeau of voor thuisdecoratie. Kies uit bureau-, wand- of minikalenders die bij uw stijl passen.',
             'product_photobook_desc': 'Premium hardcover fotoboeken om uw herinneringen te verzamelen. Perfect voor bruiloften, vakanties of familiealbums. Kies uit verschillende formaten en bindingsopties.',
             'product_canvas_desc': 'Uw favoriete foto gemonteerd op hoogwaardig canvas. Galerij-gespannen en klaar om op te hangen. Perfect voor thuisdecoratie of speciale cadeaus.',
             'product_mousepads_desc': 'Gepersonaliseerde fotomuismatten voor uw bureau. Perfect voor kantoor of thuisgebruik. Antislip rubberen basis en glad oppervlak voor optimale muisbediening.',
@@ -2335,5 +2335,6 @@ const languages = [
 // Default language (US English)
 let currentLanguage = languages[0];
 window.currentLanguage = currentLanguage;
+
 
 
