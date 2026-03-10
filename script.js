@@ -2580,7 +2580,7 @@ document.getElementById('paperUpgradePrice').textContent = formatPrice(paperUpgr
 document.getElementById('quantityMultiplier').textContent = formatPrice(priceBeforeQuantity * quantity);
 document.getElementById('advancedTotalPrice').textContent = formatPrice(totalPriceUSD);
 document.getElementById('finalPrice').textContent = formatPrice(totalPriceUSD);
-
+}
     
 // Handle when size is selected
 function onSizeSelect() {
@@ -5531,12 +5531,3 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
-
-
-
-
-
-
-
-
-
