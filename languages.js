@@ -397,7 +397,7 @@ const languages = [
             'product_canvas_desc': 'Your favourite photo mounted on high-quality canvas. Gallery-wrapped and ready to hang. Perfect for home decor or special gifts.',
             'product_mousepads_desc': 'Custom photo mouse pads for your desk. Perfect for office or home use. Non-slip rubber base and smooth surface for optimal mouse control.',
             'product_doublecards_desc': 'Elegant folded greeting cards for all special occasions. Perfect for invitations, thank you notes, or holiday greetings. Comes with matching envelopes.'
-            
+
         }
     },
 
@@ -588,7 +588,7 @@ const languages = [
     },
 
 
-        // ===== NORWEGIAN =====
+    // ===== NORWEGIAN =====
     {
         code: 'no',
         name: 'Norsk',
@@ -794,14 +794,14 @@ const languages = [
             // LOADING STATES
             'loading_cart': 'Laster handlekurv...',
             'back': 'Tilbake',
-            
+
             'product_photocards_desc': 'Lag personlige gratulasjonskort for enhver anledning. Perfekt for bursdager, høytider eller bare for å si takk. Velg mellom ulike størrelser og papirtyper som passer din stil.',
             'product_calendar_desc': 'Lag personlige kalendere med dine favorittbilder. Perfekt som gave eller hjemmedekorasjon. Velg mellom bord-, vegg- eller minikalendere som passer din stil.',
             'product_photobook_desc': 'Premium innbundne fotobøker for å samle minnene dine. Perfekt for bryllup, ferier eller familiealbum. Velg mellom ulike størrelser og bindingsalternativer.',
             'product_canvas_desc': 'Ditt favorittbilde montert på høykvalitets lerret. Gallerioppspent og klar til henging. Perfekt for hjemmedekorasjon eller spesielle gaver.',
             'product_mousepads_desc': 'Tilpassede fotomusmatter for skrivebordet ditt. Perfekt for kontor eller hjemmebruk. Sklisikker gummibase og glatt overflate for optimal musekontroll.',
             'product_doublecards_desc': 'Elegante brettede gratulasjonskort for alle spesielle anledninger. Perfekt for invitasjoner, takkekort eller julehilsener. Kommer med matchende konvolutter.'
-            
+
         }
     },
 
@@ -1021,7 +1021,7 @@ const languages = [
             'product_mousepads_desc': 'Tilpassede fotomusmåtter til dit skrivebord. Perfekt til kontor eller hjemmebrug. Skridsikker gummibase og glat overflade for optimal musekontrol.',
             'product_doublecards_desc': 'Elegante foldede lykønskningskort til alle særlige lejligheder. Perfekt til invitationer, takkekort eller julehilsner. Kommer med matchende kuverter.'
 
-        
+
         }
     },
 
@@ -1450,7 +1450,7 @@ const languages = [
             'product_canvas_desc': 'Suosikkikuvasi laadukkaalle canvas-pohjalle kiinnitettynä. Galleriakääritty ja valmis ripustettavaksi. Täydellinen kodin sisustukseen tai erityislahjaksi.',
             'product_mousepads_desc': 'Personoidut valokuvahiirimattosi työpöydällesi. Täydellinen toimistoon tai kotikäyttöön. Liukumaton kumipohja ja sileä pinta optimaalista hiiren hallintaa varten.',
             'product_doublecards_desc': 'Tyylikkäät taitettavat onnittelukortit kaikkiin erityistilaisuuksiin. Täydellinen kutsukortteihin, kiitoskortteihin tai joulutervehdyksiin. Toimitetaan yhteensopivien kirjekuorien kanssa.'
-            
+
         }
     },
 
@@ -1670,7 +1670,7 @@ const languages = [
             'product_mousepads_desc': 'Gepersonaliseerde fotomuismatten voor uw bureau. Perfect voor kantoor of thuisgebruik. Antislip rubberen basis en glad oppervlak voor optimale muisbediening.',
             'product_doublecards_desc': 'Elegante gevouwen wenskaarten voor alle speciale gelegenheden. Perfect voor uitnodigingen, bedankkaarten of kerstgroeten. Wordt geleverd met bijpassende enveloppen.'
 
-            
+
         }
     },
 
@@ -1888,7 +1888,7 @@ const languages = [
             'product_canvas_desc': 'Votre photo préférée montée sur toile de haute qualité. Tendue façon galerie et prête à être accrochée. Parfait pour la décoration intérieure ou les cadeaux spéciaux.',
             'product_mousepads_desc': 'Tapis de souris photo personnalisés pour votre bureau. Parfait pour le bureau ou la maison. Base en caoutchouc antidérapante et surface lisse pour un contrôle optimal de la souris.',
             'product_doublecards_desc': 'Cartes de vœux pliées élégantes pour toutes les occasions spéciales. Parfait pour les invitations, les remerciements ou les vœux de Noël. Livré avec des enveloppes assorties.'
-            
+
         }
     },
 
@@ -2099,15 +2099,15 @@ const languages = [
             // LOADING STATES
             'loading_cart': 'Caricamento carrello...',
             'back': 'Indietro',
-            
-            
-        'product_photocards_desc': 'Crea biglietti d\'auguri personalizzati per ogni occasione. Perfetto per compleanni, festività o semplicemente per dire grazie. Scegli tra varie dimensioni e tipi di carta che si adattano al tuo stile.',
-        'product_calendar_desc': 'Crea calendari personalizzati con le tue foto preferite. Perfetto come regalo o per la decorazione della casa. Scegli tra calendari da tavolo, da parete o mini che si adattano al tuo stile.',
-        'product_photobook_desc': 'Fotolibri rilegati di alta qualità per raccogliere i tuoi ricordi. Perfetto per matrimoni, vacanze o album di famiglia. Scegli tra varie dimensioni e opzioni di rilegatura.',
-        'product_canvas_desc': 'La tua foto preferita montata su tela di alta qualità. Tesa in stile galleria e pronta da appendere. Perfetto per l\'arredamento della casa o regali speciali.',
-        'product_mousepads_desc': 'Tappetini per mouse fotografici personalizzati per la tua scrivania. Perfetto per l\'ufficio o l\'uso domestico. Base in gomma antiscivolo e superficie liscia per un controllo ottimale del mouse.',
-        'product_doublecards_desc': 'Eleganti biglietti d\'auguri pieghevoli per tutte le occasioni speciali. Perfetto per inviti, biglietti di ringraziamento o auguri di Natale. Viene fornito con buste abbinate.'
-            
+
+
+            'product_photocards_desc': 'Crea biglietti d\'auguri personalizzati per ogni occasione. Perfetto per compleanni, festività o semplicemente per dire grazie. Scegli tra varie dimensioni e tipi di carta che si adattano al tuo stile.',
+            'product_calendar_desc': 'Crea calendari personalizzati con le tue foto preferite. Perfetto come regalo o per la decorazione della casa. Scegli tra calendari da tavolo, da parete o mini che si adattano al tuo stile.',
+            'product_photobook_desc': 'Fotolibri rilegati di alta qualità per raccogliere i tuoi ricordi. Perfetto per matrimoni, vacanze o album di famiglia. Scegli tra varie dimensioni e opzioni di rilegatura.',
+            'product_canvas_desc': 'La tua foto preferita montata su tela di alta qualità. Tesa in stile galleria e pronta da appendere. Perfetto per l\'arredamento della casa o regali speciali.',
+            'product_mousepads_desc': 'Tappetini per mouse fotografici personalizzati per la tua scrivania. Perfetto per l\'ufficio o l\'uso domestico. Base in gomma antiscivolo e superficie liscia per un controllo ottimale del mouse.',
+            'product_doublecards_desc': 'Eleganti biglietti d\'auguri pieghevoli per tutte le occasioni speciali. Perfetto per inviti, biglietti di ringraziamento o auguri di Natale. Viene fornito con buste abbinate.'
+
         }
     },
 
@@ -2326,15 +2326,16 @@ const languages = [
             'product_mousepads_desc': 'Εξατομικευμένα ποντικοπατάκια με φωτογραφία για το γραφείο σας. Ιδανικό για γραφείο ή οικιακή χρήση. Αντιολισθητική βάση από καουτσούκ και λεία επιφάνεια για βέλτιστο έλεγχο του ποντικιού.',
             'product_doublecards_desc': 'Κομψές διπλωμένες ευχετήριες κάρτες για όλες τις ειδικές περιστάσεις. Ιδανικό για προσκλήσεις, ευχαριστήριες κάρτες ή χριστουγεννιάτικες ευχές. Συνοδεύεται από αντίστοιχους φακέλους.'
 
-            
+
         }
     }
 ]; // ← FINAL CLOSING BRACKET!
 
 // Default language (US English)
-let currentLanguage = languages[0];
-window.currentLanguage = currentLanguage;
-
+// Expose default via window to avoid redeclaring the identifier in other scripts
+if (typeof window.currentLanguage === 'undefined') {
+    window.currentLanguage = languages[0];
+}
 
 
 
