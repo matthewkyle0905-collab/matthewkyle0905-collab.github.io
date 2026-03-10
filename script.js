@@ -345,6 +345,11 @@ function loadProductDetails(productType) {
     
     // Store selected product for editor
     document.getElementById('openEditorBtn').setAttribute('data-product', product.productType);
+    
+    updateAllText();
+    updateAllPrices();
+    
+    
 }
 
 // ============== MODIFY SLIDESHOW ==============
@@ -5531,3 +5536,4 @@ window.updateQuantity = updateQuantity;
 window.calculatePrice = calculatePrice;
 window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
+
