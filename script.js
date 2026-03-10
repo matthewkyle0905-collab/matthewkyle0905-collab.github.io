@@ -1,12 +1,12 @@
 // ============== LANGUAGE SYSTEM ==============
 // Get currentLanguage from languages.js (loaded first)
 if (typeof window.currentLanguage === 'undefined') {
-    window.currentLanguage = { 
-        code: 'us', 
-        name: 'English (US)', 
-        flag: '🇺🇸', 
-        currency: 'USD', 
-        symbol: '$', 
+    window.currentLanguage = {
+        code: 'us',
+        name: 'English (US)',
+        flag: '🇺🇸',
+        currency: 'USD',
+        symbol: '$',
         rate: 1,
         translations: {}
     };
@@ -19,14 +19,14 @@ function initLanguageDropdown() {
     const languageBtn = document.getElementById('languageBtn');
     const languageMenu = document.getElementById('languageMenu');
     const languageDropdown = document.getElementById('languageDropdown');
-    
+
     if (!languageBtn || !languageMenu) return;
-    
+
     if (typeof languages === 'undefined') {
         console.error('languages not defined! Make sure languages.js loads first.');
         return;
     }
-    
+
     languageMenu.innerHTML = '';
     languages.forEach(lang => {
         const item = document.createElement('div');
@@ -41,43 +41,43 @@ function initLanguageDropdown() {
         item.addEventListener('click', () => selectLanguage(lang));
         languageMenu.appendChild(item);
     });
-    
+
     languageBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         languageDropdown.classList.toggle('open');
     });
-    
+
     document.addEventListener('click', (e) => {
         if (!languageDropdown.contains(e.target)) {
             languageDropdown.classList.remove('open');
         }
     });
-    
+
     updateLanguageButton();
 }
 
 function selectLanguage(lang) {
     currentLanguage = lang;
     window.currentLanguage = lang;
-    
+
     document.querySelectorAll('.language-item').forEach(item => {
         item.classList.remove('active');
         if (item.getAttribute('data-language') === lang.code) {
             item.classList.add('active');
         }
     });
-    
+
     updateLanguageButton();
     updateAllText();
     updateAllPrices();
-    
+
     localStorage.setItem('preferredLanguage', lang.code);
 }
 
 function updateLanguageButton() {
     const btn = document.getElementById('languageBtn');
     if (!btn) return;
-    
+
     btn.innerHTML = `
         <span class="flag-icon">${currentLanguage.flag}</span>
         <span class="language-name">${currentLanguage.name}</span>
@@ -97,8 +97,8 @@ function updateAllText() {
 
 function formatPrice(usdPrice) {
     const convertedPrice = usdPrice * currentLanguage.rate;
-    
-    switch(currentLanguage.currency) {
+
+    switch (currentLanguage.currency) {
         case 'USD':
             return `$${convertedPrice.toFixed(2)}`;
         case 'GBP':
@@ -121,7 +121,7 @@ function updateAllPrices() {
             element.textContent = formatPrice(usdPrice);
         }
     });
-    
+
     document.querySelectorAll('[data-php]').forEach(element => {
         const phpPrice = parseFloat(element.getAttribute('data-php'));
         if (!isNaN(phpPrice)) {
@@ -129,7 +129,7 @@ function updateAllPrices() {
             element.textContent = formatPrice(usdPrice);
         }
     });
-    
+
     document.querySelectorAll('.slide-price[data-php]').forEach(el => {
         const phpPrice = parseFloat(el.getAttribute('data-php'));
         if (!isNaN(phpPrice)) {
@@ -168,7 +168,7 @@ const printOptionsConfig = {
         { value: "5x7", label: "5x7", price: "70.00" },
         { value: "8x10", label: "8x10", price: "95.00" }
     ]
-}; 
+};
 window.printOptionsConfig = printOptionsConfig;
 
 // ============== PRODUCT DATABASE ==============
@@ -299,15 +299,15 @@ const productDatabase = {
 function loadProductDetails(productType) {
     const product = productDatabase[productType];
     if (!product) return;
-    
+
     document.getElementById('productMainImage').src = product.mainImage;
     document.getElementById('productName').textContent = product.name;
-    
+
     const priceElement = document.getElementById('productPrice');
     const productUsdPrice = (product.basePricePHP * 0.018).toFixed(2);
     priceElement.setAttribute('data-usd', productUsdPrice);
     priceElement.textContent = `$${productUsdPrice}`;
-    
+
     document.getElementById('productDescription').textContent = product.description;
     document.getElementById('productIcon').textContent = product.icon;
 
@@ -315,21 +315,21 @@ function loadProductDetails(productType) {
     const descriptionKey = `product_${productType}_desc`;
     descriptionElement.setAttribute('data-i18n', descriptionKey);
     descriptionElement.textContent = currentLanguage.translations[descriptionKey] || product.description;
-    
+
     const thumbnailsContainer = document.getElementById('productThumbnails');
     thumbnailsContainer.innerHTML = '';
     product.thumbnails.forEach((thumb, index) => {
         const thumbDiv = document.createElement('div');
         thumbDiv.className = `thumbnail-item ${index === 0 ? 'active' : ''}`;
         thumbDiv.innerHTML = `<img src="${thumb}" alt="Variation ${index + 1}">`;
-        thumbDiv.addEventListener('click', function() {
+        thumbDiv.addEventListener('click', function () {
             document.getElementById('productMainImage').src = thumb;
             document.querySelectorAll('.thumbnail-item').forEach(item => item.classList.remove('active'));
             this.classList.add('active');
         });
         thumbnailsContainer.appendChild(thumbDiv);
     });
-    
+
     const sizesContainer = document.getElementById('productSizes');
     sizesContainer.innerHTML = '';
     product.sizes.forEach(size => {
@@ -340,7 +340,7 @@ function loadProductDetails(productType) {
         sizeDiv.innerHTML = `<span data-i18n="size_${size.value}">${size.label}</span> <span data-usd="${usdPrice}">$${usdPrice}</span>`;
         sizesContainer.appendChild(sizeDiv);
     });
-    
+
     const paperContainer = document.getElementById('productPaperTypes');
     paperContainer.innerHTML = '';
     product.paperTypes.forEach(paper => {
@@ -350,9 +350,9 @@ function loadProductDetails(productType) {
         paperDiv.innerHTML = `<span>${paper.name}</span> <span data-usd="${usdPrice}">+$${usdPrice}</span>`;
         paperContainer.appendChild(paperDiv);
     });
-    
+
     document.getElementById('openEditorBtn').setAttribute('data-product', product.productType);
-    
+
     updateAllText();
     updateAllPrices();
 }
@@ -365,13 +365,13 @@ class Slideshow {
         this.prevBtn = document.getElementById('slideshowPrev');
         this.nextBtn = document.getElementById('slideshowNext');
         this.pauseBtn = document.getElementById('slideshowPause');
-        
+
         this.currentIndex = 0;
         this.totalSlides = 0;
         this.isPaused = false;
         this.interval = null;
         this.autoPlayDelay = 5000;
-        
+
         this.products = [
             { name: 'Photo Cards', pricePHP: 25, image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Create personalized greeting cards' },
             { name: 'Calendar', pricePHP: 60, image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Make your own custom calendar' },
@@ -382,13 +382,13 @@ class Slideshow {
         ];
         this.init();
     }
-    
+
     init() {
         if (!this.track) {
             console.error('Slideshow track not found');
             return;
         }
-        
+
         this.totalSlides = this.products.length;
         this.renderSlides();
         this.createDots();
@@ -396,11 +396,11 @@ class Slideshow {
         this.startAutoPlay();
         this.updateSlidePosition(0);
     }
-    
+
     renderSlides() {
         this.track.innerHTML = '';
         this.track.style.width = `${this.totalSlides * 100}%`;
-        
+
         this.products.forEach(product => {
             const slide = document.createElement('div');
             slide.className = 'slide-card';
@@ -421,10 +421,10 @@ class Slideshow {
             this.track.appendChild(slide);
         });
     }
-    
+
     createDots() {
         if (!this.dotsContainer) return;
-        
+
         this.dotsContainer.innerHTML = '';
         for (let i = 0; i < this.totalSlides; i++) {
             const dot = document.createElement('button');
@@ -434,7 +434,7 @@ class Slideshow {
             this.dotsContainer.appendChild(dot);
         }
     }
-    
+
     setupEventListeners() {
         if (this.prevBtn) {
             const newPrev = this.prevBtn.cloneNode(true);
@@ -442,70 +442,70 @@ class Slideshow {
             this.prevBtn = newPrev;
             this.prevBtn.addEventListener('click', () => this.prevSlide());
         }
-        
+
         if (this.nextBtn) {
             const newNext = this.nextBtn.cloneNode(true);
             this.nextBtn.parentNode.replaceChild(newNext, this.nextBtn);
             this.nextBtn = newNext;
             this.nextBtn.addEventListener('click', () => this.nextSlide());
         }
-        
+
         if (this.pauseBtn) {
             const newPause = this.pauseBtn.cloneNode(true);
             this.pauseBtn.parentNode.replaceChild(newPause, this.pauseBtn);
             this.pauseBtn = newPause;
             this.pauseBtn.addEventListener('click', () => this.togglePause());
         }
-        
+
         window.addEventListener('resize', () => {
             this.updateSlidePosition(this.currentIndex);
         });
     }
-    
+
     updateSlidePosition(index) {
         if (index < 0) index = this.totalSlides - 1;
         if (index >= this.totalSlides) index = 0;
-        
+
         const translateX = -(index * 100 / this.totalSlides) + '%';
         this.track.style.transform = `translateX(${translateX})`;
-        
+
         const dots = document.querySelectorAll('.dot');
         dots.forEach((dot, i) => {
             dot.classList.toggle('active', i === index);
         });
-        
+
         this.currentIndex = index;
     }
-    
+
     nextSlide() {
         const nextIndex = (this.currentIndex + 1) % this.totalSlides;
         this.updateSlidePosition(nextIndex);
     }
-    
+
     prevSlide() {
         const prevIndex = (this.currentIndex - 1 + this.totalSlides) % this.totalSlides;
         this.updateSlidePosition(prevIndex);
     }
-    
+
     goToSlide(index) {
         if (index >= 0 && index < this.totalSlides) {
             this.updateSlidePosition(index);
         }
     }
-    
+
     togglePause() {
         this.isPaused = !this.isPaused;
         if (this.pauseBtn) {
             this.pauseBtn.innerHTML = this.isPaused ? '▶️ Play' : '⏸️ Pause';
         }
-        
+
         if (this.isPaused) {
             this.stopAutoPlay();
         } else {
             this.startAutoPlay();
         }
     }
-    
+
     startAutoPlay() {
         this.stopAutoPlay();
         this.interval = setInterval(() => {
@@ -514,7 +514,7 @@ class Slideshow {
             }
         }, this.autoPlayDelay);
     }
-    
+
     stopAutoPlay() {
         if (this.interval) {
             clearInterval(this.interval);
@@ -585,16 +585,16 @@ let currentUnit = 'inches';
 
 function convertSize(sizeInInches, targetUnit) {
     if (!sizeInInches) return '';
-    
+
     const parts = sizeInInches.split('x');
     if (parts.length !== 2) return sizeInInches;
-    
+
     const width = parseFloat(parts[0]);
     const height = parseFloat(parts[1]);
-    
+
     if (isNaN(width) || isNaN(height)) return sizeInInches;
-    
-    switch(targetUnit) {
+
+    switch (targetUnit) {
         case 'cm':
             return `${(width * 2.54).toFixed(1)}x${(height * 2.54).toFixed(1)}`;
         case 'mm':
@@ -606,7 +606,7 @@ function convertSize(sizeInInches, targetUnit) {
 }
 
 function getUnitSymbol(unit) {
-    switch(unit) {
+    switch (unit) {
         case 'cm': return 'cm';
         case 'mm': return 'mm';
         default: return '"';
@@ -616,25 +616,25 @@ function getUnitSymbol(unit) {
 function updateUnitDisplay() {
     const container = document.getElementById('sizeOptionsContainer');
     if (!container) return;
-    
+
     const sizeLabels = container.querySelectorAll('.size-label');
     const sizePriceSpans = container.querySelectorAll('.size-price');
     const radioInputs = container.querySelectorAll('input[name="advancedPrintSize"]');
-    
+
     radioInputs.forEach((radio, index) => {
         if (radio.value === 'custom') return;
-        
+
         const sizeValue = radio.value;
         const sizeLabel = sizeLabels[index];
         const sizePrice = sizePriceSpans[index];
-        
+
         if (sizeLabel) {
             sizeLabel.innerHTML = sizeValue + '"';
-            
+
             if (currentUnit !== 'inches') {
                 const convertedSize = convertSize(sizeValue, currentUnit);
                 const unitSymbol = getUnitSymbol(currentUnit);
-                
+
                 let convertedSpan = sizeLabel.parentElement.querySelector('.converted-size');
                 if (!convertedSpan) {
                     convertedSpan = document.createElement('span');
@@ -653,7 +653,7 @@ function updateUnitDisplay() {
             }
         }
     });
-    
+
     updateCustomSizeUnit();
 }
 
@@ -661,12 +661,12 @@ function updateCustomSizeUnit() {
     const widthInput = document.getElementById('customWidth');
     const heightInput = document.getElementById('customHeight');
     const unitSelect = document.getElementById('customUnit');
-    
+
     if (!widthInput || !heightInput || !unitSelect) return;
-    
+
     const currentWidthInInches = parseFloat(widthInput.getAttribute('data-inches') || widthInput.value);
     const currentHeightInInches = parseFloat(heightInput.getAttribute('data-inches') || heightInput.value);
-    
+
     if (currentUnit === 'inches') {
         widthInput.value = currentWidthInInches;
         heightInput.value = currentHeightInInches;
@@ -680,7 +680,7 @@ function updateCustomSizeUnit() {
         heightInput.value = Math.round(currentHeightInInches * 25.4);
         unitSelect.value = 'cm';
     }
-    
+
     widthInput.setAttribute('data-inches', currentWidthInInches);
     heightInput.setAttribute('data-inches', currentHeightInInches);
 }
@@ -871,7 +871,7 @@ function sendMessage() {
         if (window.socket && window.socket.connected) {
             try {
                 window.socket.emit('message', { sender: 'bot', text: response, time: new Date().toLocaleTimeString() });
-            } catch (e) {}
+            } catch (e) { }
         }
     }, 1000);
 
@@ -941,11 +941,11 @@ function addToCart(item) {
     if (!item.sizeMode) {
         item.sizeMode = 'fill';
     }
-    
+
     if (item.selected === undefined) {
         item.selected = true;
     }
-    
+
     const existingItemIndex = shoppingCart.findIndex(cartItem =>
         cartItem.id === item.id &&
         cartItem.type === item.type &&
@@ -1369,7 +1369,7 @@ function navigateTo(pageId) {
             switchPhotoMode('upload');
         }, 50);
     }
-    
+
     if (pageId === 'cart-page') {
         setTimeout(() => {
             renderCartPage();
@@ -2119,7 +2119,7 @@ function selectProduct(type) {
     });
 
     updateProductBadge(type);
-    
+
     updatePrintOptions(type);
 
     if (templates[type]) {
@@ -2146,41 +2146,41 @@ function updateQuantity(change) {
 
 window.calculatePrice = function calculatePrice() {
     console.log('💰 Calculating price in USD...');
-    
+
     const productType = window.currentProduct || 'photocards';
     console.log('1. Product type:', productType);
-    
+
     const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
     console.log('2. Selected size element:', selectedSize);
-    
+
     let basePriceUSD = 0.45;
-    
+
     if (selectedSize) {
         const sizeValue = selectedSize.value;
         console.log('3. Size value:', sizeValue);
-        
+
         if (sizeValue === 'custom') {
             const width = parseFloat(document.getElementById('customWidth')?.value) || 8;
             const height = parseFloat(document.getElementById('customHeight')?.value) || 10;
             const area = width * height;
             basePriceUSD = Math.max(0.45, Math.round(area * 0.009 * 100) / 100);
-            console.log('4. Custom size calculation:', {width, height, area, basePriceUSD});
+            console.log('4. Custom size calculation:', { width, height, area, basePriceUSD });
         } else {
             const options = window.printOptionsConfig?.[productType] || window.printOptionsConfig?.photocards || [];
             console.log('4. Options for this product:', options);
-            
+
             const option = options.find(opt => opt.value === sizeValue);
             console.log('5. Found option:', option);
-            
+
             basePriceUSD = option ? parseFloat(option.price) * 0.018 : 0.45;
             console.log('6. Calculated basePriceUSD:', basePriceUSD);
         }
     } else {
         console.log('3. No size selected, using default');
     }
-    
+
     console.log('7. Final basePriceUSD before paper:', basePriceUSD);
-    
+
     let paperUpgradeUSD = 0;
     const selectedPaper = document.querySelector('input[name="paperType"]:checked');
     console.log('8. Selected paper element:', selectedPaper);
@@ -2189,63 +2189,63 @@ window.calculatePrice = function calculatePrice() {
     if (selectedPaper) {
         const paperValue = selectedPaper.value;
         console.log('10. Paper value:', paperValue);
-        
-        switch(paperValue) {
-            case 'glossy': 
-                paperUpgradeUSD = 0.18; 
+
+        switch (paperValue) {
+            case 'glossy':
+                paperUpgradeUSD = 0.18;
                 console.log('11. Glossy selected: $0.18');
                 break;
-            case 'matte': 
-                paperUpgradeUSD = 0.27; 
+            case 'matte':
+                paperUpgradeUSD = 0.27;
                 console.log('11. Matte selected: $0.27');
                 break;
-            case 'premium': 
-                paperUpgradeUSD = 0.45; 
+            case 'premium':
+                paperUpgradeUSD = 0.45;
                 console.log('11. Premium selected: $0.45');
                 break;
-            default: 
-                paperUpgradeUSD = 0; 
+            default:
+                paperUpgradeUSD = 0;
                 console.log('11. Standard selected: $0.00');
         }
     } else {
         console.log('10. No paper selected, defaulting to 0');
     }
     console.log('12. Final paperUpgradeUSD:', paperUpgradeUSD);
-    
+
     const quantity = parseInt(document.getElementById('quantityDisplay')?.textContent || '1');
     console.log('13. Quantity:', quantity);
-    
+
     const priceBeforeQuantity = basePriceUSD + paperUpgradeUSD;
     const totalPriceUSD = priceBeforeQuantity * quantity;
-    
+
     console.log(`14. 📏 Base: $${basePriceUSD.toFixed(2)}, 📄 Paper: $${paperUpgradeUSD.toFixed(2)}, 🔢 Qty: ${quantity}, 💰 Total: $${totalPriceUSD.toFixed(2)}`);
-    
+
     document.getElementById('basePrice')?.setAttribute('data-usd', basePriceUSD);
     document.getElementById('paperUpgradePrice')?.setAttribute('data-usd', paperUpgradeUSD);
     document.getElementById('quantityMultiplier')?.setAttribute('data-usd', priceBeforeQuantity * quantity);
     document.getElementById('advancedTotalPrice')?.setAttribute('data-usd', totalPriceUSD);
     document.getElementById('finalPrice')?.setAttribute('data-usd', totalPriceUSD);
-    
 
-document.getElementById('basePrice').textContent = formatPrice(basePriceUSD);
-document.getElementById('paperUpgradePrice').textContent = formatPrice(paperUpgradeUSD);
-document.getElementById('quantityMultiplier').textContent = formatPrice(priceBeforeQuantity * quantity);
-document.getElementById('advancedTotalPrice').textContent = formatPrice(totalPriceUSD);
-document.getElementById('finalPrice').textContent = formatPrice(totalPriceUSD);
+
+    document.getElementById('basePrice').textContent = formatPrice(basePriceUSD);
+    document.getElementById('paperUpgradePrice').textContent = formatPrice(paperUpgradeUSD);
+    document.getElementById('quantityMultiplier').textContent = formatPrice(priceBeforeQuantity * quantity);
+    document.getElementById('advancedTotalPrice').textContent = formatPrice(totalPriceUSD);
+    document.getElementById('finalPrice').textContent = formatPrice(totalPriceUSD);
 }
-    
+
 function onSizeSelect() {
     const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
     if (!selectedSize) return;
-    
+
     const customSizeContainer = document.getElementById('customSizeContainer');
-    
+
     if (selectedSize.value === 'custom') {
         customSizeContainer.style.display = 'block';
         document.getElementById('customWidth').disabled = false;
         document.getElementById('customHeight').disabled = false;
         document.getElementById('customUnit').disabled = false;
-        
+
         updateCustomSizeUnit();
     } else {
         customSizeContainer.style.display = 'none';
@@ -2253,22 +2253,22 @@ function onSizeSelect() {
         document.getElementById('customHeight').disabled = true;
         document.getElementById('customUnit').disabled = true;
     }
-    
+
     calculatePrice();
 }
 
 function updatePrintOptions(productType) {
     console.log('Updating print options for:', productType);
     const container = document.getElementById('sizeOptionsContainer');
-    
+
     if (!container) {
         console.error('Size options container not found!');
         return;
     }
-    
+
     const options = printOptionsConfig[productType] || printOptionsConfig.photocards;
     console.log('Options:', options);
-    
+
     let html = '';
     options.forEach(opt => {
         const usdPrice = (parseFloat(opt.price) * 0.018).toFixed(2);
@@ -2280,25 +2280,25 @@ function updatePrintOptions(productType) {
             </label>
         `;
     });
-    
+
     html += `
         <label class="print-size-btn small custom">
             <input type="radio" name="advancedPrintSize" value="custom" onchange="onSizeSelect()">
             <span class="size-label">Custom</span>
         </label>
     `;
-    
+
     container.innerHTML = html;
-    
+
     const firstRadio = container.querySelector('input[type="radio"]');
     if (firstRadio) {
         firstRadio.checked = true;
     }
-    
+
     if (typeof updateUnitDisplay === 'function') {
         updateUnitDisplay();
     }
-    
+
     if (typeof calculatePrice === 'function') {
         calculatePrice();
     }
@@ -2309,7 +2309,7 @@ function initPrintOptions() {
     advancedInputs.forEach(id => {
         const element = document.getElementById(id);
         if (element) {
-            element.addEventListener('input', function() {
+            element.addEventListener('input', function () {
                 if (currentUnit === 'inches') {
                     this.setAttribute('data-inches', this.value);
                 }
@@ -2317,38 +2317,38 @@ function initPrintOptions() {
             });
         }
     });
-    
+
     document.querySelectorAll('input[name="paperType"]').forEach(radio => {
         radio.addEventListener('change', calculatePrice);
     });
-    
+
     updatePrintOptions(currentProduct || 'photocards');
 }
 
-window.addPhotoToCart = function() {
+window.addPhotoToCart = function () {
     if (uploadedImages.length === 0) {
         alert('Please upload at least one photo first.');
         return;
     }
-    
+
     let size, price, paperType = 'standard', sizeMode = 'fill', isCustom = false;
     let customWidth = null, customHeight = null, customUnit = 'inches';
-    
+
     const sizeModeRadio = document.querySelector('input[name="sizeMode"]:checked');
     sizeMode = sizeModeRadio ? sizeModeRadio.value : 'fill';
-    
+
     const paperTypeRadio = document.querySelector('input[name="paperType"]:checked');
     paperType = paperTypeRadio ? paperTypeRadio.value : 'standard';
-    
+
     const selectedSize = document.querySelector('input[name="advancedPrintSize"]:checked');
     size = selectedSize ? selectedSize.value : '4x6';
-    
+
     if (size === 'custom') {
         isCustom = true;
         const widthInput = document.getElementById('customWidth');
         const heightInput = document.getElementById('customHeight');
         const unitSelect = document.getElementById('customUnit');
-        
+
         if (currentUnit === 'cm') {
             customWidth = (parseFloat(widthInput.value) / 2.54).toFixed(2);
             customHeight = (parseFloat(heightInput.value) / 2.54).toFixed(2);
@@ -2359,23 +2359,23 @@ window.addPhotoToCart = function() {
             customWidth = widthInput.value;
             customHeight = heightInput.value;
         }
-        
+
         customUnit = 'inches';
         size = `${customWidth} x ${customHeight} ${customUnit}`;
     }
-    
+
     price = document.getElementById('advancedTotalPrice').textContent;
-    
+
     const productName = productDisplayNames[currentProduct] || 'Photo';
-    
+
     const photosData = uploadedImages.map(img => ({
         name: img.name,
         thumbnail: img.src,
     }));
-    
+
     const basePrice = parseFloat(price.toString().replace('₱', '')) || 0;
     const totalPrice = basePrice * uploadedImages.length;
-    
+
     const cartItem = {
         id: 'photo-' + Date.now(),
         type: 'photo',
@@ -2383,12 +2383,12 @@ window.addPhotoToCart = function() {
         productName: productName,
         name: `${productName} (${size}) - ${uploadedImages.length} photos`,
         size: size,
-        
+
         photos: photosData,
         photoCount: uploadedImages.length,
-        
+
         displayImage: uploadedImages[0]?.src || null,
-        
+
         price: `₱${totalPrice.toFixed(2)}`,
         basePrice: basePrice,
         quantity: 1,
@@ -2400,26 +2400,26 @@ window.addPhotoToCart = function() {
         timestamp: new Date().toISOString(),
         selected: true
     };
-    
+
     addToCart(cartItem);
-    
+
     uploadedImages = [];
     currentImageIndex = -1;
     updateImageGallery();
-    
+
     const canvas = document.getElementById('photoCanvas');
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     const overlay = document.getElementById('canvasOverlay');
     if (overlay) overlay.style.display = 'block';
-    
+
     document.getElementById('uploadCount').textContent = '0';
-    
+
     currentQuantity = 1;
     document.getElementById('quantityDisplay').textContent = '1';
     calculatePrice();
-    
+
     console.log('✨ Editor reset complete! Cart has thumbnails only');
 };
 
@@ -3139,7 +3139,7 @@ function updateLoginStatus() {
     } else if (loginLink) {
         loginLink.textContent = 'Log in';
         loginLink.onclick = function () {
-            openLoginModal();  
+            openLoginModal();
             return false;
         };
     }
@@ -3727,10 +3727,10 @@ let lastSearchQuery = localStorage.getItem('lastSearch') || 'canvas prints...';
 function initSearchBar() {
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) return;
-    
+
     searchInput.placeholder = lastSearchQuery;
-    
-    searchInput.addEventListener('keypress', function(e) {
+
+    searchInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             const query = this.value.trim();
@@ -3741,30 +3741,30 @@ function initSearchBar() {
             }
         }
     });
-    
+
     const searchIcon = document.querySelector('.search-icon');
     if (searchIcon) {
-        searchIcon.addEventListener('click', function() {
+        searchIcon.addEventListener('click', function () {
             const query = searchInput.value.trim();
             if (query) {
                 performSearch(query);
             }
         });
     }
-    
+
     console.log('Search bar initialized');
 }
 
 function performSearch(query) {
     console.log('Performing search for:', query);
-    
+
     if (!query) return;
-    
+
     localStorage.setItem('lastSearch', query);
     document.getElementById('searchInput').placeholder = query;
-    
+
     navigateTo('shop');
-    
+
     setTimeout(() => {
         filterProducts(query);
     }, 300);
@@ -3772,43 +3772,43 @@ function performSearch(query) {
 
 function filterProducts(query) {
     console.log('Filtering products for:', query);
-    
+
     const shopGrid = document.getElementById('shopProductsGrid');
     if (!shopGrid) {
         console.log('Shop grid not found');
         return;
     }
-    
+
     if (!shopGrid.hasChildNodes() || shopGrid.children.length === 0) {
         console.log('No products in grid, rendering first...');
         renderShopProducts();
         setTimeout(() => filterProducts(query), 200);
         return;
     }
-    
+
     const productCards = shopGrid.querySelectorAll('.product-card');
     console.log('Found', productCards.length, 'product cards');
-    
+
     if (productCards.length === 0) return;
-    
+
     const searchTerm = query.toLowerCase();
     let matchCount = 0;
-    
+
     const existingNoResults = shopGrid.querySelector('.no-results-message');
     if (existingNoResults) existingNoResults.remove();
-    
+
     const searchInfo = document.getElementById('searchResultsInfo');
     const searchText = document.getElementById('searchResultsText');
-    
+
     if (searchInfo && searchText) {
         searchInfo.style.display = 'flex';
     }
-    
+
     productCards.forEach(card => {
         const title = card.querySelector('h3, h4')?.textContent.toLowerCase() || '';
         const desc = card.querySelector('.product-desc, p')?.textContent.toLowerCase() || '';
         const priceText = card.querySelector('.price')?.textContent.toLowerCase() || '';
-        
+
         if (title.includes(searchTerm) || desc.includes(searchTerm) || priceText.includes(searchTerm)) {
             card.classList.add('search-highlight');
             card.classList.remove('search-dim');
@@ -3819,13 +3819,13 @@ function filterProducts(query) {
             card.classList.remove('search-highlight');
         }
     });
-    
+
     console.log('Total matches:', matchCount);
-    
+
     if (searchText) {
         searchText.innerHTML = `Found <span>${matchCount}</span> result${matchCount !== 1 ? 's' : ''} for: <span>"${query}"</span>`;
     }
-    
+
     if (matchCount === 0) {
         const noResults = document.createElement('div');
         noResults.className = 'no-results-message';
@@ -3841,22 +3841,22 @@ function filterProducts(query) {
 
 function clearSearch() {
     console.log('Clearing search');
-    
+
     const shopGrid = document.getElementById('shopProductsGrid');
     if (!shopGrid) return;
-    
+
     shopGrid.querySelectorAll('.product-card').forEach(card => {
         card.classList.remove('search-highlight', 'search-dim');
     });
-    
+
     const noResults = shopGrid.querySelector('.no-results-message');
     if (noResults) noResults.remove();
-    
+
     const searchInfo = document.getElementById('searchResultsInfo');
     if (searchInfo) {
         searchInfo.style.display = 'none';
     }
-    
+
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.value = '';
@@ -3909,7 +3909,7 @@ function base64ToBlob(base64, mimeType) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], {type: mimeType});
+    return new Blob([byteArray], { type: mimeType });
 }
 
 async function getOrCreateOrdersFolder() {
@@ -3919,20 +3919,20 @@ async function getOrCreateOrdersFolder() {
             fields: 'files(id, name)',
             spaces: 'drive'
         });
-        
+
         let c8Folder;
         if (response.result.files.length > 0) {
             c8Folder = response.result.files[0];
         } else {
             c8Folder = await createDriveFolder('C8FOCENTER');
         }
-        
+
         const ordersResponse = await gapi.client.drive.files.list({
             q: `name='orders' and '${c8Folder.id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
             fields: 'files(id, name)',
             spaces: 'drive'
         });
-        
+
         if (ordersResponse.result.files.length > 0) {
             return ordersResponse.result.files[0].id;
         } else {
@@ -3953,12 +3953,12 @@ async function createDriveFolder(folderName, parentId = null) {
     if (parentId) {
         metadata.parents = [parentId];
     }
-    
+
     const response = await gapi.client.drive.files.create({
         resource: metadata,
         fields: 'id, name'
     });
-    
+
     return response.result;
 }
 
@@ -3966,10 +3966,10 @@ async function uploadFileToDrive(fileName, content, folderId) {
     const boundary = '-------' + Date.now();
     const delimiter = '\r\n--' + boundary + '\r\n';
     const closeDelimiter = '\r\n--' + boundary + '--';
-    
+
     let contentType;
     let bodyContent;
-    
+
     if (fileName.endsWith('.jpg')) {
         contentType = 'image/jpeg';
         const blob = base64ToBlob(content, 'image/jpeg');
@@ -3978,27 +3978,27 @@ async function uploadFileToDrive(fileName, content, folderId) {
         contentType = 'text/plain';
         bodyContent = content;
     }
-    
+
     const metadata = {
         name: fileName,
         mimeType: contentType,
         parents: [folderId]
     };
-    
+
     if (fileName.endsWith('.jpg')) {
         const form = new FormData();
         form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
         form.append('file', bodyContent);
-        
+
         const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
             method: 'POST',
             headers: new Headers({ 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }),
             body: form
         });
-        
+
         return await response.json();
     } else {
-        const multipartRequestBody = 
+        const multipartRequestBody =
             delimiter +
             'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
             JSON.stringify(metadata) +
@@ -4006,7 +4006,7 @@ async function uploadFileToDrive(fileName, content, folderId) {
             'Content-Type: ' + contentType + '\r\n\r\n' +
             bodyContent +
             closeDelimiter;
-        
+
         const response = await gapi.client.request({
             path: '/upload/drive/v3/files',
             method: 'POST',
@@ -4014,7 +4014,7 @@ async function uploadFileToDrive(fileName, content, folderId) {
             headers: { 'Content-Type': 'multipart/related; boundary="' + boundary + '"' },
             body: multipartRequestBody
         });
-        
+
         return response.result;
     }
 }
@@ -4022,13 +4022,13 @@ async function uploadFileToDrive(fileName, content, folderId) {
 function generateConditionFile(orderData) {
     let content = `[OutDevice]\n    DeviceName= SP-1500sRGB\n\n`;
     content += `[ImageList]\n    ImageCnt=${orderData.photos.length}\n`;
-    
+
     orderData.photos.forEach((photo, index) => {
-        content += `    ${index+1}=${index+1}.jpg\n`;
+        content += `    ${index + 1}=${index + 1}.jpg\n`;
     });
-    
+
     orderData.photos.forEach((photo, index) => {
-        content += `\n[${index+1}.jpg]\n`;
+        content += `\n[${index + 1}.jpg]\n`;
         content += `    SizeName=${photo.size || '102C'}\n`;
         content += `    PrintCnt=${photo.quantity || 1}\n`;
         content += `    BackPrint=FILE\n`;
@@ -4036,7 +4036,7 @@ function generateConditionFile(orderData) {
         content += `    Resize=${photo.resize || 'FITIN'}\n`;
         content += `    DSC_Chk=FALSE\n`;
     });
-    
+
     return content;
 }
 
@@ -4053,7 +4053,7 @@ function generateEndFile(orderData) {
 
 function generateReceiptFile(orderData) {
     const filenameCount = {};
-    
+
     let receipt = "=".repeat(60) + "\n";
     receipt += "                    FOTOCENTER ORDER RECEIPT\n";
     receipt += "=".repeat(60) + "\n\n";
@@ -4061,13 +4061,13 @@ function generateReceiptFile(orderData) {
     receipt += `Customer: ${orderData.username}\n`;
     receipt += `Date: ${new Date().toLocaleString()}\n`;
     receipt += `Order #: ${orderData.orderCount}\n\n`;
-    
+
     receipt += "-".repeat(60) + "\n";
     receipt += "Item                          Price    Size       Paper Type\n";
     receipt += "-".repeat(60) + "\n";
-    
+
     let totalAmount = 0;
-    
+
     orderData.photos.forEach((photo, index) => {
         let displayName = photo.originalName || `Photo_${index + 1}`;
         if (filenameCount[displayName]) {
@@ -4081,34 +4081,34 @@ function generateReceiptFile(orderData) {
         } else {
             filenameCount[displayName] = 1;
         }
-        
+
         if (displayName.length > 25) {
             displayName = displayName.substring(0, 22) + "...";
         }
-        
+
         let sizeDisplay = photo.size || '4x6';
         if (photo.isCustom) {
             sizeDisplay = `${photo.customWidth}x${photo.customHeight} ${photo.customUnit}`;
         }
-        
+
         let paperType = photo.paperType || 'Standard';
         if (paperType === 'glossy') paperType = 'Glossy';
         if (paperType === 'matte') paperType = 'Matte';
-        
+
         const price = parseFloat(photo.price || 25) * (photo.quantity || 1);
         totalAmount += price;
-        
+
         const line = `${displayName.padEnd(25)} ₱${price.toFixed(2).padStart(7)} ${sizeDisplay.padEnd(10)} ${paperType}`;
         receipt += line + "\n";
     });
-    
+
     receipt += "-".repeat(60) + "\n";
     receipt += `\nTotal Amount: ₱${totalAmount.toFixed(2)}\n`;
     receipt += `Total Items: ${orderData.photos.length}\n\n`;
     receipt += "=".repeat(60) + "\n";
     receipt += "Thank you for choosing FOTOCENTER!\n";
     receipt += "=".repeat(60) + "\n";
-    
+
     return receipt;
 }
 
@@ -4149,7 +4149,7 @@ window.copyOrderNumber = copyOrderNumber;
 function initSelectAll() {
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function() {
+        selectAllCheckbox.addEventListener('change', function () {
             shoppingCart.forEach(item => {
                 item.selected = this.checked;
             });
@@ -4162,7 +4162,7 @@ function initSelectAll() {
 function renderCartPage() {
     const container = document.getElementById('cartItemsContainer');
     if (!container) return;
-    
+
     if (shoppingCart.length === 0) {
         container.innerHTML = `
             <div class="empty-cart-message">
@@ -4180,13 +4180,13 @@ function renderCartPage() {
         document.getElementById('cartTotalSelected').textContent = '₱0.00';
         return;
     }
-    
+
     const selectAllBar = document.getElementById('selectAllBar');
     const stickyBottom = document.getElementById('cartStickyBottom');
     if (selectAllBar) selectAllBar.style.display = 'flex';
     if (stickyBottom) stickyBottom.style.display = 'flex';
     document.getElementById('totalCount').textContent = shoppingCart.length;
-    
+
     let html = '';
     shoppingCart.forEach((item, index) => {
         let sizeModeDisplay = '';
@@ -4195,11 +4195,11 @@ function renderCartPage() {
         } else {
             sizeModeDisplay = 'Fill';
         }
-        
+
         const photoCount = item.photoCount || 1;
         const hasMultiplePhotos = photoCount > 1;
         const additionalPhotos = photoCount - 1;
-        
+
         html += `
             <div class="cart-item-card" data-index="${index}">
                 <div class="cart-item-checkbox">
@@ -4233,32 +4233,32 @@ function renderCartPage() {
             </div>
         `;
     });
-    
+
     container.innerHTML = html;
-    
+
     document.querySelectorAll('.item-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
+        checkbox.addEventListener('change', function () {
             const index = this.dataset.index;
             shoppingCart[index].selected = this.checked;
             updateCartSelection();
         });
     });
-    
+
     shoppingCart.forEach(item => {
         if (item.selected === undefined) item.selected = true;
     });
-    
+
     updateCartSelection();
 }
 
 function showPhotoPreview(itemIndex) {
     const item = shoppingCart[itemIndex];
-    
+
     if (!item || !item.photos || item.photos.length === 0) {
         alert('No photos to preview');
         return;
     }
-    
+
     let previewModal = document.getElementById('photoPreviewModal');
     if (!previewModal) {
         previewModal = document.createElement('div');
@@ -4288,16 +4288,16 @@ function showPhotoPreview(itemIndex) {
         `;
         document.body.appendChild(previewModal);
     }
-    
+
     window.currentPreviewItemIndex = itemIndex;
     window.currentPreviewPhotoIndex = 0;
     window.currentPreviewPhotos = item.photos;
-    
-    document.getElementById('previewModalTitle').textContent = 
+
+    document.getElementById('previewModalTitle').textContent =
         `${item.productName || 'Photo'} - ${item.photos.length} photos`;
-    
+
     updatePreviewMainImage();
-    
+
     const thumbnailsContainer = document.getElementById('previewThumbnails');
     thumbnailsContainer.innerHTML = item.photos.map((photo, idx) => {
         let imgSrc = photo.thumbnail || photo;
@@ -4307,24 +4307,24 @@ function showPhotoPreview(itemIndex) {
             </div>
         `;
     }).join('');
-    
+
     previewModal.style.display = 'flex';
 }
 
 function updatePreviewMainImage() {
     const photos = window.currentPreviewPhotos;
     const index = window.currentPreviewPhotoIndex;
-    
+
     if (!photos || photos.length === 0) return;
-    
+
     const mainImage = document.getElementById('previewMainImage');
     const photo = photos[index];
     let imgSrc = photo.thumbnail || photo;
     mainImage.src = imgSrc;
-    
-    document.getElementById('previewCounter').textContent = 
+
+    document.getElementById('previewCounter').textContent =
         `${index + 1} / ${photos.length}`;
-    
+
     const thumbnails = document.querySelectorAll('#previewThumbnails div');
     thumbnails.forEach((thumb, idx) => {
         thumb.style.border = idx === index ? '3px solid var(--accent)' : '2px solid transparent';
@@ -4363,10 +4363,10 @@ function updateCartSelection() {
     const selectAll = document.getElementById('selectAllCheckbox');
     const selectedCount = shoppingCart.filter(item => item.selected).length;
     const totalCount = shoppingCart.length;
-    
+
     document.getElementById('selectedCount').textContent = selectedCount;
     document.getElementById('selectedItemsCount').textContent = selectedCount;
-    
+
     if (selectAll) {
         if (totalCount > 0) {
             selectAll.checked = selectedCount === totalCount;
@@ -4376,7 +4376,7 @@ function updateCartSelection() {
             selectAll.indeterminate = false;
         }
     }
-    
+
     let total = 0;
     shoppingCart.forEach((item) => {
         if (item.selected) {
@@ -4384,7 +4384,7 @@ function updateCartSelection() {
             total += price * (item.quantity || 1);
         }
     });
-    
+
     document.getElementById('cartTotalSelected').textContent = `₱${total.toFixed(2)}`;
 }
 
@@ -4408,7 +4408,7 @@ function deleteSelectedItems() {
     shoppingCart = shoppingCart.filter(item => !item.selected);
     const afterCount = shoppingCart.length;
     console.log(`Removed ${beforeCount - afterCount} items`);
-    
+
     updateCartStorage();
     renderCartPage();
     updateCartUI();
@@ -4417,35 +4417,35 @@ function deleteSelectedItems() {
 
 async function processOrderFromCart() {
     const selectedItems = shoppingCart.filter(item => item.selected);
-    
+
     if (selectedItems.length === 0) {
         alert('Please select at least one item to order.');
         return;
     }
-    
+
     const username = localStorage.getItem('userName') || localStorage.getItem('userEmail')?.split('@')[0] || 'guest';
     const isLoggedIn = localStorage.getItem('isLoggedIn');
-    
+
     if (!isLoggedIn) {
         const proceed = confirm('You are not logged in. Continue as guest?');
         if (!proceed) return;
     }
-    
+
     const multiPhotoTypes = ['calendar', 'photobook', 'doublecards'];
-    
+
     const photos = [];
     let photoCounter = 1;
 
     selectedItems.forEach((item, itemIndex) => {
         const productType = item.productType || item.type;
         const isMultiPhoto = multiPhotoTypes.includes(productType);
-        
+
         if (isMultiPhoto && item.photos && item.photos.length > 0) {
             console.log(`📸 Processing ${item.productName} with ${item.photos.length} photos`);
-            
+
             item.photos.forEach((photo, photoIndex) => {
                 let imageData = '';
-                
+
                 if (photo.data) {
                     imageData = photo.data;
                 } else if (photo.thumbnail) {
@@ -4453,11 +4453,11 @@ async function processOrderFromCart() {
                 } else if (typeof photo === 'string') {
                     imageData = photo;
                 }
-                
+
                 if (imageData && imageData.includes(',')) {
                     imageData = imageData.split(',')[1];
                 }
-                
+
                 photos.push({
                     originalName: photo.name || `Photo_${photoIndex + 1}.jpg`,
                     filename: `${photoCounter}.jpg`,
@@ -4478,9 +4478,9 @@ async function processOrderFromCart() {
             });
         } else {
             console.log(`🖼️ Processing ${item.name} as single photo product`);
-            
+
             let imageSource = '';
-            
+
             if (item.displayImage) {
                 imageSource = item.displayImage;
             } else if (item.image) {
@@ -4489,7 +4489,7 @@ async function processOrderFromCart() {
                 const firstPhoto = item.photos[0];
                 imageSource = firstPhoto.data || firstPhoto.thumbnail || firstPhoto;
             }
-            
+
             let imageData = '';
             if (imageSource && typeof imageSource === 'string') {
                 if (imageSource.includes(',')) {
@@ -4498,7 +4498,7 @@ async function processOrderFromCart() {
                     imageData = imageSource;
                 }
             }
-            
+
             photos.push({
                 originalName: item.originalName || item.name || `item_${itemIndex + 1}.jpg`,
                 filename: `${photoCounter}.jpg`,
@@ -4518,9 +4518,9 @@ async function processOrderFromCart() {
             photoCounter++;
         }
     });
-    
+
     console.log(`📦 Total photos to upload: ${photos.length}`);
-    
+
     const orderData = {
         orderId: generateOrderId(),
         username: username,
@@ -4528,12 +4528,12 @@ async function processOrderFromCart() {
         photos: photos,
         timestamp: new Date().toISOString()
     };
-    
+
     const btn = document.getElementById('completeOrderBtn');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<span class="spinner"></span> Processing Order...';
     btn.disabled = true;
-    
+
     try {
         const token = await new Promise((resolve, reject) => {
             tokenClient.callback = (resp) => {
@@ -4544,52 +4544,52 @@ async function processOrderFromCart() {
             };
             tokenClient.requestAccessToken();
         });
-        
+
         const ordersFolderId = await getOrCreateOrdersFolder();
-        
+
         const folderName = `${username}_${orderData.orderCount}_${orderData.orderId}`;
         const mainFolder = await createDriveFolder(folderName, ordersFolderId);
-        
+
         const photosFolder = await createDriveFolder('Photos', mainFolder.id);
-        
+
         for (let i = 0; i < orderData.photos.length; i++) {
             const photo = orderData.photos[i];
             await uploadFileToDrive(
-                `${i+1}.jpg`,
+                `${i + 1}.jpg`,
                 photo.data,
                 photosFolder.id
             );
         }
-        
+
         await uploadFileToDrive(
             'Condition.txt',
             generateConditionFile(orderData),
             mainFolder.id
         );
-        
+
         await uploadFileToDrive(
             'End.txt',
             generateEndFile(orderData),
             mainFolder.id
         );
-        
+
         await uploadFileToDrive(
             'OrderReceipt.txt',
             generateReceiptFile(orderData),
             mainFolder.id
         );
-        
+
         shoppingCart = shoppingCart.filter(item => !item.selected);
         updateCartStorage();
-        
+
         const message = `Hello ${username},\n\nThis is your Order Number: ${orderData.orderId} <button class="copy-btn" onclick="copyOrderNumber()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:5px;" title="Copy order number">📋</button>\n\nTotal Photos: ${photos.length}\n\nPlease copy and save the Order Number\n\nThank you for choosing FOTOCENTER!`;
         document.getElementById('orderSuccessMessage').innerHTML = message;
         document.getElementById('orderSuccessModal').style.display = 'flex';
-        
+
         renderCartPage();
         updateCartUI();
         updateCartHover();
-        
+
     } catch (error) {
         console.error('Order failed:', error);
         alert('❌ Order failed: ' + (error.error || error.message || 'Unknown error'));
@@ -4603,7 +4603,7 @@ async function processOrderFromCart() {
 function initCartHover() {
     const cartWrapper = document.querySelector('.cart-hover-wrapper');
     if (cartWrapper) {
-        cartWrapper.addEventListener('mouseenter', function() {
+        cartWrapper.addEventListener('mouseenter', function () {
             updateCartHover();
         });
     }
@@ -4612,15 +4612,15 @@ function initCartHover() {
 function updateCartHover() {
     const dropdown = document.getElementById('cartHoverDropdown');
     if (!dropdown) return;
-    
+
     if (shoppingCart.length === 0) {
         dropdown.innerHTML = '<div class="cart-hover-empty">Your cart is empty</div>';
         return;
     }
-    
+
     let itemsHtml = '<div class="cart-hover-header"><span>Shopping Cart</span><button class="cart-hover-view-cart" onclick="navigateTo(\'cart-page\')">VIEW CART</button></div>';
     itemsHtml += '<div class="cart-hover-items">';
-    
+
     shoppingCart.slice(0, 3).forEach((item, index) => {
         itemsHtml += `
             <div class="cart-hover-item">
@@ -4634,13 +4634,13 @@ function updateCartHover() {
             </div>
         `;
     });
-    
+
     if (shoppingCart.length > 3) {
         itemsHtml += `<div style="padding: 0.5rem 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">and ${shoppingCart.length - 3} more items</div>`;
     }
-    
+
     itemsHtml += '</div>';
-    
+
     const subtotal = calculateCartTotal();
     itemsHtml += `
         <div class="cart-hover-footer">
@@ -4651,7 +4651,7 @@ function updateCartHover() {
             <button class="cart-hover-checkout" onclick="navigateTo('cart-page')">VIEW CART</button>
         </div>
     `;
-    
+
     dropdown.innerHTML = itemsHtml;
 }
 
@@ -4668,39 +4668,39 @@ function setupHamburgerMenu() {
     const hamburgerMenu = document.getElementById('hamburgerMenu');
     const hamburgerIcon = document.querySelector('.hamburger-icon');
     const hamburgerDropdown = document.getElementById('hamburgerDropdown');
-    
+
     if (!hamburgerMenu || !hamburgerIcon || !hamburgerDropdown) return;
-    
-    hamburgerIcon.addEventListener('click', function(e) {
+
+    hamburgerIcon.addEventListener('click', function (e) {
         e.stopPropagation();
         hamburgerMenu.classList.toggle('open');
     });
-    
-    document.addEventListener('click', function(e) {
+
+    document.addEventListener('click', function (e) {
         if (!hamburgerMenu.contains(e.target)) {
             hamburgerMenu.classList.remove('open');
         }
     });
-    
+
     let timeoutId;
-    
-    hamburgerDropdown.addEventListener('mouseenter', function() {
+
+    hamburgerDropdown.addEventListener('mouseenter', function () {
         clearTimeout(timeoutId);
     });
-    
-    hamburgerDropdown.addEventListener('mouseleave', function() {
+
+    hamburgerDropdown.addEventListener('mouseleave', function () {
         timeoutId = setTimeout(() => {
             hamburgerMenu.classList.remove('open');
         }, 300);
     });
-    
+
     const menuItems = hamburgerDropdown.querySelectorAll('.dropdown-item');
     menuItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function () {
             hamburgerMenu.classList.remove('open');
         });
     });
-    
+
     console.log('✅ Hamburger menu initialized with 3 items (Editor, Shop, Info)');
 }
 
@@ -4708,15 +4708,15 @@ function setupHamburgerMenu() {
 function setupSimpleHamburger() {
     const menu = document.getElementById('hamburgerMenu');
     const icon = document.querySelector('.hamburger-icon');
-    
+
     if (icon) {
-        icon.onclick = function(e) {
+        icon.onclick = function (e) {
             e.preventDefault();
             e.stopPropagation();
             menu.classList.toggle('open');
         };
-        
-        document.addEventListener('click', function(e) {
+
+        document.addEventListener('click', function (e) {
             if (!menu.contains(e.target)) {
                 menu.classList.remove('open');
             }
@@ -4727,9 +4727,9 @@ function setupSimpleHamburger() {
 function makeSlidesClickable() {
     const slides = document.querySelectorAll('.slide-card');
     const products = ['photocards', 'calendar', 'photobook', 'canvas', 'mousepads', 'doublecards'];
-    
+
     slides.forEach((slide, i) => {
-        slide.onclick = function(e) {
+        slide.onclick = function (e) {
             e.preventDefault();
             navigateTo('product-page');
             setTimeout(() => {
@@ -4744,91 +4744,91 @@ function makeSlidesClickable() {
 
 (function fixOpenInEditor() {
     console.log('🔧 Setting up Open in Editor button...');
-    
+
     function attachEditorListener() {
         const editorBtn = document.getElementById('openEditorBtn');
-        
+
         if (editorBtn) {
             console.log('✅ Found Open in Editor button');
-            
+
             const newBtn = editorBtn.cloneNode(true);
             editorBtn.parentNode.replaceChild(newBtn, editorBtn);
-            
-           newBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    console.log('🎯 OPEN IN EDITOR CLICKED!');
-    
-    const productType = this.getAttribute('data-product') || 'photocards';
-    console.log('📦 Product type:', productType);
-    
-    navigateTo('photos');
-    
-    setTimeout(() => {
-        console.log('📸 Photos page loaded, selecting product...');
-        
-        if (typeof selectProduct === 'function') {
-            selectProduct(productType);
-            console.log('✅ selectProduct called with:', productType);
-        }
-        
-        const badge = document.getElementById('currentProductBadge');
-        if (badge) {
-            const icons = {
-                'photocards': '🖼️',
-                'calendar': '📅',
-                'photobook': '📘',
-                'canvas': '🖼️',
-                'mousepads': '🖱️',
-                'doublecards': '🃏'
-            };
-            
-            const names = {
-                'photocards': 'Photo Cards',
-                'calendar': 'Calendar',
-                'photobook': 'Photo Book',
-                'canvas': 'Canvas',
-                'mousepads': 'Mouse Pads',
-                'doublecards': 'Double Cards'
-            };
-            
-            badge.innerHTML = `<span class="badge-text">${icons[productType] || '📷'} ${names[productType] || productType}</span>`;
-        }
 
-        if (typeof updatePrintOptions === 'function') {
-            updatePrintOptions(productType);
-        }
-        
-        showEditorWelcome(productType);
-        
-    }, 800);
-    
-    return false;
-});
+            newBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
 
-            
+                console.log('🎯 OPEN IN EDITOR CLICKED!');
+
+                const productType = this.getAttribute('data-product') || 'photocards';
+                console.log('📦 Product type:', productType);
+
+                navigateTo('photos');
+
+                setTimeout(() => {
+                    console.log('📸 Photos page loaded, selecting product...');
+
+                    if (typeof selectProduct === 'function') {
+                        selectProduct(productType);
+                        console.log('✅ selectProduct called with:', productType);
+                    }
+
+                    const badge = document.getElementById('currentProductBadge');
+                    if (badge) {
+                        const icons = {
+                            'photocards': '🖼️',
+                            'calendar': '📅',
+                            'photobook': '📘',
+                            'canvas': '🖼️',
+                            'mousepads': '🖱️',
+                            'doublecards': '🃏'
+                        };
+
+                        const names = {
+                            'photocards': 'Photo Cards',
+                            'calendar': 'Calendar',
+                            'photobook': 'Photo Book',
+                            'canvas': 'Canvas',
+                            'mousepads': 'Mouse Pads',
+                            'doublecards': 'Double Cards'
+                        };
+
+                        badge.innerHTML = `<span class="badge-text">${icons[productType] || '📷'} ${names[productType] || productType}</span>`;
+                    }
+
+                    if (typeof updatePrintOptions === 'function') {
+                        updatePrintOptions(productType);
+                    }
+
+                    showEditorWelcome(productType);
+
+                }, 800);
+
+                return false;
+            });
+
+
             console.log('✅ Open in Editor button is now working!');
             return true;
         }
         return false;
     }
-    
+
     if (!attachEditorListener()) {
         console.log('⏳ Waiting for Open in Editor button...');
-        const observer = new MutationObserver(function(mutations) {
+        const observer = new MutationObserver(function (mutations) {
             if (document.getElementById('openEditorBtn')) {
                 if (attachEditorListener()) {
                     observer.disconnect();
                 }
             }
         });
-        
+
         observer.observe(document.body, {
             childList: true,
             subtree: true
         });
-        
+
         setTimeout(attachEditorListener, 2000);
     }
 })();
@@ -4840,7 +4840,7 @@ function showEditorWelcome(productType) {
         console.error('Editor welcome popup not found');
         return;
     }
-    
+
     const productNames = {
         'photocards': 'Photo Cards',
         'calendar': 'Calendar',
@@ -4849,14 +4849,14 @@ function showEditorWelcome(productType) {
         'mousepads': 'Mouse Pads',
         'doublecards': 'Double Cards'
     };
-    
+
     const nameEl = document.getElementById('welcomeProductName');
     if (nameEl) {
         nameEl.textContent = productNames[productType] || 'Photo Cards';
     }
-    
+
     popup.style.display = 'flex';
-    
+
     setTimeout(() => {
         if (popup.style.display === 'flex') {
             popup.style.display = 'none';
@@ -4873,69 +4873,69 @@ function closeEditorWelcome() {
 
 (function setupEditorWelcome() {
     console.log('🔧 Setting up editor welcome popup...');
-    
-    document.addEventListener('click', function(e) {
-        const isHamburgerEditor = e.target.closest('.hamburger-dropdown') && 
-                                  (e.target.textContent.includes('Editor') || 
-                                   e.target.closest('[onclick*="photos"]'));
-        
+
+    document.addEventListener('click', function (e) {
+        const isHamburgerEditor = e.target.closest('.hamburger-dropdown') &&
+            (e.target.textContent.includes('Editor') ||
+                e.target.closest('[onclick*="photos"]'));
+
         if (isHamburgerEditor) {
             console.log('📸 Editor opened via hamburger menu');
-            
+
             setTimeout(() => {
                 const photosPage = document.getElementById('photos');
                 if (photosPage && photosPage.classList.contains('active')) {
                     let currentProduct = 'photocards';
-                    
+
                     const activeItem = document.querySelector('.dropdown-item.active');
                     if (activeItem) {
                         currentProduct = activeItem.getAttribute('data-product') || 'photocards';
                     }
-                    
+
                     showEditorWelcome(currentProduct);
                 }
             }, 1000);
         }
     });
-    
+
     console.log('✅ Editor welcome popup ready for both entry methods');
 })();
 
 // ============== ULTIMATE DROPDOWN FIX ==============
 (function ultimateDropdownFix() {
     console.log('🔧 Applying ultimate dropdown fix...');
-    
+
     function fixDropdown() {
         const btn = document.getElementById('productDropdownBtn');
         const menu = document.getElementById('productDropdownMenu');
-        
+
         if (btn && menu) {
             console.log('✅ Found dropdown elements, attaching handler...');
-            
+
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
-            
-            newBtn.onclick = function(e) {
+
+            newBtn.onclick = function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 menu.classList.toggle('show');
                 console.log('Dropdown toggled:', menu.classList.contains('show'));
                 return false;
             };
-            
-            document.addEventListener('click', function(e) {
+
+            document.addEventListener('click', function (e) {
                 if (!menu.contains(e.target) && !newBtn.contains(e.target)) {
                     menu.classList.remove('show');
                 }
             });
-            
+
             return true;
         }
         return false;
     }
-    
+
     let attempts = 0;
-    const interval = setInterval(function() {
+    const interval = setInterval(function () {
         attempts++;
         if (fixDropdown() || attempts > 10) {
             clearInterval(interval);
@@ -4945,12 +4945,46 @@ function closeEditorWelcome() {
 })();
 
 // ============== GLOBAL FUNCTIONS ==============
+// Ensure openProductPage exists to avoid ReferenceError when other scripts call it
+function openProductPage(productTypeOrId) {
+    // If a numeric id is provided, open the product-detail page and show that product
+    if (typeof productTypeOrId === 'number') {
+        navigateTo('product-detail');
+        if (typeof showProductDetail === 'function') {
+            showProductDetail(productTypeOrId);
+        }
+        return;
+    }
+
+    // If a product type string is provided, load product page details
+    if (typeof productTypeOrId === 'string') {
+        navigateTo('product-page');
+        if (typeof loadProductDetails === 'function') {
+            loadProductDetails(productTypeOrId);
+        }
+        return;
+    }
+
+    // Default behavior: open product listing page
+    navigateTo('product-page');
+}
+
+// Generic close for any welcome modal variants used in the UI
+function closeWelcomePopup() {
+    const popupIds = ['welcomePopup', 'editorWelcomePopup'];
+    for (const id of popupIds) {
+        const el = document.getElementById(id);
+        if (el && el.style.display === 'flex') {
+            el.style.display = 'none';
+        }
+    }
+}
 window.showEditorWelcome = showEditorWelcome;
 window.closeEditorWelcome = closeEditorWelcome;
-window.prevSlide = function() { if (window.slideshow) window.slideshow.prevSlide(); };
-window.nextSlide = function() { if (window.slideshow) window.slideshow.nextSlide(); };
-window.goToSlide = function(i) { if (window.slideshow) window.slideshow.goToSlide(i); };
-window.toggleSlideshowPause = function() { if (window.slideshow) window.slideshow.togglePause(); };
+window.prevSlide = function () { if (window.slideshow) window.slideshow.prevSlide(); };
+window.nextSlide = function () { if (window.slideshow) window.slideshow.nextSlide(); };
+window.goToSlide = function (i) { if (window.slideshow) window.slideshow.goToSlide(i); };
+window.toggleSlideshowPause = function () { if (window.slideshow) window.slideshow.togglePause(); };
 window.openProductPage = openProductPage;
 window.closeWelcomePopup = closeWelcomePopup;
 window.renderCartPage = renderCartPage;
@@ -4971,14 +5005,14 @@ window.onSizeSelect = onSizeSelect;
 window.changeUnit = changeUnit;
 
 // ============== INITIALIZATION ==============
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('🚀 DOM Content Loaded - Initializing...');
-    
+
     // Initialize language dropdown
     if (typeof initLanguageDropdown === 'function') {
         initLanguageDropdown();
     }
-    
+
     // Initialize existing functions
     if (typeof displayHomeProducts === 'function') displayHomeProducts();
     if (typeof setupPhotoEditor === 'function') setupPhotoEditor();
@@ -4991,41 +5025,41 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof setupFaqScroll === 'function') setupFaqScroll();
     if (typeof setupChatKeyboard === 'function') setupChatKeyboard();
     if (typeof setupDropdownMenu === 'function') setupDropdownMenu();
-    
+
     const cartBtn = document.querySelector('.cart-btn');
     if (cartBtn) {
-        cartBtn.onclick = function(e) {
+        cartBtn.onclick = function (e) {
             e.preventDefault();
             navigateTo('cart-page');
         };
     }
-    
+
     if (typeof renderShopProducts === 'function') renderShopProducts();
     if (typeof renderReviews === 'function') renderReviews();
     if (typeof updateCartBadgeOnLoad === 'function') updateCartBadgeOnLoad();
     if (typeof loadChatHistory === 'function') loadChatHistory();
     if (typeof updateUndoRedoButtons === 'function') updateUndoRedoButtons();
-    
+
     setTimeout(() => {
         if (typeof selectProduct === 'function') selectProduct('photocards');
     }, 500);
-    
+
     if (typeof initPrintOptions === 'function') initPrintOptions();
     if (typeof initializeGoogleApi === 'function') initializeGoogleApi();
     if (typeof initCartHover === 'function') initCartHover();
     if (typeof initSelectAll === 'function') initSelectAll();
     if (typeof initSearchBar === 'function') initSearchBar();
-    
+
     const deleteBtn = document.getElementById('deleteSelectedBtn');
     if (deleteBtn) {
         deleteBtn.onclick = null;
-        deleteBtn.addEventListener('click', function(e) {
+        deleteBtn.addEventListener('click', function (e) {
             e.preventDefault();
             console.log('🗑️ Delete Selected button clicked');
             if (typeof deleteSelectedItems === 'function') deleteSelectedItems();
         });
     }
-    
+
     // Initialize slideshow
     setTimeout(() => {
         if (typeof Slideshow === 'function' && !window.slideshowInitialized) {
@@ -5034,17 +5068,17 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('✅ Slideshow initialized');
         }
     }, 500);
-    
+
     // Initialize hamburger menu
     if (typeof setupHamburgerMenu === 'function') setupHamburgerMenu();
-    
+
     // Make slides clickable
     setTimeout(() => {
         if (typeof makeSlidesClickable === 'function') makeSlidesClickable();
     }, 1000);
-    
+
     // Initialize chat backend
     initChatBackend();
-    
+
     console.log('✅ All initializations complete!');
 });
