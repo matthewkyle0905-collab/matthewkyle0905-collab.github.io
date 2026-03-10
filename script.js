@@ -71,6 +71,53 @@ function selectLanguage(lang) {
     updateAllText();
     updateAllPrices();
 
+    // Re-render dynamic content to apply translations and new currency formats
+    const activePage = document.querySelector('.page.active');
+    if (activePage) {
+        const pageId = activePage.id;
+        console.log(`Language changed. Re-rendering active page: ${pageId}`);
+        switch (pageId) {
+            case 'home':
+                if (typeof displayHomeProducts === 'function') displayHomeProducts();
+                break;
+            case 'shop':
+                if (typeof renderShopProducts === 'function') renderShopProducts();
+                break;
+            case 'product-page':
+                const openEditorBtn = document.getElementById('openEditorBtn');
+                if (openEditorBtn && typeof loadProductDetails === 'function') {
+                    const productType = openEditorBtn.getAttribute('data-product');
+                    if (productType) loadProductDetails(productType);
+                }
+                break;
+            case 'cart-page':
+                if (typeof renderCartPage === 'function') renderCartPage();
+                break;
+            case 'photos':
+                 if (typeof calculatePrice === 'function') calculatePrice();
+                 if (typeof updatePrintOptions === 'function') updatePrintOptions(window.currentProduct);
+                 break;
+            case 'calendars':
+                if (document.getElementById('calendarsProductsView').style.display === 'block') {
+                    if (typeof displayCalendarProducts === 'function') displayCalendarProducts();
+                } else {
+                    if (typeof updateCalendarPrice === 'function') updateCalendarPrice();
+                }
+                break;
+            case 'cards':
+                 if (document.getElementById('cardsProductsView').style.display === 'block') {
+                    if (typeof displayCardsProducts === 'function') displayCardsProducts();
+                }
+                break;
+        }
+    }
+
+    // Also update slideshow if it's visible
+    if (window.slideshow) {
+        window.slideshow.renderSlides();
+        updateAllPrices(); // re-run after render
+    }
+
     localStorage.setItem('preferredLanguage', lang.code);
 }
 
@@ -96,6 +143,10 @@ function updateAllText() {
 }
 
 function formatPrice(usdPrice) {
+    if (typeof usdPrice !== 'number' || isNaN(usdPrice)) {
+        // console.error('Invalid price provided to formatPrice:', usdPrice);
+        return ''; // Return empty string or a default value for invalid input
+    }
     const convertedPrice = usdPrice * currentLanguage.rate;
 
     switch (currentLanguage.currency) {
@@ -112,6 +163,12 @@ function formatPrice(usdPrice) {
         default:
             return `${currentLanguage.symbol}${convertedPrice.toFixed(2)}`;
     }
+}
+
+// Helper function to parse PHP price string
+function parsePhpPrice(priceStr) {
+    if (!priceStr || typeof priceStr !== 'string') return 0;
+    return parseFloat(priceStr.replace(/[₱,\s]/g, '')) || 0;
 }
 
 function updateAllPrices() {
@@ -983,8 +1040,8 @@ function updateCartUI() {
 
 function calculateCartTotal() {
     return shoppingCart.reduce((total, item) => {
-        const price = parseFloat(item.price.toString().replace('₱', '').replace(',', '')) || 0;
-        return total + (price * (item.quantity || 1));
+        const itemPrice = item.basePriceUSD || (parsePhpPrice(item.price) * 0.018);
+        return total + (itemPrice * (item.quantity || 1));
     }, 0);
 }
 
@@ -1063,35 +1120,24 @@ function updateCartBadgeOnLoad() {
 function renderShopProducts() {
     const grid = document.getElementById('shopProductsGrid');
     if (!grid) return;
-    grid.innerHTML = products.map(p => `
-        <div class="product-card">
+    grid.innerHTML = products.map(p => {
+        const phpPrice = parsePhpPrice(p.price);
+        const usdPrice = phpPrice * 0.018;
+        return `
+        <div class="product-card" onclick="openProductPage(${p.id})">
             <div class="product-image"><img src="${p.image}" alt="${p.name}" loading="lazy"></div>
             <div class="product-info">
-                <h4>${p.name}</h4>
-                <p>${p.description}</p>
+                <h4 data-i18n="product_${p.name.toLowerCase().replace(/ /g, '_')}_name">${p.name}</h4>
+                <p data-i18n="product_${p.name.toLowerCase().replace(/ /g, '_')}_desc">${p.description}</p>
                 <div class="product-footer">
-                    <div class="price-list">
-                        <span>USD: ${convertPriceToUSD(p.price)}</span>
-                        <span>SEK: ${convertPriceToSEK(p.price)}</span>
-                        <span>PHP: ${p.price}</span>
-                    </div>
-                    <button onclick="navigateTo('photos');">Edit</button>
+                    <span class="price" data-usd="${usdPrice.toFixed(2)}">${formatPrice(usdPrice)}</span>
+                    <button onclick="navigateTo('photos');" data-i18n="edit_btn">Edit</button>
                 </div>
             </div>
         </div>
-    `).join('');
-}
-
-function convertPriceToUSD(priceStr) {
-    const php = parseFloat(priceStr.replace(/[₱,\s]/g, '')) || 0;
-    const rate = 0.018;
-    return `$${(php * rate).toFixed(2)}`;
-}
-
-function convertPriceToSEK(priceStr) {
-    const php = parseFloat(priceStr.replace(/[₱,\s]/g, '')) || 0;
-    const rate = 0.20;
-    return `${(php * rate).toFixed(2)} kr`;
+    `}).join('');
+    updateAllText();
+    updateAllPrices();
 }
 
 // ============== REVIEWS ==============
@@ -1262,47 +1308,58 @@ function displayHomeProducts() {
     const productsContainer = document.getElementById('products');
     if (!productsContainer) return;
 
-    productsContainer.innerHTML = products.map(product => `
-        <div class="product-card" onclick="navigateTo('product-detail'); showProductDetail(${product.id})">
+    productsContainer.innerHTML = products.map(product => {
+        const phpPrice = parsePhpPrice(product.price);
+        const usdPrice = phpPrice * 0.018;
+        return `
+        <div class="product-card" onclick="openProductPage(${product.id})">
             <div class="product-image">
                 <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
             </div>
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p class="product-desc">${product.description}</p>
+                <h3 data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_name">${product.name}</h3>
+                <p class="product-desc" data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_desc">${product.description}</p>
                 <div class="product-footer">
-                    <span class="price">${product.price}</span>
-                    <button class="add-btn" onclick="event.stopPropagation(); navigateTo('photos');">Add to Cart</button>
+                    <span class="price" data-usd="${usdPrice.toFixed(2)}">${formatPrice(usdPrice)}</span>
+                    <button class="add-btn" onclick="event.stopPropagation(); addToCartProduct(${product.id});" data-i18n="add_to_cart_btn">Add to Cart</button>
                 </div>
             </div>
         </div>
-    `).join('');
+    `}).join('');
+    updateAllText();
 }
 
 function displayProductsGrid() {
     const productsGrid = document.getElementById('printProductsGrid');
     if (!productsGrid) return;
 
-    productsGrid.innerHTML = products.map(product => `
-        <div class="product-card" onclick="navigateTo('product-detail'); showProductDetail(${product.id})">
+    productsGrid.innerHTML = products.map(product => {
+        const phpPrice = parsePhpPrice(product.price);
+        const usdPrice = phpPrice * 0.018;
+        return `
+        <div class="product-card" onclick="openProductPage(${product.id})">
             <div class="product-image">
                 <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
             </div>
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p class="product-desc">${product.description}</p>
+                <h3 data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_name">${product.name}</h3>
+                <p class="product-desc" data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_desc">${product.description}</p>
                 <div class="product-footer">
-                    <span class="price">${product.price}</span>
-                    <button class="add-btn" onclick="event.stopPropagation(); addToCartProduct(${product.id})">Add to Cart</button>
+                    <span class="price" data-usd="${usdPrice.toFixed(2)}">${formatPrice(usdPrice)}</span>
+                    <button class="add-btn" onclick="event.stopPropagation(); addToCartProduct(${product.id})" data-i18n="add_to_cart_btn">Add to Cart</button>
                 </div>
             </div>
         </div>
-    `).join('');
+    `}).join('');
+    updateAllText();
 }
 
 function showProductDetail(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
+
+    const phpPrice = parsePhpPrice(product.price);
+    const usdPrice = phpPrice * 0.018;
 
     const detailContent = document.getElementById('detail-content');
     detailContent.innerHTML = `
@@ -1311,19 +1368,20 @@ function showProductDetail(productId) {
                 <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
             </div>
             <div class="detail-info">
-                <h2>${product.name}</h2>
-                <p class="detail-desc">${product.description}</p>
+                <h2 data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_name">${product.name}</h2>
+                <p class="detail-desc" data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_desc">${product.description}</p>
                 <div class="price-section">
-                    <span class="detail-price">${product.price}</span>
+                    <span class="detail-price" data-usd="${usdPrice.toFixed(2)}">${formatPrice(usdPrice)}</span>
                 </div>
                 <div class="quantity-section">
-                    <label for="quantity">Quantity:</label>
+                    <label for="quantity" data-i18n="quantity_label">Quantity:</label>
                     <input type="number" id="quantity" min="1" value="1">
                 </div>
-                <button class="detail-add-btn" onclick="addToCartProduct(${product.id})">Add to Cart</button>
+                <button class="detail-add-btn" onclick="addToCartProduct(${product.id})" data-i18n="add_to_cart_btn">Add to Cart</button>
             </div>
         </div>
     `;
+    updateAllText();
 }
 
 function addToCartProduct(productId) {
@@ -1333,6 +1391,9 @@ function addToCartProduct(productId) {
     const quantityInput = document.getElementById('quantity');
     const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
 
+    const phpPrice = parsePhpPrice(product.price);
+    const usdPrice = phpPrice * 0.018;
+
     const cartItem = {
         id: productId,
         type: 'product',
@@ -1340,7 +1401,8 @@ function addToCartProduct(productId) {
         productName: product.name,
         name: product.name,
         image: product.image,
-        price: product.price,
+        price: product.price, // Keep original for display if needed, but don't use for calculation
+        basePriceUSD: usdPrice, // NEW: Store base price in USD
         quantity: quantity,
         selected: true,
         sizeMode: 'fill',
@@ -2331,7 +2393,10 @@ window.addPhotoToCart = function () {
         return;
     }
 
-    let size, price, paperType = 'standard', sizeMode = 'fill', isCustom = false;
+    // Recalculate price to ensure it's up-to-date
+    calculatePrice();
+
+    let size, paperType = 'standard', sizeMode = 'fill', isCustom = false;
     let customWidth = null, customHeight = null, customUnit = 'inches';
 
     const sizeModeRadio = document.querySelector('input[name="sizeMode"]:checked');
@@ -2347,24 +2412,16 @@ window.addPhotoToCart = function () {
         isCustom = true;
         const widthInput = document.getElementById('customWidth');
         const heightInput = document.getElementById('customHeight');
-        const unitSelect = document.getElementById('customUnit');
 
-        if (currentUnit === 'cm') {
-            customWidth = (parseFloat(widthInput.value) / 2.54).toFixed(2);
-            customHeight = (parseFloat(heightInput.value) / 2.54).toFixed(2);
-        } else if (currentUnit === 'ml') {
-            customWidth = (parseFloat(widthInput.value) / 25.4).toFixed(2);
-            customHeight = (parseFloat(heightInput.value) / 25.4).toFixed(2);
-        } else {
-            customWidth = widthInput.value;
-            customHeight = heightInput.value;
-        }
-
+        customWidth = widthInput.getAttribute('data-inches') || widthInput.value;
+        customHeight = heightInput.getAttribute('data-inches') || heightInput.value;
         customUnit = 'inches';
         size = `${customWidth} x ${customHeight} ${customUnit}`;
     }
 
-    price = document.getElementById('advancedTotalPrice').textContent;
+    const finalPriceUSD = parseFloat(document.getElementById('finalPrice').getAttribute('data-usd'));
+    const quantity = parseInt(document.getElementById('quantityDisplay').textContent || '1');
+    const pricePerPhotoUSD = finalPriceUSD / quantity;
 
     const productName = productDisplayNames[currentProduct] || 'Photo';
 
@@ -2373,25 +2430,19 @@ window.addPhotoToCart = function () {
         thumbnail: img.src,
     }));
 
-    const basePrice = parseFloat(price.toString().replace('₱', '')) || 0;
-    const totalPrice = basePrice * uploadedImages.length;
-
     const cartItem = {
         id: 'photo-' + Date.now(),
         type: 'photo',
         productType: currentProduct,
         productName: productName,
-        name: `${productName} (${size}) - ${uploadedImages.length} photos`,
+        name: `${productName} (${size})`,
         size: size,
-
         photos: photosData,
         photoCount: uploadedImages.length,
-
         displayImage: uploadedImages[0]?.src || null,
-
-        price: `₱${totalPrice.toFixed(2)}`,
-        basePrice: basePrice,
-        quantity: 1,
+        price: formatPrice(finalPriceUSD), // Formatted total price for display
+        basePriceUSD: pricePerPhotoUSD, // Price per unit in USD
+        quantity: quantity,
         paperType: paperType,
         sizeMode: sizeMode,
         isCustom: isCustom,
@@ -2403,24 +2454,18 @@ window.addPhotoToCart = function () {
 
     addToCart(cartItem);
 
+    // Reset editor state
     uploadedImages = [];
     currentImageIndex = -1;
     updateImageGallery();
-
-    const canvas = document.getElementById('photoCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     const overlay = document.getElementById('canvasOverlay');
     if (overlay) overlay.style.display = 'block';
-
     document.getElementById('uploadCount').textContent = '0';
-
     currentQuantity = 1;
     document.getElementById('quantityDisplay').textContent = '1';
     calculatePrice();
 
-    console.log('✨ Editor reset complete! Cart has thumbnails only');
+    console.log('✨ Editor reset complete! Item added to cart.');
 };
 
 // ============== CROP TOOL ==============
@@ -3387,52 +3432,43 @@ function updateCalendarPrice() {
     const bindingType = document.getElementById('bindingType').value;
     const quantity = parseInt(document.getElementById('calendarQuantity').value) || 1;
 
-    const basePrices = {
-        'desk': 800,
-        'wall': 650,
-        'mini': 350,
-        'photo': 900
-    };
+    const basePricesPHP = { 'desk': 800, 'wall': 650, 'mini': 350, 'photo': 900 };
+    const sizeAdjustmentsPHP = { '8x10': 0, '12x12': 200, '8.5x11': 100, '11x17': 300 };
+    const paperAdjustmentsPHP = { 'glossy': 0, 'matte': 100, 'premium': 200 };
+    const bindingAdjustmentsPHP = { 'spiral': 0, 'wire': 50, 'hardcover': 300 };
 
-    let basePrice = basePrices[calendarType] || 800;
+    const basePricePHP = basePricesPHP[calendarType] || 800;
+    const optionsPricePHP = (sizeAdjustmentsPHP[size] || 0) + (paperAdjustmentsPHP[paperType] || 0) + (bindingAdjustmentsPHP[bindingType] || 0);
+    const totalUnitPricePHP = basePricePHP + optionsPricePHP;
+    const totalPricePHP = totalUnitPricePHP * quantity;
 
-    const sizeAdjustments = {
-        '8x10': 0,
-        '12x12': 200,
-        '8.5x11': 100,
-        '11x17': 300
-    };
+    const basePriceUSD = (basePricePHP * 0.018);
+    const optionsPriceUSD = (optionsPricePHP * 0.018);
+    const totalPriceUSD = (totalPricePHP * 0.018);
 
-    basePrice += sizeAdjustments[size] || 0;
+    const basePriceEl = document.getElementById('basePrice');
+    const optionsPriceEl = document.getElementById('optionsPrice');
+    const totalTextEl = document.getElementById('calendarTotalPrice');
+    const finalPriceEl = document.getElementById('calendarFinalPrice');
 
-    const paperAdjustments = {
-        'glossy': 0,
-        'matte': 100,
-        'premium': 200
-    };
+    if(basePriceEl) {
+        basePriceEl.setAttribute('data-usd', basePriceUSD.toFixed(2));
+        basePriceEl.textContent = formatPrice(basePriceUSD);
+    }
+    if(optionsPriceEl) {
+        optionsPriceEl.setAttribute('data-usd', optionsPriceUSD.toFixed(2));
+        optionsPriceEl.textContent = formatPrice(optionsPriceUSD);
+    }
+    if(totalTextEl) {
+        totalTextEl.setAttribute('data-usd', totalPriceUSD.toFixed(2));
+        totalTextEl.textContent = formatPrice(totalPriceUSD);
+    }
+     if(finalPriceEl) {
+        finalPriceEl.setAttribute('data-usd', totalPriceUSD.toFixed(2));
+        finalPriceEl.textContent = formatPrice(totalPriceUSD);
+    }
 
-    basePrice += paperAdjustments[paperType] || 0;
-
-    const bindingAdjustments = {
-        'spiral': 0,
-        'wire': 50,
-        'hardcover': 300
-    };
-
-    basePrice += bindingAdjustments[bindingType] || 0;
-
-    const optionsPrice = (sizeAdjustments[size] || 0) +
-        (paperAdjustments[paperType] || 0) +
-        (bindingAdjustments[bindingType] || 0);
-
-    const totalPrice = basePrice * quantity;
-
-    document.getElementById('basePrice').textContent = `₱ ${(basePrice - optionsPrice).toFixed(2)}`;
-    document.getElementById('optionsPrice').textContent = `₱ ${optionsPrice.toFixed(2)}`;
-    document.getElementById('calendarTotalPrice').textContent = `₱ ${totalPrice.toFixed(2)}`;
-    document.getElementById('calendarFinalPrice').textContent = `₱ ${totalPrice.toFixed(2)}`;
-
-    return totalPrice;
+    return totalUnitPricePHP * 0.018; // Return unit price in USD
 }
 
 function updateCalendarQuantity(change) {
@@ -3465,31 +3501,33 @@ function displayCalendarProducts() {
         const typeName = getCalendarTypeName(type);
         html += `
             <div class="calendar-type-section">
-                <h3 style="margin: 2rem 0 1rem 0; color: var(--text); border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">${typeName}</h3>
+                <h3 data-i18n="calendar_type_${type}" style="margin: 2rem 0 1rem 0; color: var(--text); border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem;">${typeName}</h3>
                 <div class="calendar-samples">
         `;
 
         groupedCalendars[type].forEach(product => {
+            const phpPrice = parsePhpPrice(product.price);
+            const usdPrice = phpPrice * 0.018;
             html += `
                 <div class="calendar-product-card">
-                    ${product.badge ? `<div class="calendar-badge">${product.badge}</div>` : ''}
+                    ${product.badge ? `<div class="calendar-badge" data-i18n="badge_${product.badge.toLowerCase()}">${product.badge}</div>` : ''}
                     <div class="calendar-product-image">
                         <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x300?text=Calendar+Image'">
                     </div>
                     <div class="calendar-product-info">
-                        <h3>${product.name}</h3>
+                        <h3 data-i18n="product_cal_${product.id}_name">${product.name}</h3>
                         <div class="calendar-product-type">
-                            <span>📅 ${typeName}</span>
+                            <span data-i18n="calendar_type_${type}">📅 ${typeName}</span>
                         </div>
-                        <p class="calendar-product-desc">${product.description}</p>
+                        <p class="calendar-product-desc" data-i18n="product_cal_${product.id}_desc">${product.description}</p>
                         <div class="calendar-features">
-                            ${product.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
+                            ${product.features.map(feature => `<span class="feature-tag" data-i18n="feature_${feature.toLowerCase().replace(/ /g, '_')}">${feature}</span>`).join('')}
                         </div>
                         <div class="calendar-product-footer">
-                            <span class="calendar-price">${product.price}</span>
+                            <span class="calendar-price" data-usd="${usdPrice.toFixed(2)}">${formatPrice(usdPrice)}</span>
                             <button class="calendar-add-btn" onclick="addCalendarProductToCart(${product.id})">
-                                <span>🛒</span>
-                                Add to Cart
+                                <span data-i18n="add_to_cart_btn_icon">🛒</span>
+                                <span data-i18n="add_to_cart_btn">Add to Cart</span>
                             </button>
                         </div>
                     </div>
@@ -3504,6 +3542,7 @@ function displayCalendarProducts() {
     });
 
     grid.innerHTML = html;
+    updateAllText();
 }
 
 function getCalendarTypeName(type) {
@@ -3520,6 +3559,9 @@ function addCalendarProductToCart(productId) {
     const product = calendarProducts.find(p => p.id === productId);
     if (!product) return;
 
+    const phpPrice = parsePhpPrice(product.price);
+    const usdPrice = phpPrice * 0.018;
+
     const cartItem = {
         id: productId,
         type: 'calendar',
@@ -3528,7 +3570,7 @@ function addCalendarProductToCart(productId) {
         name: product.name,
         image: product.image,
         price: product.price,
-        productType: product.type,
+        basePriceUSD: usdPrice,
         quantity: 1,
         selected: true,
         sizeMode: 'fill',
@@ -3552,7 +3594,8 @@ function addCustomCalendarToCart() {
     const bindingType = document.getElementById('bindingType').value;
     const startMonth = document.getElementById('startMonth').value;
     const quantity = parseInt(document.getElementById('calendarQuantity').value) || 1;
-    const totalPrice = updateCalendarPrice();
+    const unitPriceUSD = updateCalendarPrice();
+    const totalPriceUSD = unitPriceUSD * quantity;
 
     const cartItem = {
         id: 'custom-calendar-' + Date.now(),
@@ -3561,7 +3604,8 @@ function addCustomCalendarToCart() {
         productName: `Custom ${getCalendarTypeName(calendarType)}`,
         name: `Custom ${getCalendarTypeName(calendarType)} (${size})`,
         displayImage: calendarImages[0]?.src,
-        price: `₱ ${totalPrice.toFixed(2)}`,
+        price: formatPrice(totalPriceUSD),
+        basePriceUSD: unitPriceUSD,
         size: size,
         paperType: paperType,
         sizeMode: 'fill',
@@ -3620,27 +3664,31 @@ function displayCardsProducts() {
     if (!grid) return;
 
     const cardProducts = [
-        { id: 101, name: "Standard Photo Card", price: "₱150", image: "https://i5.walmartimages.com/seo/48-Pack-Photo-Frame-Cards-with-Envelopes-Notecards-for-4x6-Picture-Insert-Ivory_5339c47e-9e2e-4d17-bbcc-46da7d0288fb.88480b050f2d7e488cd5a07e5e90cfb5.jpeg", description: "5x7 inch photo card with envelope" },
-        { id: 102, name: "Premium Photo Card", price: "₱250", image: "https://framkallning.fotocenter.se/templates2/categories/FOLDEDCARDS/mobile_image.png", description: "8x10 inch premium card with matte finish" },
-        { id: 103, name: "Folded Greeting Card", price: "₱350", image: "https://th.bing.com/th/id/OIP.2JQJy-hTVtAdeD9wR7SFZgHaHa?w=188&h=188&c=7&r=0&o=7&pid=1.7&rm=3", description: "Folded card with multiple photo slots" },
-        { id: 104, name: "Holiday Card Pack", price: "₱600", image: "https://th.bing.com/th/id/OIP.qtYORFPfMvfnjzqE2NZ7bQHaHa?w=197&h=197&c=7&r=0&o=7&pid=1.7&rm=3", description: "Pack of 10 holiday-themed cards" }
+        { id: 201, name: "Standard Photo Card", price: "₱150", image: "https://i5.walmartimages.com/seo/48-Pack-Photo-Frame-Cards-with-Envelopes-Notecards-for-4x6-Picture-Insert-Ivory_5339c47e-9e2e-4d17-bbcc-46da7d0288fb.88480b050f2d7e488cd5a07e5e90cfb5.jpeg", description: "5x7 inch photo card with envelope" },
+        { id: 202, name: "Premium Photo Card", price: "₱250", image: "https://framkallning.fotocenter.se/templates2/categories/FOLDEDCARDS/mobile_image.png", description: "8x10 inch premium card with matte finish" },
+        { id: 203, name: "Folded Greeting Card", price: "₱350", image: "https://th.bing.com/th/id/OIP.2JQJy-hTVtAdeD9wR7SFZgHaHa?w=188&h=188&c=7&r=0&o=7&pid=1.7&rm=3", description: "Folded card with multiple photo slots" },
+        { id: 204, name: "Holiday Card Pack", price: "₱600", image: "https://th.bing.com/th/id/OIP.qtYORFPfMvfnjzqE2NZ7bQHaHa?w=197&h=197&c=7&r=0&o=7&pid=1.7&rm=3", description: "Pack of 10 holiday-themed cards" }
     ];
 
-    grid.innerHTML = cardProducts.map(product => `
+    grid.innerHTML = cardProducts.map(product => {
+        const phpPrice = parsePhpPrice(product.price);
+        const usdPrice = phpPrice * 0.018;
+        return `
         <div class="product-card">
             <div class="product-image">
                 <img src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
             </div>
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p class="product-desc">${product.description}</p>
+                <h3 data-i18n="product_card_${product.id}_name">${product.name}</h3>
+                <p class="product-desc" data-i18n="product_card_${product.id}_desc">${product.description}</p>
                 <div class="product-footer">
-                    <span class="price">${product.price}</span>
+                    <span class="price" data-usd="${usdPrice.toFixed(2)}">${formatPrice(usdPrice)}</span>
                     <button class="add-btn" onclick="addToCartProduct(${product.id})">Add to Cart</button>
                 </div>
             </div>
         </div>
-    `).join('');
+    `}).join('');
+    updateAllText();
 }
 
 function adjustCardsBrightness(amount) {
@@ -3691,7 +3739,8 @@ function addCardsToCart() {
     }
 
     const size = selectedSize.value;
-    const price = getCardPriceForSize(size);
+    const pricePHP = getCardPriceForSize(size);
+    const priceUSD = pricePHP * 0.018;
 
     const cartItem = {
         id: 'card-' + Date.now(),
@@ -3700,7 +3749,8 @@ function addCardsToCart() {
         productName: 'Photo Card',
         name: `Photo Card (${size})`,
         image: 'https://via.placeholder.com/200x150?text=Photo+Card',
-        price: `₱ ${price.toFixed(2)}`,
+        price: formatPrice(priceUSD),
+        basePriceUSD: priceUSD,
         size: size,
         quantity: 1,
         selected: true,
@@ -4166,8 +4216,8 @@ function renderCartPage() {
     if (shoppingCart.length === 0) {
         container.innerHTML = `
             <div class="empty-cart-message">
-                <p>Your cart is empty</p>
-                <button onclick="navigateTo('shop')">Continue Shopping</button>
+                <p data-i18n="cart_empty">Your cart is empty</p>
+                <button onclick="navigateTo('shop')" data-i18n="continue_shopping">Continue Shopping</button>
             </div>
         `;
         const selectAllBar = document.getElementById('selectAllBar');
@@ -4177,7 +4227,10 @@ function renderCartPage() {
         document.getElementById('totalCount').textContent = '0';
         document.getElementById('selectedCount').textContent = '0';
         document.getElementById('selectedItemsCount').textContent = '0';
-        document.getElementById('cartTotalSelected').textContent = '₱0.00';
+        const totalEl = document.getElementById('cartTotalSelected');
+        totalEl.setAttribute('data-usd', '0');
+        totalEl.textContent = formatPrice(0);
+        updateAllText();
         return;
     }
 
@@ -4187,20 +4240,14 @@ function renderCartPage() {
     if (stickyBottom) stickyBottom.style.display = 'flex';
     document.getElementById('totalCount').textContent = shoppingCart.length;
 
-    let html = '';
-    shoppingCart.forEach((item, index) => {
-        let sizeModeDisplay = '';
-        if (item.sizeMode) {
-            sizeModeDisplay = item.sizeMode === 'fill' ? 'Fill' : 'Fit';
-        } else {
-            sizeModeDisplay = 'Fill';
-        }
-
+    container.innerHTML = shoppingCart.map((item, index) => {
+        const itemPriceUSD = item.basePriceUSD || (parsePhpPrice(item.price) * 0.018);
+        const totalItemPriceUSD = itemPriceUSD * (item.quantity || 1);
+        const sizeModeDisplay = item.sizeMode === 'fill' ? 'Fill' : 'Fit';
         const photoCount = item.photoCount || 1;
         const hasMultiplePhotos = photoCount > 1;
-        const additionalPhotos = photoCount - 1;
 
-        html += `
+        return `
             <div class="cart-item-card" data-index="${index}">
                 <div class="cart-item-checkbox">
                     <input type="checkbox" class="item-checkbox" data-index="${index}" ${item.selected ? 'checked' : ''}>
@@ -4208,20 +4255,20 @@ function renderCartPage() {
                 <div class="cart-item-image" onclick="showPhotoPreview(${index})" style="cursor: pointer; position: relative;">
                     <img src="${item.displayImage || item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/100?text=Image'">
                     ${hasMultiplePhotos ? `
-                        <div style="position: absolute; bottom: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; padding: 2px 6px; border-radius: 12px; font-size: 12px; font-weight: bold;">
-                            +${additionalPhotos} more
+                        <div class="cart-item-more-photos" data-i18n="plus_more" data-i18n-count="${photoCount - 1}">
+                            +${photoCount - 1} more
                         </div>
                     ` : ''}
                 </div>
                 <div class="cart-item-details">
                     <div class="cart-item-name">${item.productName || item.name}</div>
                     <div class="cart-item-specs">
-                        ${item.size ? `<span>Size: ${item.size}</span>` : ''}
-                        ${item.paperType ? `<span>Paper: ${item.paperType}</span>` : ''}
-                        <span>Mode: ${sizeModeDisplay}</span>
+                        ${item.size ? `<span data-i18n="size_label_cart">Size: ${item.size}</span>` : ''}
+                        ${item.paperType ? `<span data-i18n="paper_label_cart">Paper: ${item.paperType}</span>` : ''}
+                        <span data-i18n="mode_label_cart">Mode: ${sizeModeDisplay}</span>
                         ${hasMultiplePhotos ? `<span>📸 ${photoCount} photos</span>` : ''}
                     </div>
-                    <div class="cart-item-price">${item.price}</div>
+                    <div class="cart-item-price" data-usd="${totalItemPriceUSD.toFixed(2)}">${formatPrice(totalItemPriceUSD)}</div>
                     <div class="cart-item-actions">
                         <div class="cart-item-quantity">
                             <button onclick="updateCartItemQuantityFromCart(${index}, -1)">−</button>
@@ -4232,9 +4279,7 @@ function renderCartPage() {
                 </div>
             </div>
         `;
-    });
-
-    container.innerHTML = html;
+    }).join('');
 
     document.querySelectorAll('.item-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', function () {
@@ -4249,6 +4294,7 @@ function renderCartPage() {
     });
 
     updateCartSelection();
+    updateAllText();
 }
 
 function showPhotoPreview(itemIndex) {
@@ -4361,7 +4407,8 @@ function closePhotoPreview() {
 
 function updateCartSelection() {
     const selectAll = document.getElementById('selectAllCheckbox');
-    const selectedCount = shoppingCart.filter(item => item.selected).length;
+    const selectedItems = shoppingCart.filter(item => item.selected);
+    const selectedCount = selectedItems.length;
     const totalCount = shoppingCart.length;
 
     document.getElementById('selectedCount').textContent = selectedCount;
@@ -4377,15 +4424,14 @@ function updateCartSelection() {
         }
     }
 
-    let total = 0;
-    shoppingCart.forEach((item) => {
-        if (item.selected) {
-            const price = parseFloat(item.price.toString().replace('₱', '').replace(',', '')) || 0;
-            total += price * (item.quantity || 1);
-        }
-    });
+    const totalUSD = selectedItems.reduce((total, item) => {
+        const itemPriceUSD = item.basePriceUSD || (parsePhpPrice(item.price) * 0.018);
+        return total + (itemPriceUSD * (item.quantity || 1));
+    }, 0);
 
-    document.getElementById('cartTotalSelected').textContent = `₱${total.toFixed(2)}`;
+    const totalEl = document.getElementById('cartTotalSelected');
+    totalEl.setAttribute('data-usd', totalUSD.toFixed(2));
+    totalEl.textContent = formatPrice(totalUSD);
 }
 
 function selectAllItems(checked) {
@@ -4614,14 +4660,17 @@ function updateCartHover() {
     if (!dropdown) return;
 
     if (shoppingCart.length === 0) {
-        dropdown.innerHTML = '<div class="cart-hover-empty">Your cart is empty</div>';
+        dropdown.innerHTML = '<div class="cart-hover-empty" data-i18n="cart_empty">Your cart is empty</div>';
+        updateAllText();
         return;
     }
 
-    let itemsHtml = '<div class="cart-hover-header"><span>Shopping Cart</span><button class="cart-hover-view-cart" onclick="navigateTo(\'cart-page\')">VIEW CART</button></div>';
+    let itemsHtml = `<div class="cart-hover-header"><span data-i18n="shopping_cart">Shopping Cart</span><button class="cart-hover-view-cart" onclick="navigateTo('cart-page')" data-i18n="view_cart">VIEW CART</button></div>`;
     itemsHtml += '<div class="cart-hover-items">';
 
     shoppingCart.slice(0, 3).forEach((item, index) => {
+        const itemPriceUSD = item.basePriceUSD || (parsePhpPrice(item.price) * 0.018);
+        const totalItemPriceUSD = itemPriceUSD * (item.quantity || 1);
         itemsHtml += `
             <div class="cart-hover-item">
                 <div class="cart-hover-item-image">
@@ -4629,30 +4678,31 @@ function updateCartHover() {
                 </div>
                 <div class="cart-hover-item-details">
                     <div class="cart-hover-item-name">${item.productName || item.name} ${item.photoCount > 1 ? `(${item.photoCount} photos)` : ''}</div>
-                    <div class="cart-hover-item-price">${item.price}</div>
+                    <div class="cart-hover-item-price" data-usd="${totalItemPriceUSD.toFixed(2)}">${formatPrice(totalItemPriceUSD)}</div>
                 </div>
             </div>
         `;
     });
 
     if (shoppingCart.length > 3) {
-        itemsHtml += `<div style="padding: 0.5rem 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">and ${shoppingCart.length - 3} more items</div>`;
+        itemsHtml += `<div class="cart-hover-more" data-i18n="and_n_more_items" data-i18n-count="${shoppingCart.length - 3}">and ${shoppingCart.length - 3} more items</div>`;
     }
 
     itemsHtml += '</div>';
 
-    const subtotal = calculateCartTotal();
+    const subtotalUSD = calculateCartTotal();
     itemsHtml += `
         <div class="cart-hover-footer">
             <div class="cart-hover-subtotal">
-                <span>Subtotal:</span>
-                <span>₱${subtotal.toFixed(2)}</span>
+                <span data-i18n="subtotal">Subtotal:</span>
+                <span data-usd="${subtotalUSD.toFixed(2)}">${formatPrice(subtotalUSD)}</span>
             </div>
-            <button class="cart-hover-checkout" onclick="navigateTo('cart-page')">VIEW CART</button>
+            <button class="cart-hover-checkout" onclick="navigateTo('cart-page')" data-i18n="view_cart_btn">VIEW CART</button>
         </div>
     `;
 
     dropdown.innerHTML = itemsHtml;
+    updateAllText();
 }
 
 function forceCartUpdate() {
