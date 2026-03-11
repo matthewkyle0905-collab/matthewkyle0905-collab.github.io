@@ -3877,158 +3877,7 @@ function clearSearch() {
 window.performSearch = performSearch;
 window.clearSearch = clearSearch;
 
-// ============== GOOGLE DRIVE ORDER PROCESSING ==============
-const CLIENT_ID = '758191937461-epcuq05oanl0cq8oedgj5pt32h79nojr.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyA0_S5lH8BwyvekzmG2s5qxt0_MAmLKOiM';
-const DISCOVERY_DOCS = ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'];
-const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-
-let tokenClient;
-let gapiInited = false;
-let gisInited = false;
-let rootFolderId = null;
-
-function initializeGoogleApi() {
-    gapi.load('client', async () => {
-        await gapi.client.init({
-            apiKey: API_KEY,
-            discoveryDocs: DISCOVERY_DOCS,
-        });
-        gapiInited = true;
-        maybeEnableButtons();
-    });
-
-    tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: '',
-    });
-    gisInited = true;
-    maybeEnableButtons();
-}
-
-function maybeEnableButtons() {
-    if (gapiInited && gisInited) {
-        document.getElementById('completeOrderBtn').disabled = false;
-    }
-}
-
-function base64ToBlob(base64, mimeType) {
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    return new Blob([byteArray], { type: mimeType });
-}
-
-async function getOrCreateOrdersFolder() {
-    try {
-        const response = await gapi.client.drive.files.list({
-            q: "name='C8FOCENTER' and mimeType='application/vnd.google-apps.folder' and trashed=false",
-            fields: 'files(id, name)',
-            spaces: 'drive'
-        });
-
-        let c8Folder;
-        if (response.result.files.length > 0) {
-            c8Folder = response.result.files[0];
-        } else {
-            c8Folder = await createDriveFolder('C8FOCENTER');
-        }
-
-        const ordersResponse = await gapi.client.drive.files.list({
-            q: `name='orders' and '${c8Folder.id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-            fields: 'files(id, name)',
-            spaces: 'drive'
-        });
-
-        if (ordersResponse.result.files.length > 0) {
-            return ordersResponse.result.files[0].id;
-        } else {
-            const ordersFolder = await createDriveFolder('orders', c8Folder.id);
-            return ordersFolder.id;
-        }
-    } catch (error) {
-        console.error('Error finding/creating orders folder:', error);
-        throw error;
-    }
-}
-
-async function createDriveFolder(folderName, parentId = null) {
-    const metadata = {
-        name: folderName,
-        mimeType: 'application/vnd.google-apps.folder'
-    };
-    if (parentId) {
-        metadata.parents = [parentId];
-    }
-
-    const response = await gapi.client.drive.files.create({
-        resource: metadata,
-        fields: 'id, name'
-    });
-
-    return response.result;
-}
-
-async function uploadFileToDrive(fileName, content, folderId) {
-    const boundary = '-------' + Date.now();
-    const delimiter = '\r\n--' + boundary + '\r\n';
-    const closeDelimiter = '\r\n--' + boundary + '--';
-
-    let contentType;
-    let bodyContent;
-
-    if (fileName.endsWith('.jpg')) {
-        contentType = 'image/jpeg';
-        const blob = base64ToBlob(content, 'image/jpeg');
-        bodyContent = blob;
-    } else {
-        contentType = 'text/plain';
-        bodyContent = content;
-    }
-
-    const metadata = {
-        name: fileName,
-        mimeType: contentType,
-        parents: [folderId]
-    };
-
-    if (fileName.endsWith('.jpg')) {
-        const form = new FormData();
-        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-        form.append('file', bodyContent);
-
-        const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-            method: 'POST',
-            headers: new Headers({ 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }),
-            body: form
-        });
-
-        return await response.json();
-    } else {
-        const multipartRequestBody =
-            delimiter +
-            'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
-            JSON.stringify(metadata) +
-            delimiter +
-            'Content-Type: ' + contentType + '\r\n\r\n' +
-            bodyContent +
-            closeDelimiter;
-
-        const response = await gapi.client.request({
-            path: '/upload/drive/v3/files',
-            method: 'POST',
-            params: { uploadType: 'multipart' },
-            headers: { 'Content-Type': 'multipart/related; boundary="' + boundary + '"' },
-            body: multipartRequestBody
-        });
-
-        return response.result;
-    }
-}
+// ============== ORDER PROCESSING ==============
 
 function generateConditionFile(orderData) {
     let content = `[OutDevice]\n    DeviceName= SP-1500sRGB\n\n`;
@@ -4448,22 +4297,12 @@ async function processOrderFromCart() {
         const isMultiPhoto = multiPhotoTypes.includes(productType);
 
         if (isMultiPhoto && item.photos && item.photos.length > 0) {
-            console.log(`📸 Processing ${item.productName} with ${item.photos.length} photos`);
-
             item.photos.forEach((photo, photoIndex) => {
                 let imageData = '';
-
-                if (photo.data) {
-                    imageData = photo.data;
-                } else if (photo.thumbnail) {
-                    imageData = photo.thumbnail;
-                } else if (typeof photo === 'string') {
-                    imageData = photo;
-                }
-
-                if (imageData && imageData.includes(',')) {
-                    imageData = imageData.split(',')[1];
-                }
+                if (photo.data) imageData = photo.data;
+                else if (photo.thumbnail) imageData = photo.thumbnail;
+                else if (typeof photo === 'string') imageData = photo;
+                if (imageData && imageData.includes(',')) imageData = imageData.split(',')[1];
 
                 photos.push({
                     originalName: photo.name || `Photo_${photoIndex + 1}.jpg`,
@@ -4484,26 +4323,14 @@ async function processOrderFromCart() {
                 photoCounter++;
             });
         } else {
-            console.log(`🖼️ Processing ${item.name} as single photo product`);
-
-            let imageSource = '';
-
-            if (item.displayImage) {
-                imageSource = item.displayImage;
-            } else if (item.image) {
-                imageSource = item.image;
-            } else if (item.photos && item.photos[0]) {
+            let imageSource = item.displayImage || item.image || '';
+            if (!imageSource && item.photos && item.photos[0]) {
                 const firstPhoto = item.photos[0];
                 imageSource = firstPhoto.data || firstPhoto.thumbnail || firstPhoto;
             }
-
             let imageData = '';
             if (imageSource && typeof imageSource === 'string') {
-                if (imageSource.includes(',')) {
-                    imageData = imageSource.split(',')[1];
-                } else {
-                    imageData = imageSource;
-                }
+                imageData = imageSource.includes(',') ? imageSource.split(',')[1] : imageSource;
             }
 
             photos.push({
@@ -4519,14 +4346,12 @@ async function processOrderFromCart() {
                 customHeight: item.customDimensions?.height || null,
                 customUnit: item.customDimensions?.unit || 'inches',
                 resize: item.sizeMode || 'FITIN',
-                productType: productType,
+                productType: item.productType || item.type,
                 productName: item.productName || item.name
             });
             photoCounter++;
         }
     });
-
-    console.log(`📦 Total photos to upload: ${photos.length}`);
 
     const orderData = {
         orderId: generateOrderId(),
@@ -4542,54 +4367,44 @@ async function processOrderFromCart() {
     btn.disabled = true;
 
     try {
-        const token = await new Promise((resolve, reject) => {
-            tokenClient.callback = (resp) => {
-                if (resp.error !== undefined) {
-                    reject(resp);
-                }
-                resolve(resp);
-            };
-            tokenClient.requestAccessToken();
+        const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                orderId: orderData.orderId,
+                username: orderData.username,
+                orderCount: orderData.orderCount,
+                photos: orderData.photos,
+                conditionFile: generateConditionFile(orderData),
+                endFile: generateEndFile(orderData),
+                receiptFile: generateReceiptFile(orderData)
+            })
         });
 
-        const ordersFolderId = await getOrCreateOrdersFolder();
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Server error');
 
-        const folderName = `${username}_${orderData.orderCount}_${orderData.orderId}`;
-        const mainFolder = await createDriveFolder(folderName, ordersFolderId);
-
-        const photosFolder = await createDriveFolder('Photos', mainFolder.id);
-
-        for (let i = 0; i < orderData.photos.length; i++) {
-            const photo = orderData.photos[i];
-            await uploadFileToDrive(
-                `${i + 1}.jpg`,
-                photo.data,
-                photosFolder.id
-            );
-        }
-
-        await uploadFileToDrive(
-            'Condition.txt',
-            generateConditionFile(orderData),
-            mainFolder.id
-        );
-
-        await uploadFileToDrive(
-            'End.txt',
-            generateEndFile(orderData),
-            mainFolder.id
-        );
-
-        await uploadFileToDrive(
-            'OrderReceipt.txt',
-            generateReceiptFile(orderData),
-            mainFolder.id
-        );
+        // Save order to localStorage for Printing tab
+        const completedOrders = JSON.parse(localStorage.getItem('fotocenterOrders') || '[]');
+        completedOrders.push({
+            orderId: orderData.orderId,
+            username: orderData.username,
+            photoCount: photos.length,
+            items: selectedItems.map(item => ({
+                name: item.productName || item.name,
+                size: item.size,
+                quantity: item.quantity || 1,
+                price: item.basePriceUSD || 0
+            })),
+            timestamp: orderData.timestamp,
+            status: 'printing'
+        });
+        localStorage.setItem('fotocenterOrders', JSON.stringify(completedOrders));
 
         shoppingCart = shoppingCart.filter(item => !item.selected);
         updateCartStorage();
 
-        const message = `Hello ${username},\n\nThis is your Order Number: ${orderData.orderId} <button class="copy-btn" onclick="copyOrderNumber()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:5px;" title="Copy order number">📋</button>\n\nTotal Photos: ${photos.length}\n\nPlease copy and save the Order Number\n\nThank you for choosing FOTOCENTER!`;
+        const message = `✅ Thank you for purchasing at FOTOCENTER PH!\n\nYour Order Number: ${orderData.orderId} <button class="copy-btn" onclick="copyOrderNumber()" style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:5px;" title="Copy order number">📋</button>\n\nTotal Photos: ${photos.length}\n\nPlease copy and save your Order Number.\nYou can track your order status in Cart → Printing tab.\n\nThank you for choosing FOTOCENTER!`;
         document.getElementById('orderSuccessMessage').innerHTML = message;
         document.getElementById('orderSuccessModal').style.display = 'flex';
 
@@ -4599,7 +4414,7 @@ async function processOrderFromCart() {
 
     } catch (error) {
         console.error('Order failed:', error);
-        alert('❌ Order failed: ' + (error.error || error.message || 'Unknown error'));
+        alert('❌ Order failed: ' + (error.message || 'Unknown error'));
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -5028,7 +4843,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 500);
 
     if (typeof initPrintOptions === 'function') initPrintOptions();
-    if (typeof initializeGoogleApi === 'function') initializeGoogleApi();
     if (typeof initCartHover === 'function') initCartHover();
     if (typeof initSelectAll === 'function') initSelectAll();
     if (typeof initSearchBar === 'function') initSearchBar();
