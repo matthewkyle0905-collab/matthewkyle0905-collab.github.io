@@ -414,12 +414,12 @@ class Slideshow {
         this.autoPlayDelay = 5000;
 
         this.products = [
-            { name: 'Photo Cards', priceUSD: 0.45, image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Create personalized greeting cards' },
-            { name: 'Calendar', priceUSD: 1.08, image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Make your own custom calendar' },
-            { name: 'Photo Book', priceUSD: 2.16, image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Premium hardcover photo books' },
-            { name: 'Canvas', priceUSD: 3.60, image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Your favorite photo on canvas' },
-            { name: 'Mouse Pads', priceUSD: 0.81, image: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=1260&h=750&fit=crop', desc: 'Custom photo mouse pads' },
-            { name: 'Double Cards', priceUSD: 1.26, image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Elegant folded greeting cards' }
+            { name: 'Photo Cards', nameKey: 'slide_photo_cards', priceUSD: 0.45, image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Create personalized greeting cards', descKey: 'slide_photo_cards_desc' },
+            { name: 'Calendar', nameKey: 'slide_calendar', priceUSD: 1.08, image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Make your own custom calendar', descKey: 'slide_calendar_desc' },
+            { name: 'Photo Book', nameKey: 'slide_photo_book', priceUSD: 2.16, image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Premium hardcover photo books', descKey: 'slide_photo_book_desc' },
+            { name: 'Canvas', nameKey: 'slide_canvas', priceUSD: 3.60, image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Your favorite photo on canvas', descKey: 'slide_canvas_desc' },
+            { name: 'Mouse Pads', nameKey: 'slide_mouse_pads', priceUSD: 0.81, image: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=1260&h=750&fit=crop', desc: 'Custom photo mouse pads', descKey: 'slide_mouse_pads_desc' },
+            { name: 'Double Cards', nameKey: 'slide_double_cards', priceUSD: 1.26, image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Elegant folded greeting cards', descKey: 'slide_double_cards_desc' }
         ];
         this.init();
     }
@@ -454,13 +454,14 @@ class Slideshow {
                          onerror="this.src='https://via.placeholder.com/1200x800?text=${product.name}'">
                 </div>
                 <div class="slide-info">
-                    <h3>${product.name}</h3>
-                    <p>${product.desc}</p>
-                    <div class="slide-price" data-usd="${product.priceUSD}">For only ${formatPrice(product.priceUSD)} !!!</div>
+                    <h3 data-i18n="${product.nameKey}">${product.name}</h3>
+                    <p data-i18n="${product.descKey}">${product.desc}</p>
+                    <div class="slide-price" data-usd="${product.priceUSD}"><span data-i18n="slide_for_only">For only</span> ${formatPrice(product.priceUSD)} !!!</div>
                 </div>
             `;
             this.track.appendChild(slide);
         });
+        if (typeof updateAllText === 'function') updateAllText();
     }
 
     createDots() {
@@ -1404,6 +1405,10 @@ function navigateTo(pageId) {
 
     if (pageId === 'cart-page') {
         setTimeout(() => {
+            activeCartTab = 'all';
+            document.querySelectorAll('.cart-tab').forEach(t => t.classList.remove('active'));
+            const allTab = document.querySelector('.cart-tab[data-tab="all"]');
+            if (allTab) allTab.classList.add('active');
             renderCartPage();
         }, 100);
     }
@@ -4006,6 +4011,8 @@ function copyOrderNumber() {
 window.copyOrderNumber = copyOrderNumber;
 
 // ============== CART PAGE FUNCTIONS ==============
+let activeCartTab = 'all';
+
 function initSelectAll() {
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
     if (selectAllCheckbox) {
@@ -4019,9 +4026,92 @@ function initSelectAll() {
     }
 }
 
+function initCartTabs() {
+    document.querySelectorAll('.cart-tab').forEach(tab => {
+        tab.addEventListener('click', function () {
+            document.querySelectorAll('.cart-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            activeCartTab = this.getAttribute('data-tab');
+            renderCartPage();
+        });
+    });
+}
+
+function getOrdersByStatus(status) {
+    const orders = JSON.parse(localStorage.getItem('fotocenterOrders') || '[]');
+    return orders.filter(order => order.status === status);
+}
+
+function renderOrderCards(orders, statusLabel) {
+    const container = document.getElementById('cartItemsContainer');
+    if (!container) return;
+
+    const selectAllBar = document.getElementById('selectAllBar');
+    const stickyBottom = document.querySelector('.cart-sticky-bottom');
+    if (selectAllBar) selectAllBar.style.display = 'none';
+    if (stickyBottom) stickyBottom.style.display = 'none';
+
+    if (orders.length === 0) {
+        container.innerHTML = `
+            <div class="empty-cart-message">
+                <p>No orders in "${statusLabel}"</p>
+            </div>
+        `;
+        updateAllText();
+        return;
+    }
+
+    container.innerHTML = orders.map(order => {
+        const date = new Date(order.timestamp).toLocaleString();
+        const totalUSD = order.items.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+        const itemsList = order.items.map(item =>
+            `<span style="display:block; font-size:0.85rem; color:var(--text-muted);">• ${item.name} (${item.size || 'N/A'}) x${item.quantity || 1} — ${formatPrice(item.price * (item.quantity || 1))}</span>`
+        ).join('');
+
+        return `
+            <div class="cart-item-card" style="flex-direction:column; align-items:flex-start; gap:0.5rem;">
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <div>
+                        <strong style="color:var(--accent);">Order #${order.orderId}</strong>
+                        <span style="margin-left:1rem; font-size:0.85rem; color:var(--text-muted);">${date}</span>
+                    </div>
+                    <span style="background:var(--accent); color:white; padding:2px 10px; border-radius:12px; font-size:0.8rem; text-transform:uppercase;">${order.status}</span>
+                </div>
+                <div style="width:100%;">${itemsList}</div>
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center; margin-top:0.5rem;">
+                    <span style="font-size:0.85rem;">📸 ${order.photoCount} photo(s)</span>
+                    <strong data-usd="${totalUSD.toFixed(2)}">${formatPrice(totalUSD)}</strong>
+                </div>
+            </div>
+        `;
+    }).join('');
+    updateAllText();
+    updateAllPrices();
+}
+
 function renderCartPage() {
     const container = document.getElementById('cartItemsContainer');
     if (!container) return;
+
+    if (activeCartTab !== 'all') {
+        const statusMap = {
+            'printing': 'printing',
+            'toship': 'toship',
+            'completed': 'completed',
+            'cancel': 'cancelled'
+        };
+        const labelMap = {
+            'printing': 'Printing',
+            'toship': 'To Ship',
+            'completed': 'Completed',
+            'cancel': 'Cancel/Return'
+        };
+        const status = statusMap[activeCartTab] || activeCartTab;
+        const label = labelMap[activeCartTab] || activeCartTab;
+        const orders = getOrdersByStatus(status);
+        renderOrderCards(orders, label);
+        return;
+    }
 
     if (shoppingCart.length === 0) {
         container.innerHTML = `
@@ -4031,7 +4121,7 @@ function renderCartPage() {
             </div>
         `;
         const selectAllBar = document.getElementById('selectAllBar');
-        const stickyBottom = document.getElementById('cartStickyBottom');
+        const stickyBottom = document.querySelector('.cart-sticky-bottom');
         if (selectAllBar) selectAllBar.style.display = 'none';
         if (stickyBottom) stickyBottom.style.display = 'none';
         document.getElementById('totalCount').textContent = '0';
@@ -4045,7 +4135,7 @@ function renderCartPage() {
     }
 
     const selectAllBar = document.getElementById('selectAllBar');
-    const stickyBottom = document.getElementById('cartStickyBottom');
+    const stickyBottom = document.querySelector('.cart-sticky-bottom');
     if (selectAllBar) selectAllBar.style.display = 'flex';
     if (stickyBottom) stickyBottom.style.display = 'flex';
     document.getElementById('totalCount').textContent = shoppingCart.length;
@@ -4845,6 +4935,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof initPrintOptions === 'function') initPrintOptions();
     if (typeof initCartHover === 'function') initCartHover();
     if (typeof initSelectAll === 'function') initSelectAll();
+    if (typeof initCartTabs === 'function') initCartTabs();
     if (typeof initSearchBar === 'function') initSearchBar();
 
     const deleteBtn = document.getElementById('deleteSelectedBtn');
