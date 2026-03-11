@@ -4815,44 +4815,16 @@ function makeSlidesClickable() {
 
                 navigateTo('photos');
 
+                // Delay selectProduct to run AFTER switchPhotoMode (50ms) completes,
+                // ensuring the photos page UI is fully ready before updating print options
                 setTimeout(() => {
-                    console.log('📸 Photos page loaded, selecting product...');
-
+                    console.log('📸 Photos page ready, selecting product...');
                     if (typeof selectProduct === 'function') {
                         selectProduct(productType);
                         console.log('✅ selectProduct called with:', productType);
                     }
-
-                    const badge = document.getElementById('currentProductBadge');
-                    if (badge) {
-                        const icons = {
-                            'photocards': '🖼️',
-                            'calendar': '📅',
-                            'photobook': '📘',
-                            'canvas': '🖼️',
-                            'mousepads': '🖱️',
-                            'doublecards': '🃏'
-                        };
-
-                        const names = {
-                            'photocards': 'Photo Cards',
-                            'calendar': 'Calendar',
-                            'photobook': 'Photo Book',
-                            'canvas': 'Canvas',
-                            'mousepads': 'Mouse Pads',
-                            'doublecards': 'Double Cards'
-                        };
-
-                        badge.innerHTML = `<span class="badge-text">${icons[productType] || '📷'} ${names[productType] || productType}</span>`;
-                    }
-
-                    if (typeof updatePrintOptions === 'function') {
-                        updatePrintOptions(productType);
-                    }
-
                     showEditorWelcome(productType);
-
-                }, 800);
+                }, 150);
 
                 return false;
             });
