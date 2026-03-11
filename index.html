@@ -205,7 +205,7 @@
         <section id="signup" class="page">
             <div class="login-container">
                 <div class="login-box" style="position: relative;">
-                    <span class="close-modal" onclick="navigateTo('home'); return false;" style="position: absolute; top: 1rem; right: 1rem; font-size: 1.8rem; color: #ff6b35; cursor: pointer; z-index: 10; line-height: 1; transition: all 0.3s ease;">&times;</span>
+                    color: var(--accent);
                     <h2 data-i18n="create_account">Create Account</h2>
                     <p class="login-subtitle" data-i18n="join_today">Join FOTOCENTER today</p>
 
@@ -258,7 +258,44 @@
                 <div class="hero-content">
                     <h2 data-i18n="welcome">Welcome to FOTOCENTER PH</h2>
                     <p data-i18n="tagline">Paper copies for your digital photos</p>
-                    <button class="cta-btn" onclick="navigateTo('shop'); return false;" data-i18n="start_ordering">Start Ordering</button>
+                </div>
+                <div class="hero-icon-grid">
+                    <a href="#" class="hero-icon-item" onclick="navigateTo('coming-photocards'); return false;">
+                        <div class="hero-icon-circle">
+                            <img src="images2/photo.png" alt="Photo Cards">
+                        </div>
+                        <span class="hero-icon-label" data-i18n="photo_cards">Photo Cards</span>
+                    </a>
+                    <a href="#" class="hero-icon-item" onclick="navigateTo('coming-calendar'); return false;">
+                        <div class="hero-icon-circle">
+                            <img src="images2/calendars.png" alt="Calendar">
+                        </div>
+                        <span class="hero-icon-label" data-i18n="calendars">Calendar</span>
+                    </a>
+                    <a href="#" class="hero-icon-item" onclick="navigateTo('coming-photobook'); return false;">
+                        <div class="hero-icon-circle">
+                            <img src="images2/bookphoto.png" alt="Photo Book">
+                        </div>
+                        <span class="hero-icon-label" data-i18n="photo_book">Photo Book</span>
+                    </a>
+                    <a href="#" class="hero-icon-item" onclick="navigateTo('coming-canvas'); return false;">
+                        <div class="hero-icon-circle">
+                            <img src="images2/canva.png" alt="Canvas">
+                        </div>
+                        <span class="hero-icon-label" data-i18n="canvas">Canvas</span>
+                    </a>
+                    <a href="#" class="hero-icon-item" onclick="navigateTo('coming-mousepads'); return false;">
+                        <div class="hero-icon-circle">
+                            <img src="images2/padmouse.png" alt="Mouse Pads">
+                        </div>
+                        <span class="hero-icon-label" data-i18n="mouse_pads">Mouse Pads</span>
+                    </a>
+                    <a href="#" class="hero-icon-item" onclick="navigateTo('coming-doublecards'); return false;">
+                        <div class="hero-icon-circle">
+                            <img src="images2/doublecards.png" alt="Double Cards">
+                        </div>
+                        <span class="hero-icon-label" data-i18n="double_cards">Double Cards</span>
+                    </a>
                 </div>
             </header>
 
@@ -269,12 +306,12 @@
                         <button class="slideshow-arrow arrow-left" id="slideshowPrev" aria-label="Previous slide">&#10094;</button>
                         <div class="slides-wrapper" id="slidesWrapper">
                             <div class="slides-track" id="slidesTrack"></div>
+                            <div class="slideshow-controls">
+                                <div class="slideshow-dots" id="slideshowDots"></div>
+                                <button class="slideshow-pause" id="slideshowPause" aria-label="Pause slideshow">⏸️</button>
+                            </div>
                         </div>
                         <button class="slideshow-arrow arrow-right" id="slideshowNext" aria-label="Next slide">&#10095;</button>
-                        <div class="slideshow-controls">
-                            <div class="slideshow-dots" id="slideshowDots"></div>
-                            <button class="slideshow-pause" id="slideshowPause" aria-label="Pause slideshow">⏸️</button>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -283,7 +320,7 @@
             <section class="home-content-section">
                 <div class="container">
                     <div class="video-wrapper">
-                        <iframe width="100%" height="500" src="https://www.youtube.com/embed/RuXa_yxZMGI?autoplay=1&loop=1&playlist=RuXa_yxZMGI&mute=1&rel=0" title="FOTOCENTER Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <iframe width="100%" height="700" src="https://www.youtube.com/embed/RuXa_yxZMGI?autoplay=1&loop=1&playlist=RuXa_yxZMGI&mute=1&rel=0" title="FOTOCENTER Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
 
                     <!-- Two Column Text Section -->
@@ -652,6 +689,61 @@
             <div class="container">
                 <h2 data-i18n="canvas">Canvas</h2>
                 <p data-i18n="canvas_description">Your favorite photo mounted on canvas.</p>
+            </div>
+        </section>
+
+        <!-- COMING SOON PAGES -->
+        <section id="coming-photocards" class="page">
+            <div class="coming-soon-container">
+                <div class="coming-soon-icon"><img src="images2/photo.png" alt="Photo Cards"></div>
+                <h2 data-i18n="photo_cards">Photo Cards</h2>
+                <p class="coming-soon-text" data-i18n="coming_soon">COMING SOON</p>
+                <button class="back-home-btn" onclick="navigateTo('home'); return false;">← <span data-i18n="back_to_home">Back to Home</span></button>
+            </div>
+        </section>
+
+        <section id="coming-calendar" class="page">
+            <div class="coming-soon-container">
+                <div class="coming-soon-icon"><img src="images2/calendars.png" alt="Calendar"></div>
+                <h2 data-i18n="calendars">Calendar</h2>
+                <p class="coming-soon-text" data-i18n="coming_soon">COMING SOON</p>
+                <button class="back-home-btn" onclick="navigateTo('home'); return false;">← <span data-i18n="back_to_home">Back to Home</span></button>
+            </div>
+        </section>
+
+        <section id="coming-photobook" class="page">
+            <div class="coming-soon-container">
+                <div class="coming-soon-icon"><img src="images2/bookphoto.png" alt="Photo Book"></div>
+                <h2 data-i18n="photo_book">Photo Book</h2>
+                <p class="coming-soon-text" data-i18n="coming_soon">COMING SOON</p>
+                <button class="back-home-btn" onclick="navigateTo('home'); return false;">← <span data-i18n="back_to_home">Back to Home</span></button>
+            </div>
+        </section>
+
+        <section id="coming-canvas" class="page">
+            <div class="coming-soon-container">
+                <div class="coming-soon-icon"><img src="images2/canva.png" alt="Canvas"></div>
+                <h2 data-i18n="canvas">Canvas</h2>
+                <p class="coming-soon-text" data-i18n="coming_soon">COMING SOON</p>
+                <button class="back-home-btn" onclick="navigateTo('home'); return false;">← <span data-i18n="back_to_home">Back to Home</span></button>
+            </div>
+        </section>
+
+        <section id="coming-mousepads" class="page">
+            <div class="coming-soon-container">
+                <div class="coming-soon-icon"><img src="images2/padmouse.png" alt="Mouse Pads"></div>
+                <h2 data-i18n="mouse_pads">Mouse Pads</h2>
+                <p class="coming-soon-text" data-i18n="coming_soon">COMING SOON</p>
+                <button class="back-home-btn" onclick="navigateTo('home'); return false;">← <span data-i18n="back_to_home">Back to Home</span></button>
+            </div>
+        </section>
+
+        <section id="coming-doublecards" class="page">
+            <div class="coming-soon-container">
+                <div class="coming-soon-icon"><img src="images2/doublecards.png" alt="Double Cards"></div>
+                <h2 data-i18n="double_cards">Double Cards</h2>
+                <p class="coming-soon-text" data-i18n="coming_soon">COMING SOON</p>
+                <button class="back-home-btn" onclick="navigateTo('home'); return false;">← <span data-i18n="back_to_home">Back to Home</span></button>
             </div>
         </section>
 
