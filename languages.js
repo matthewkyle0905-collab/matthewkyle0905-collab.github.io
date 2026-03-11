@@ -208,7 +208,27 @@ const languages = [
 
             // LOADING STATES
             'loading_cart': 'Loading cart...',
-            'back': 'Back'
+            'back': 'Back',
+
+            // SLIDESHOW
+            'slide_photo_cards': 'Photo Cards',
+            'slide_photo_cards_desc': 'Create personalized greeting cards',
+            'slide_calendar': 'Calendar',
+            'slide_calendar_desc': 'Make your own custom calendar',
+            'slide_photo_book': 'Photo Book',
+            'slide_photo_book_desc': 'Premium hardcover photo books',
+            'slide_canvas': 'Canvas',
+            'slide_canvas_desc': 'Your favorite photo on canvas',
+            'slide_mouse_pads': 'Mouse Pads',
+            'slide_mouse_pads_desc': 'Custom photo mouse pads',
+            'slide_double_cards': 'Double Cards',
+            'slide_double_cards_desc': 'Elegant folded greeting cards',
+            'slide_for_only': 'For only',
+
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Mouse Pads',
+            'double_cards': 'Double Cards',
+            'coming_soon': 'COMING SOON'
         }
     },
 
@@ -390,6 +410,26 @@ const languages = [
             'send': 'Send',
             'loading_cart': 'Loading basket...',
             'back': 'Back',
+
+            // SLIDESHOW
+            'slide_photo_cards': 'Photo Cards',
+            'slide_photo_cards_desc': 'Create personalised greeting cards',
+            'slide_calendar': 'Calendar',
+            'slide_calendar_desc': 'Make your own custom calendar',
+            'slide_photo_book': 'Photo Book',
+            'slide_photo_book_desc': 'Premium hardcover photo books',
+            'slide_canvas': 'Canvas',
+            'slide_canvas_desc': 'Your favourite photo on canvas',
+            'slide_mouse_pads': 'Mouse Pads',
+            'slide_mouse_pads_desc': 'Custom photo mouse pads',
+            'slide_double_cards': 'Double Cards',
+            'slide_double_cards_desc': 'Elegant folded greeting cards',
+            'slide_for_only': 'For only',
+
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Mouse Pads',
+            'double_cards': 'Double Cards',
+            'coming_soon': 'COMING SOON',
 
             'product_photocards_desc': 'Create personalised greeting cards for any occasion. Perfect for birthdays, holidays, or just to say thank you. Choose from various sizes and paper types to match your style.',
             'product_calendar_desc': 'Create personalised calendars with your favourite photos. Perfect for gifts or home decoration. Choose from desk, wall, or mini calendars to match your style.',
@@ -578,10 +618,31 @@ const languages = [
             'send': 'Skicka',
             'loading_cart': 'Laddar varukorg...',
             'back': 'Tillbaka',
+
+            // SLIDESHOW
+            'slide_photo_cards': 'Fotokort',
+            'slide_photo_cards_desc': 'Skapa personliga gratulationskort',
+            'slide_calendar': 'Kalender',
+            'slide_calendar_desc': 'Gör din egen kalender',
+            'slide_photo_book': 'Fotobok',
+            'slide_photo_book_desc': 'Premium inbundna fotoböcker',
+            'slide_canvas': 'Canvas',
+            'slide_canvas_desc': 'Ditt favoritfoto på canvas',
+            'slide_mouse_pads': 'Musmatta',
+            'slide_mouse_pads_desc': 'Anpassade fotomusmattor',
+            'slide_double_cards': 'Dubbelkort',
+            'slide_double_cards_desc': 'Eleganta vikbara gratulationskort',
+            'slide_for_only': 'Från bara',
+
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Musmattor',
+            'double_cards': 'Dubbelkort',
+            'coming_soon': 'KOMMER SNART',
+
             'product_photocards_desc': 'Skapa personliga gratulationskort för alla tillfällen. Perfekt för födelsedagar, högtider eller bara för att säga tack. Välj bland olika storlekar och papperstyper som passar din stil.',
             'product_calendar_desc': 'Skapa personliga kalendrar med dina favoritfoton. Perfekt som present eller heminredning. Välj bland bords-, vägg- eller minikalendrar som passar din stil.',
             'product_photobook_desc': 'Premium inbundna fotoböcker för att samla dina minnen. Perfekt för bröllop, semester eller familjealbum. Välj bland olika storlekar och bindningsalternativ.',
-            'product_canvas_desc': 'Ditt favoritfoto monterat på högkvalitativ canvas. Galleriuppspänd och redo att hänga. Perfekt för heminredning eller speciella presenter.',
+            'product_canvas_desc': 'Ditt favoritfoto monterat på högkvalitativ canvas. Galleriuppspänt och redo att hänga. Perfekt för heminredning eller speciella presenter.',
             'product_mousepads_desc': 'Anpassade fotomusmattor för ditt skrivbord. Perfekt för kontor eller hemma. Halkfri gummibas och slät yta för optimal muskontroll.',
             'product_doublecards_desc': 'Eleganta vikbara gratulationskort för alla speciella tillfällen. Perfekt för inbjudningar, tackkort eller julhälsningar. Kommer med matchande kuvert.'
         }
@@ -795,7 +856,27 @@ const languages = [
             'loading_cart': 'Laster handlekurv...',
             'back': 'Tilbake',
 
-            'product_photocards_desc': 'Lag personlige gratulasjonskort for enhver anledning. Perfekt for bursdager, høytider eller bare for å si takk. Velg mellom ulike størrelser og papirtyper som passer din stil.',
+            // SLIDESHOW
+            'slide_photo_cards': 'Fotokort',
+            'slide_photo_cards_desc': 'Lag personlige gratulasjonskort',
+            'slide_calendar': 'Kalender',
+            'slide_calendar_desc': 'Lag din egen kalender',
+            'slide_photo_book': 'Fotobok',
+            'slide_photo_book_desc': 'Premium innbundne fotobøker',
+            'slide_canvas': 'Lerret',
+            'slide_canvas_desc': 'Ditt favorittbilde på lerret',
+            'slide_mouse_pads': 'Musematter',
+            'slide_mouse_pads_desc': 'Tilpassede fotomusematter',
+            'slide_double_cards': 'Dobbeltkort',
+            'slide_double_cards_desc': 'Elegante brettede gratulasjonskort',
+            'slide_for_only': 'Fra bare',
+
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Musematter',
+            'double_cards': 'Dobbeltkort',
+            'coming_soon': 'KOMMER SNART',
+
+            'product_photocards_desc': 'Lag personlige gratulasjonskort for enhver anledning. Perfekt for bursdager, helligdager eller bare for å si takk. Velg mellom ulike størrelser og papirtyper som passer din stil.',
             'product_calendar_desc': 'Lag personlige kalendere med dine favorittbilder. Perfekt som gave eller hjemmedekorasjon. Velg mellom bord-, vegg- eller minikalendere som passer din stil.',
             'product_photobook_desc': 'Premium innbundne fotobøker for å samle minnene dine. Perfekt for bryllup, ferier eller familiealbum. Velg mellom ulike størrelser og bindingsalternativer.',
             'product_canvas_desc': 'Ditt favorittbilde montert på høykvalitets lerret. Gallerioppspent og klar til henging. Perfekt for hjemmedekorasjon eller spesielle gaver.',
@@ -1013,6 +1094,26 @@ const languages = [
             // LOADING STATES
             'loading_cart': 'Indlæser kurv...',
             'back': 'Tilbage',
+
+            // SLIDESHOW
+            'slide_photo_cards': 'Fotokort',
+            'slide_photo_cards_desc': 'Lav personlige lykønskningskort',
+            'slide_calendar': 'Kalender',
+            'slide_calendar_desc': 'Lav din egen kalender',
+            'slide_photo_book': 'Fotobog',
+            'slide_photo_book_desc': 'Premium indbundne fotobøger',
+            'slide_canvas': 'Lærred',
+            'slide_canvas_desc': 'Dit yndlingsbillede på lærred',
+            'slide_mouse_pads': 'Musemåtter',
+            'slide_mouse_pads_desc': 'Tilpassede fotomusmåtter',
+            'slide_double_cards': 'Dobbeltkort',
+            'slide_double_cards_desc': 'Elegante foldede lykønskningskort',
+            'slide_for_only': 'Fra bare',
+
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Musemåtter',
+            'double_cards': 'Dobbeltkort',
+            'coming_soon': 'KOMMER SNART',
 
             'product_photocards_desc': 'Lav personlige lykønskningskort til enhver lejlighed. Perfekt til fødselsdage, helligdage eller bare for at sige tak. Vælg mellem forskellige størrelser og papirtyper, der passer til din stil.',
             'product_calendar_desc': 'Lav personlige kalendere med dine yndlingsbilleder. Perfekt som gave eller boligindretning. Vælg mellem bord-, væg- eller minikalendere, der passer til din stil.',
@@ -1232,7 +1333,27 @@ const languages = [
 
             // LOADING STATES
             'loading_cart': 'Ladataan ostoskoria...',
-            'back': 'Takaisin'
+            'back': 'Takaisin',
+
+            // SLIDESHOW
+            'slide_photo_cards': 'Valokuvakortit',
+            'slide_photo_cards_desc': 'Luo personoituja onnittelukortteja',
+            'slide_calendar': 'Kalenteri',
+            'slide_calendar_desc': 'Tee oma kalenteri',
+            'slide_photo_book': 'Valokuvakirja',
+            'slide_photo_book_desc': 'Laadukkaat kovakantiset valokuvakirjat',
+            'slide_canvas': 'Canvas',
+            'slide_canvas_desc': 'Suosikkikuvasi canvasille',
+            'slide_mouse_pads': 'Hiirimatto',
+            'slide_mouse_pads_desc': 'Personoidut valokuvahiirimattot',
+            'slide_double_cards': 'Kaksipuoleiset kortit',
+            'slide_double_cards_desc': 'Tyylikkäät taitettavat onnittelukortit',
+            'slide_for_only': 'Vain',
+
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Hiirimatto',
+            'double_cards': 'Kaksipuoleiset kortit',
+            'coming_soon': 'TULOSSA PIAN'
         }
     },
 
@@ -1444,12 +1565,32 @@ const languages = [
             'loading_cart': 'Warenkorb wird geladen...',
             'back': 'Zurück',
 
-            'product_photocards_desc': 'Luo personoituja onnittelukortteja joka tilanteeseen. Täydellinen syntymäpäiviin, juhlapyhiin tai vain kiitoksen sanomiseen. Valitse eri kokojen ja paperityyppien joukosta tyyliisi sopiva.',
-            'product_calendar_desc': 'Luo personoituja kalentereita suosikkikuvillasi. Täydellinen lahjaksi tai kodin sisustukseen. Valitse pöytä-, seinä- tai minikalenteri tyyliisi sopivaksi.',
-            'product_photobook_desc': 'Laadukkaat kovakantiset valokuvakirjat muistojesi tallentamiseen. Täydellinen häihin, lomille tai perhealbumeihin. Valitse eri kokojen ja sidontavaihtoehtojen joukosta.',
-            'product_canvas_desc': 'Suosikkikuvasi laadukkaalle canvas-pohjalle kiinnitettynä. Galleriakääritty ja valmis ripustettavaksi. Täydellinen kodin sisustukseen tai erityislahjaksi.',
-            'product_mousepads_desc': 'Personoidut valokuvahiirimattosi työpöydällesi. Täydellinen toimistoon tai kotikäyttöön. Liukumaton kumipohja ja sileä pinta optimaalista hiiren hallintaa varten.',
-            'product_doublecards_desc': 'Tyylikkäät taitettavat onnittelukortit kaikkiin erityistilaisuuksiin. Täydellinen kutsukortteihin, kiitoskortteihin tai joulutervehdyksiin. Toimitetaan yhteensopivien kirjekuorien kanssa.'
+            // SLIDESHOW
+            'slide_photo_cards': 'Fotokarten',
+            'slide_photo_cards_desc': 'Erstellen Sie personalisierte Grußkarten',
+            'slide_calendar': 'Kalender',
+            'slide_calendar_desc': 'Erstellen Sie Ihren eigenen Kalender',
+            'slide_photo_book': 'Fotobuch',
+            'slide_photo_book_desc': 'Premium-Hardcover-Fotobücher',
+            'slide_canvas': 'Leinwand',
+            'slide_canvas_desc': 'Ihr Lieblingsfoto auf Leinwand',
+            'slide_mouse_pads': 'Mauspads',
+            'slide_mouse_pads_desc': 'Individuelle Foto-Mauspads',
+            'slide_double_cards': 'Doppelkarten',
+            'slide_double_cards_desc': 'Elegante gefaltete Grußkarten',
+            'slide_for_only': 'Nur ab',
+
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Mauspads',
+            'double_cards': 'Doppelkarten',
+            'coming_soon': 'DEMNÄCHST',
+
+            'product_photocards_desc': 'Erstellen Sie personalisierte Grußkarten für jeden Anlass. Perfekt für Geburtstage, Feiertage oder einfach um Danke zu sagen. Wählen Sie aus verschiedenen Größen und Papierarten.',
+            'product_calendar_desc': 'Erstellen Sie personalisierte Kalender mit Ihren Lieblingsfotos. Perfekt als Geschenk oder Dekoration. Wählen Sie zwischen Tisch-, Wand- oder Minikalendern, die zu Ihrem Stil passen.',
+            'product_photobook_desc': 'Hochwertige gebundene Fotobücher zum Sammeln Ihrer Erinnerungen. Perfekt für Hochzeiten, Urlaub oder Familienalben. Wählen Sie aus verschiedenen Größen und Bindungsoptionen.',
+            'product_canvas_desc': 'Ihr Lieblingsfoto auf hochwertiger Leinwand montiert. Galeriebespannt und fertig zum Aufhängen. Perfekt für Wohndekor oder besondere Geschenke.',
+            'product_mousepads_desc': 'Individuelle Foto-Mauspads für Ihren Schreibtisch. Perfekt für Büro oder Zuhause. Rutschfeste Gummiunterseite und glatte Oberfläche für optimale Maussteuerung.',
+            'product_doublecards_desc': 'Elegante gefaltete Grußkarten für alle besonderen Anlässe. Perfekt für Einladungen, Dankeskarten oder Weihnachtsgrüße. Wird mit passenden Umschlägen geliefert.'
 
         }
     },
@@ -1663,8 +1804,28 @@ const languages = [
             'loading_cart': 'Winkelwagen laden...',
             'back': 'Terug',
 
-            'product_photocards_desc': 'Maak gepersonaliseerde wenskaarten voor elke gelegenheid. Perfect voor verjaardagen, feestdagen of gewoon om dankjewel te zeggen. Kies uit verschillende formaten en papiersoorten die bij uw stijl passen.',
-            'product_calendar_desc': 'Maak gepersonaliseerde kalenders met uw favoriete foto\'s. Perfect als cadeau of voor thuisdecoratie. Kies uit bureau-, wand- of minikalenders die bij uw stijl passen.',
+            // SLIDESHOW
+            'slide_photo_cards': 'Fotokaarten',
+            'slide_photo_cards_desc': 'Maak gepersonaliseerde wenskaarten',
+            'slide_calendar': 'Kalender',
+            'slide_calendar_desc': 'Maak uw eigen kalender',
+            'slide_photo_book': 'Fotoboek',
+            'slide_photo_book_desc': 'Premium hardcover fotoboeken',
+            'slide_canvas': 'Canvas',
+            'slide_canvas_desc': 'Uw favoriete foto op canvas',
+            'slide_mouse_pads': 'Muismatten',
+            'slide_mouse_pads_desc': 'Gepersonaliseerde fotomuismatten',
+            'slide_double_cards': 'Dubbele kaarten',
+            'slide_double_cards_desc': 'Elegante gevouwen wenskaarten',
+            'slide_for_only': 'Vanaf slechts',
+
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Muismatten',
+            'double_cards': 'Dubbele kaarten',
+            'coming_soon': 'BINNENKORT',
+
+            'product_photocards_desc': 'Maak gepersonaliseerde wenskaarten voor elke gelegenheid. Perfect voor verjaardagen, feestdagen of gewoon om dank je wel te zeggen.',
+            'product_calendar_desc': 'Maak gepersonaliseerde kalenders met uw favoriete foto\'s. Perfect als cadeau of woondecoratie. Kies uit bureau-, wand- of minikalenders die bij uw stijl passen.',
             'product_photobook_desc': 'Premium hardcover fotoboeken om uw herinneringen te verzamelen. Perfect voor bruiloften, vakanties of familiealbums. Kies uit verschillende formaten en bindingsopties.',
             'product_canvas_desc': 'Uw favoriete foto gemonteerd op hoogwaardig canvas. Galerij-gespannen en klaar om op te hangen. Perfect voor thuisdecoratie of speciale cadeaus.',
             'product_mousepads_desc': 'Gepersonaliseerde fotomuismatten voor uw bureau. Perfect voor kantoor of thuisgebruik. Antislip rubberen basis en glad oppervlak voor optimale muisbediening.',
@@ -1882,8 +2043,28 @@ const languages = [
             'loading_cart': 'Chargement du panier...',
             'back': 'Retour',
 
-            'product_photocards_desc': 'Créez des cartes de vœux personnalisées pour toutes les occasions. Parfait pour les anniversaires, les fêtes ou simplement pour dire merci. Choisissez parmi différentes tailles et types de papier correspondant à votre style.',
-            'product_calendar_desc': 'Créez des calendriers personnalisés avec vos photos préférées. Parfait comme cadeau ou pour la décoration intérieure. Choisissez parmi des calendriers de bureau, muraux ou mini adaptés à votre style.',
+            // SLIDESHOW
+            'slide_photo_cards': 'Cartes photo',
+            'slide_photo_cards_desc': 'Créez des cartes de vœux personnalisées',
+            'slide_calendar': 'Calendrier',
+            'slide_calendar_desc': 'Créez votre propre calendrier',
+            'slide_photo_book': 'Livre photo',
+            'slide_photo_book_desc': 'Livres photos reliés de qualité',
+            'slide_canvas': 'Toile',
+            'slide_canvas_desc': 'Votre photo préférée sur toile',
+            'slide_mouse_pads': 'Tapis de souris',
+            'slide_mouse_pads_desc': 'Tapis de souris photo personnalisés',
+            'slide_double_cards': 'Cartes doubles',
+            'slide_double_cards_desc': 'Cartes de vœux pliées élégantes',
+            'slide_for_only': 'À partir de',
+
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Tapis de souris',
+            'double_cards': 'Cartes doubles',
+            'coming_soon': 'BIENTÔT DISPONIBLE',
+
+            'product_photocards_desc': 'Créez des cartes de vœux personnalisées pour toutes les occasions. Parfait pour les anniversaires, les fêtes ou simplement pour dire merci.',
+            'product_calendar_desc': 'Créez des calendriers personnalisés avec vos photos préférées. Parfait comme cadeau ou décoration. Choisissez entre calendriers de bureau, muraux ou mini selon votre style.',
             'product_photobook_desc': 'Livres photos reliés de qualité supérieure pour rassembler vos souvenirs. Parfait pour les mariages, les vacances ou les albums de famille. Choisissez parmi différentes tailles et options de reliure.',
             'product_canvas_desc': 'Votre photo préférée montée sur toile de haute qualité. Tendue façon galerie et prête à être accrochée. Parfait pour la décoration intérieure ou les cadeaux spéciaux.',
             'product_mousepads_desc': 'Tapis de souris photo personnalisés pour votre bureau. Parfait pour le bureau ou la maison. Base en caoutchouc antidérapante et surface lisse pour un contrôle optimal de la souris.',
@@ -2100,9 +2281,29 @@ const languages = [
             'loading_cart': 'Caricamento carrello...',
             'back': 'Indietro',
 
+            // SLIDESHOW
+            'slide_photo_cards': 'Biglietti foto',
+            'slide_photo_cards_desc': 'Crea biglietti d\'auguri personalizzati',
+            'slide_calendar': 'Calendario',
+            'slide_calendar_desc': 'Crea il tuo calendario personalizzato',
+            'slide_photo_book': 'Fotolibro',
+            'slide_photo_book_desc': 'Fotolibri rilegati di alta qualità',
+            'slide_canvas': 'Tela',
+            'slide_canvas_desc': 'La tua foto preferita su tela',
+            'slide_mouse_pads': 'Tappetini mouse',
+            'slide_mouse_pads_desc': 'Tappetini per mouse personalizzati',
+            'slide_double_cards': 'Biglietti doppi',
+            'slide_double_cards_desc': 'Eleganti biglietti d\'auguri pieghevoli',
+            'slide_for_only': 'A partire da',
 
-            'product_photocards_desc': 'Crea biglietti d\'auguri personalizzati per ogni occasione. Perfetto per compleanni, festività o semplicemente per dire grazie. Scegli tra varie dimensioni e tipi di carta che si adattano al tuo stile.',
-            'product_calendar_desc': 'Crea calendari personalizzati con le tue foto preferite. Perfetto come regalo o per la decorazione della casa. Scegli tra calendari da tavolo, da parete o mini che si adattano al tuo stile.',
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Tappetini mouse',
+            'double_cards': 'Biglietti doppi',
+            'coming_soon': 'IN ARRIVO',
+
+
+            'product_photocards_desc': 'Crea biglietti d\'auguri personalizzati per ogni occasione. Perfetto per compleanni, festività o semplicemente per dire grazie.',
+            'product_calendar_desc': 'Crea calendari personalizzati con le tue foto preferite. Perfetto come regalo o decorazione. Scegli tra calendari da scrivania, da parete o mini per abbinarli al tuo stile.',
             'product_photobook_desc': 'Fotolibri rilegati di alta qualità per raccogliere i tuoi ricordi. Perfetto per matrimoni, vacanze o album di famiglia. Scegli tra varie dimensioni e opzioni di rilegatura.',
             'product_canvas_desc': 'La tua foto preferita montata su tela di alta qualità. Tesa in stile galleria e pronta da appendere. Perfetto per l\'arredamento della casa o regali speciali.',
             'product_mousepads_desc': 'Tappetini per mouse fotografici personalizzati per la tua scrivania. Perfetto per l\'ufficio o l\'uso domestico. Base in gomma antiscivolo e superficie liscia per un controllo ottimale del mouse.',
@@ -2319,8 +2520,28 @@ const languages = [
             'loading_cart': 'Φόρτωση καλαθιού...',
             'back': 'Πίσω',
 
-            'product_photocards_desc': 'Δημιουργήστε εξατομικευμένες ευχετήριες κάρτες για κάθε περίσταση. Ιδανικό για γενέθλια, γιορτές ή απλά για να πείτε ευχαριστώ. Επιλέξτε ανάμεσα σε διάφορα μεγέθη και τύπους χαρτιού που ταιριάζουν στο στυλ σας.',
-            'product_calendar_desc': 'Δημιουργήστε εξατομικευμένα ημερολόγια με τις αγαπημένες σας φωτογραφίες. Ιδανικό ως δώρο ή για διακόσμηση σπιτιού. Επιλέξτε ανάμεσα σε ημερολόγια γραφείου, τοίχου ή μίνι που ταιριάζουν στο στυλ σας.',
+            // SLIDESHOW
+            'slide_photo_cards': 'Φωτοκάρτες',
+            'slide_photo_cards_desc': 'Δημιουργήστε εξατομικευμένες ευχετήριες κάρτες',
+            'slide_calendar': 'Ημερολόγιο',
+            'slide_calendar_desc': 'Φτιάξτε το δικό σας ημερολόγιο',
+            'slide_photo_book': 'Φωτογραφικό λεύκωμα',
+            'slide_photo_book_desc': 'Πολυτελή φωτογραφικά λευκώματα',
+            'slide_canvas': 'Καμβάς',
+            'slide_canvas_desc': 'Η αγαπημένη σας φωτογραφία σε καμβά',
+            'slide_mouse_pads': 'Ποντικοπατάκια',
+            'slide_mouse_pads_desc': 'Εξατομικευμένα ποντικοπατάκια',
+            'slide_double_cards': 'Διπλές κάρτες',
+            'slide_double_cards_desc': 'Κομψές διπλωμένες ευχετήριες κάρτες',
+            'slide_for_only': 'Μόνο από',
+
+            // ICON GRID & COMING SOON
+            'mouse_pads': 'Ποντικοπατάκια',
+            'double_cards': 'Διπλές κάρτες',
+            'coming_soon': 'ΕΡΧΕΤΑΙ ΣΥΝΤΟΜΑ',
+
+            'product_photocards_desc': 'Δημιουργήστε εξατομικευμένες ευχετήριες κάρτες για κάθε περίσταση. Ιδανικό για γενέθλια, γιορτές ή απλά για να πείτε ευχαριστώ.',
+            'product_calendar_desc': 'Δημιουργήστε εξατομικευμένα ημερολόγια με τις αγαπημένες σας φωτογραφίες. Ιδανικό για δώρα ή διακόσμηση σπιτιού. Επιλέξτε ανάμεσα σε επιτραπέζια, τοίχου ή μίνι ημερολόγια που ταιριάζουν στο στυλ σας.',
             'product_photobook_desc': 'Πολυτελή φωτογραφικά λευκώματα με σκληρό εξώφυλλο για να συλλέξετε τις αναμνήσεις σας. Ιδανικό για γάμους, διακοπές ή οικογενειακά άλμπουμ. Επιλέξτε ανάμεσα σε διάφορα μεγέθη και επιλογές βιβλιοδεσίας.',
             'product_canvas_desc': 'Η αγαπημένη σας φωτογραφία τοποθετημένη σε καμβά υψηλής ποιότητας. Τεντωμένο σε στυλ γκαλερί και έτοιμο για κρέμασμα. Ιδανικό για διακόσμηση σπιτιού ή ειδικά δώρα.',
             'product_mousepads_desc': 'Εξατομικευμένα ποντικοπατάκια με φωτογραφία για το γραφείο σας. Ιδανικό για γραφείο ή οικιακή χρήση. Αντιολισθητική βάση από καουτσούκ και λεία επιφάνεια για βέλτιστο έλεγχο του ποντικιού.',
