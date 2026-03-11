@@ -165,33 +165,15 @@ function formatPrice(usdPrice) {
     }
 }
 
-// Helper function to parse PHP price string
-function parsePhpPrice(priceStr) {
-    if (!priceStr || typeof priceStr !== 'string') return 0;
-    return parseFloat(priceStr.replace(/[₱,\s]/g, '')) || 0;
-}
-
 function updateAllPrices() {
     document.querySelectorAll('[data-usd]').forEach(element => {
         const usdPrice = parseFloat(element.getAttribute('data-usd'));
         if (!isNaN(usdPrice)) {
-            element.textContent = formatPrice(usdPrice);
-        }
-    });
-
-    document.querySelectorAll('[data-php]').forEach(element => {
-        const phpPrice = parseFloat(element.getAttribute('data-php'));
-        if (!isNaN(phpPrice)) {
-            const usdPrice = phpPrice * 0.018;
-            element.textContent = formatPrice(usdPrice);
-        }
-    });
-
-    document.querySelectorAll('.slide-price[data-php]').forEach(el => {
-        const phpPrice = parseFloat(el.getAttribute('data-php'));
-        if (!isNaN(phpPrice)) {
-            const usdPrice = phpPrice * 0.018;
-            el.textContent = `For only ${formatPrice(usdPrice)} !!!`;
+            if (element.classList.contains('slide-price')) {
+                element.textContent = `For only ${formatPrice(usdPrice)} !!!`;
+            } else {
+                element.textContent = formatPrice(usdPrice);
+            }
         }
     });
 }
@@ -199,31 +181,31 @@ function updateAllPrices() {
 // ============== PRINT OPTIONS CONFIGURATION ==============
 const printOptionsConfig = {
     photocards: [
-        { value: "4x6", label: "4x6", price: "25.00" },
-        { value: "5x7", label: "5x7", price: "35.00" },
-        { value: "8x10", label: "8x10", price: "50.00" }
+        { value: "4x6", label: "4x6", priceUSD: 0.45 },
+        { value: "5x7", label: "5x7", priceUSD: 0.63 },
+        { value: "8x10", label: "8x10", priceUSD: 0.90 }
     ],
     calendar: [
-        { value: "8x10", label: "8x10", price: "60.00" },
-        { value: "12x12", label: "12x12", price: "85.00" },
-        { value: "8.5x11", label: "8.5x11", price: "70.00" },
-        { value: "11x17", label: "11x17", price: "100.00" }
+        { value: "8x10", label: "8x10", priceUSD: 1.08 },
+        { value: "12x12", label: "12x12", priceUSD: 1.53 },
+        { value: "8.5x11", label: "8.5x11", priceUSD: 1.26 },
+        { value: "11x17", label: "11x17", priceUSD: 1.80 }
     ],
     photobook: [
-        { value: "8x8", label: "8x8", price: "120.00" },
-        { value: "11x8.5", label: "11x8.5", price: "150.00" }
+        { value: "8x8", label: "8x8", priceUSD: 2.16 },
+        { value: "11x8.5", label: "11x8.5", priceUSD: 2.70 }
     ],
     canvas: [
-        { value: "8x10", label: "8x10", price: "200.00" },
-        { value: "16x20", label: "16x20", price: "350.00" }
+        { value: "8x10", label: "8x10", priceUSD: 3.60 },
+        { value: "16x20", label: "16x20", priceUSD: 6.30 }
     ],
     mousepads: [
-        { value: "7x9", label: "7x9", price: "45.00" },
-        { value: "9x11", label: "9x11", price: "60.00" }
+        { value: "7x9", label: "7x9", priceUSD: 0.81 },
+        { value: "9x11", label: "9x11", priceUSD: 1.08 }
     ],
     doublecards: [
-        { value: "5x7", label: "5x7", price: "70.00" },
-        { value: "8x10", label: "8x10", price: "95.00" }
+        { value: "5x7", label: "5x7", priceUSD: 1.26 },
+        { value: "8x10", label: "8x10", priceUSD: 1.71 }
     ]
 };
 window.printOptionsConfig = printOptionsConfig;
@@ -232,7 +214,7 @@ window.printOptionsConfig = printOptionsConfig;
 const productDatabase = {
     photocards: {
         name: 'Photo Cards',
-        basePricePHP: 26,
+        basePriceUSD: 0.47,
         mainImage: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -241,10 +223,10 @@ const productDatabase = {
         ],
         sizes: printOptionsConfig.photocards,
         paperTypes: [
-            { name: 'Standard', pricePHP: 0 },
-            { name: 'Glossy', pricePHP: 10 },
-            { name: 'Matte', pricePHP: 15 },
-            { name: 'Premium', pricePHP: 25 }
+            { name: 'Standard', priceUSD: 0 },
+            { name: 'Glossy', priceUSD: 0.18 },
+            { name: 'Matte', priceUSD: 0.27 },
+            { name: 'Premium', priceUSD: 0.45 }
         ],
         description: 'Create personalized greeting cards for any occasion. Perfect for birthdays, holidays, or just to say thank you. Choose from various sizes and paper types to match your style.',
         icon: '🖼️',
@@ -252,7 +234,7 @@ const productDatabase = {
     },
     calendar: {
         name: 'Calendar',
-        basePricePHP: 60,
+        basePriceUSD: 1.08,
         mainImage: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -261,10 +243,10 @@ const productDatabase = {
         ],
         sizes: printOptionsConfig.calendar,
         paperTypes: [
-            { name: 'Standard', pricePHP: 0 },
-            { name: 'Glossy', pricePHP: 10 },
-            { name: 'Matte', pricePHP: 15 },
-            { name: 'Premium', pricePHP: 25 }
+            { name: 'Standard', priceUSD: 0 },
+            { name: 'Glossy', priceUSD: 0.18 },
+            { name: 'Matte', priceUSD: 0.27 },
+            { name: 'Premium', priceUSD: 0.45 }
         ],
         description: 'Create personalized calendars with your favorite photos. Perfect for gifts or home decoration. Choose from desk, wall, or mini calendars to match your style.',
         icon: '📅',
@@ -272,7 +254,7 @@ const productDatabase = {
     },
     photobook: {
         name: 'Photo Book',
-        basePricePHP: 120,
+        basePriceUSD: 2.16,
         mainImage: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -281,10 +263,10 @@ const productDatabase = {
         ],
         sizes: printOptionsConfig.photobook,
         paperTypes: [
-            { name: 'Standard', pricePHP: 0 },
-            { name: 'Glossy', pricePHP: 10 },
-            { name: 'Matte', pricePHP: 15 },
-            { name: 'Premium', pricePHP: 25 }
+            { name: 'Standard', priceUSD: 0 },
+            { name: 'Glossy', priceUSD: 0.18 },
+            { name: 'Matte', priceUSD: 0.27 },
+            { name: 'Premium', priceUSD: 0.45 }
         ],
         description: 'Premium hardcover photo books to collect your memories. Perfect for weddings, vacations, or family albums. Choose from various sizes and binding options.',
         icon: '📘',
@@ -292,7 +274,7 @@ const productDatabase = {
     },
     canvas: {
         name: 'Canvas',
-        basePricePHP: 200,
+        basePriceUSD: 3.60,
         mainImage: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -301,10 +283,10 @@ const productDatabase = {
         ],
         sizes: printOptionsConfig.canvas,
         paperTypes: [
-            { name: 'Standard', pricePHP: 0 },
-            { name: 'Glossy', pricePHP: 10 },
-            { name: 'Matte', pricePHP: 15 },
-            { name: 'Premium', pricePHP: 25 }
+            { name: 'Standard', priceUSD: 0 },
+            { name: 'Glossy', priceUSD: 0.18 },
+            { name: 'Matte', priceUSD: 0.27 },
+            { name: 'Premium', priceUSD: 0.45 }
         ],
         description: 'Your favorite photo mounted on high-quality canvas. Gallery-wrapped and ready to hang. Perfect for home decor or special gifts.',
         icon: '🖼️',
@@ -312,7 +294,7 @@ const productDatabase = {
     },
     mousepads: {
         name: 'Mouse Pads',
-        basePricePHP: 45,
+        basePriceUSD: 0.81,
         mainImage: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=200&h=200&fit=crop',
@@ -321,10 +303,10 @@ const productDatabase = {
         ],
         sizes: printOptionsConfig.mousepads,
         paperTypes: [
-            { name: 'Standard', pricePHP: 0 },
-            { name: 'Glossy', pricePHP: 10 },
-            { name: 'Matte', pricePHP: 15 },
-            { name: 'Premium', pricePHP: 25 }
+            { name: 'Standard', priceUSD: 0 },
+            { name: 'Glossy', priceUSD: 0.18 },
+            { name: 'Matte', priceUSD: 0.27 },
+            { name: 'Premium', priceUSD: 0.45 }
         ],
         description: 'Custom photo mouse pads for your desk. Perfect for office or home use. Non-slip rubber base and smooth surface for optimal mouse control.',
         icon: '🖱️',
@@ -332,7 +314,7 @@ const productDatabase = {
     },
     doublecards: {
         name: 'Double Cards',
-        basePricePHP: 70,
+        basePriceUSD: 1.26,
         mainImage: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -341,10 +323,10 @@ const productDatabase = {
         ],
         sizes: printOptionsConfig.doublecards,
         paperTypes: [
-            { name: 'Standard', pricePHP: 0 },
-            { name: 'Glossy', pricePHP: 10 },
-            { name: 'Matte', pricePHP: 15 },
-            { name: 'Premium', pricePHP: 25 }
+            { name: 'Standard', priceUSD: 0 },
+            { name: 'Glossy', priceUSD: 0.18 },
+            { name: 'Matte', priceUSD: 0.27 },
+            { name: 'Premium', priceUSD: 0.45 }
         ],
         description: 'Elegant folded greeting cards for all special occasions. Perfect for invitations, thank you notes, or holiday greetings. Comes with matching envelopes.',
         icon: '🃏',
@@ -364,10 +346,9 @@ function loadProductDetails(productType) {
     nameElement.setAttribute('data-i18n', `product_${productType}_name`);
 
     const priceElement = document.getElementById('productPrice');
-    priceElement.removeAttribute('data-php');
-    const productUsdPrice = (product.basePricePHP * 0.018).toFixed(2);
+    const productUsdPrice = product.basePriceUSD.toFixed(2);
     priceElement.setAttribute('data-usd', productUsdPrice);
-    priceElement.textContent = `$${productUsdPrice}`;
+    priceElement.textContent = formatPrice(product.basePriceUSD);
 
     document.getElementById('productDescription').textContent = product.description;
     document.getElementById('productIcon').textContent = product.icon;
@@ -394,11 +375,10 @@ function loadProductDetails(productType) {
     const sizesContainer = document.getElementById('productSizes');
     sizesContainer.innerHTML = '';
     product.sizes.forEach(size => {
-        const phpPrice = parseFloat(size.price);
-        const usdPrice = (phpPrice * 0.018).toFixed(2);
+        const usdPrice = size.priceUSD.toFixed(2);
         const sizeDiv = document.createElement('div');
         sizeDiv.className = 'size-item';
-        sizeDiv.innerHTML = `<span data-i18n="size_${size.value}">${size.label}</span> <span data-usd="${usdPrice}">$${usdPrice}</span>`;
+        sizeDiv.innerHTML = `<span data-i18n="size_${size.value}">${size.label}</span> <span data-usd="${usdPrice}">${formatPrice(size.priceUSD)}</span>`;
         sizesContainer.appendChild(sizeDiv);
     });
 
@@ -407,8 +387,8 @@ function loadProductDetails(productType) {
     product.paperTypes.forEach(paper => {
         const paperDiv = document.createElement('div');
         paperDiv.className = 'paper-item';
-        const usdPrice = (paper.pricePHP * 0.018).toFixed(2);
-        paperDiv.innerHTML = `<span>${paper.name}</span> <span data-usd="${usdPrice}">+$${usdPrice}</span>`;
+        const usdPrice = paper.priceUSD.toFixed(2);
+        paperDiv.innerHTML = `<span>${paper.name}</span> <span data-usd="${usdPrice}">+${formatPrice(paper.priceUSD)}</span>`;
         paperContainer.appendChild(paperDiv);
     });
 
@@ -434,12 +414,12 @@ class Slideshow {
         this.autoPlayDelay = 5000;
 
         this.products = [
-            { name: 'Photo Cards', pricePHP: 25, image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Create personalized greeting cards' },
-            { name: 'Calendar', pricePHP: 60, image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Make your own custom calendar' },
-            { name: 'Photo Book', pricePHP: 120, image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Premium hardcover photo books' },
-            { name: 'Canvas', pricePHP: 200, image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Your favorite photo on canvas' },
-            { name: 'Mouse Pads', pricePHP: 45, image: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=1260&h=750&fit=crop', desc: 'Custom photo mouse pads' },
-            { name: 'Double Cards', pricePHP: 70, image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Elegant folded greeting cards' }
+            { name: 'Photo Cards', priceUSD: 0.45, image: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Create personalized greeting cards' },
+            { name: 'Calendar', priceUSD: 1.08, image: 'https://images.pexels.com/photos/4692171/pexels-photo-4692171.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Make your own custom calendar' },
+            { name: 'Photo Book', priceUSD: 2.16, image: 'https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Premium hardcover photo books' },
+            { name: 'Canvas', priceUSD: 3.60, image: 'https://images.pexels.com/photos/1572386/pexels-photo-1572386.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Your favorite photo on canvas' },
+            { name: 'Mouse Pads', priceUSD: 0.81, image: 'https://images.unsplash.com/photo-1625723044792-44de16ccb5e9?w=1260&h=750&fit=crop', desc: 'Custom photo mouse pads' },
+            { name: 'Double Cards', priceUSD: 1.26, image: 'https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&fit=crop', desc: 'Elegant folded greeting cards' }
         ];
         this.init();
     }
@@ -476,7 +456,7 @@ class Slideshow {
                 <div class="slide-info">
                     <h3>${product.name}</h3>
                     <p>${product.desc}</p>
-                    <div class="slide-price" data-php="${product.pricePHP}">For only $${(product.pricePHP * 0.018).toFixed(2)} !!!</div>
+                    <div class="slide-price" data-usd="${product.priceUSD}">For only ${formatPrice(product.priceUSD)} !!!</div>
                 </div>
             `;
             this.track.appendChild(slide);
@@ -586,12 +566,12 @@ class Slideshow {
 
 // ============== SAMPLE PRODUCTS DATA ==============
 const products = [
-    { id: 1, name: "Photo Cards", price: "₱600", image: "https://i5.walmartimages.com/seo/48-Pack-Photo-Frame-Cards-with-Envelopes-Notecards-for-4x6-Picture-Insert-Ivory_5339c47e-9e2e-4d17-bbcc-46da7d0288fb.88480b050f2d7e488cd5a07e5e90cfb5.jpeg", description: "Create personalized greeting cards with your best photos" },
-    { id: 2, name: "Calendar", price: "₱900", image: "https://th.bing.com/th/id/OIP.YCkmc4EOofxjfXtluhXq-gHaFj?w=284&h=213&c=7&r=0&o=7&pid=1.7&rm=3", description: "Make your own calendar with your favorite photos" },
-    { id: 3, name: "Photo Book", price: "₱1,500", image: "https://kroma.co.nz/cdn/shop/products/Classic_Hard_Cover_Photo_Book_Premium.jpg?v=1746043639&width=940", description: "Premium hardcover photo books to collect your memories" },
-    { id: 4, name: "Canvas", price: "₱2,400", image: "https://www.printique.com/wp-content/uploads/2019/08/1.jpg", description: "Your favorite photo mounted on canvas" },
-    { id: 5, name: "Mouse Pads", price: "₱480", image: "https://th.bing.com/th/id/OIP.3qkIBo_qp7kxxk0SVA2ntwHaEI?w=313&h=180&c=7&r=0&o=7&pid=1.7&rm=3", description: "Display your favorite photo at the office with a mouse pad" },
-    { id: 6, name: "Double Cards", price: "₱720", image: "https://framkallning.fotocenter.se/templates2/categories/FOLDEDCARDS/mobile_image.png", description: "Elegant greetings for all special occasions" },
+    { id: 1, name: "Photo Cards", priceUSD: 10.80, image: "https://i5.walmartimages.com/seo/48-Pack-Photo-Frame-Cards-with-Envelopes-Notecards-for-4x6-Picture-Insert-Ivory_5339c47e-9e2e-4d17-bbcc-46da7d0288fb.88480b050f2d7e488cd5a07e5e90cfb5.jpeg", description: "Create personalized greeting cards with your best photos" },
+    { id: 2, name: "Calendar", priceUSD: 16.20, image: "https://th.bing.com/th/id/OIP.YCkmc4EOofxjfXtluhXq-gHaFj?w=284&h=213&c=7&r=0&o=7&pid=1.7&rm=3", description: "Make your own calendar with your favorite photos" },
+    { id: 3, name: "Photo Book", priceUSD: 27.00, image: "https://kroma.co.nz/cdn/shop/products/Classic_Hard_Cover_Photo_Book_Premium.jpg?v=1746043639&width=940", description: "Premium hardcover photo books to collect your memories" },
+    { id: 4, name: "Canvas", priceUSD: 43.20, image: "https://www.printique.com/wp-content/uploads/2019/08/1.jpg", description: "Your favorite photo mounted on canvas" },
+    { id: 5, name: "Mouse Pads", priceUSD: 8.64, image: "https://th.bing.com/th/id/OIP.3qkIBo_qp7kxxk0SVA2ntwHaEI?w=313&h=180&c=7&r=0&o=7&pid=1.7&rm=3", description: "Display your favorite photo at the office with a mouse pad" },
+    { id: 6, name: "Double Cards", priceUSD: 12.96, image: "https://framkallning.fotocenter.se/templates2/categories/FOLDEDCARDS/mobile_image.png", description: "Elegant greetings for all special occasions" },
 ];
 
 const productIcons = {
@@ -614,18 +594,18 @@ const productDisplayNames = {
 
 // ============== CALENDAR PRODUCTS DATA ==============
 const calendarProducts = [
-    { id: 101, type: 'desk', name: "Classic Wooden Desk Calendar", price: "₱ 850.00", image: "https://images.unsplash.com/photo-1585241645928-1f7aeb8bb6c7?w=400&h=300&fit=crop", description: "Elegant wooden base with monthly tear-off pages", features: ["Wooden Stand", "Tear-off Pages", "8x10 inches"], badge: "Best Seller" },
-    { id: 102, type: 'desk', name: "Modern Acrylic Desk Calendar", price: "₱ 950.00", image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop", description: "Sleek acrylic stand with minimalist design", features: ["Acrylic Stand", "Modern Design", "12x12 inches"], badge: "Modern" },
-    { id: 103, type: 'desk', name: "Magnetic Cube Calendar", price: "₱ 750.00", image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w-400&h=300&fit=crop", description: "Rotating cube design with monthly magnets", features: ["Magnetic Cubes", "Rotating Design", "Compact Size"], badge: "Interactive" },
-    { id: 104, type: 'wall', name: "Landscape Wall Calendar", price: "₱ 650.00", image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop", description: "Beautiful nature photography for each month", features: ["12 Landscape Photos", "Spiral Bound", "11x17 inches"], badge: "Nature" },
-    { id: 105, type: 'wall', name: "Family Photo Wall Calendar", price: "₱ 700.00", image: "https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=400&h=300&fit=crop", description: "Perfect for displaying family memories all year", features: ["Custom Photos", "Family Themed", "12x12 inches"], badge: "Family" },
-    { id: 106, type: 'wall', name: "Art Illustration Calendar", price: "₱ 800.00", image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop", description: "Unique artwork for each month by local artists", features: ["Original Art", "Premium Paper", "8.5x11 inches"], badge: "Artistic" },
-    { id: 107, type: 'mini', name: "Magnetic Fridge Calendar", price: "₱ 350.00", image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop", description: "Small magnetic calendar perfect for your refrigerator", features: ["Magnetic Back", "Monthly View", "5x7 inches"], badge: "Practical" },
-    { id: 108, type: 'mini', name: "Credit Card Pocket Calendar", price: "₱ 250.00", image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400&h=300&fit=crop", description: "Ultra-thin calendar that fits in your wallet", features: ["Credit Card Size", "12 Months", "Plastic Coated"], badge: "Portable" },
-    { id: 109, type: 'mini', name: "Sticky Note Calendar", price: "₱ 450.00", image: "https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop", description: "Monthly sticky notes you can write on", features: ["Writeable Surface", "12 Month Pads", "Desktop Design"], badge: "Functional" },
-    { id: 110, type: 'photo', name: "12-Photo Custom Calendar", price: "₱ 900.00", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=300&fit=crop", description: "One special photo for each month of the year", features: ["12 Custom Photos", "Premium Glossy", "Wire-O Bound"], badge: "Personalized" },
-    { id: 111, type: 'photo', name: "Photo Collage Calendar", price: "₱ 1,100.00", image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop", description: "Multiple photos per month in beautiful layouts", features: ["Collage Layouts", "Hard Cover", "12x12 inches"], badge: "Deluxe" },
-    { id: 112, type: 'photo', name: "Baby's 1st Year Calendar", price: "₱ 1,200.00", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=300&fit=crop", description: "Special calendar to track baby's milestones", features: ["Baby Themed", "Milestone Stickers", "Premium Binding"], badge: "Baby" }
+    { id: 101, type: 'desk', name: "Classic Wooden Desk Calendar", priceUSD: 15.30, image: "https://images.unsplash.com/photo-1585241645928-1f7aeb8bb6c7?w=400&h=300&fit=crop", description: "Elegant wooden base with monthly tear-off pages", features: ["Wooden Stand", "Tear-off Pages", "8x10 inches"], badge: "Best Seller" },
+    { id: 102, type: 'desk', name: "Modern Acrylic Desk Calendar", priceUSD: 17.10, image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop", description: "Sleek acrylic stand with minimalist design", features: ["Acrylic Stand", "Modern Design", "12x12 inches"], badge: "Modern" },
+    { id: 103, type: 'desk', name: "Magnetic Cube Calendar", priceUSD: 13.50, image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w-400&h=300&fit=crop", description: "Rotating cube design with monthly magnets", features: ["Magnetic Cubes", "Rotating Design", "Compact Size"], badge: "Interactive" },
+    { id: 104, type: 'wall', name: "Landscape Wall Calendar", priceUSD: 11.70, image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop", description: "Beautiful nature photography for each month", features: ["12 Landscape Photos", "Spiral Bound", "11x17 inches"], badge: "Nature" },
+    { id: 105, type: 'wall', name: "Family Photo Wall Calendar", priceUSD: 12.60, image: "https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=400&h=300&fit=crop", description: "Perfect for displaying family memories all year", features: ["Custom Photos", "Family Themed", "12x12 inches"], badge: "Family" },
+    { id: 106, type: 'wall', name: "Art Illustration Calendar", priceUSD: 14.40, image: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop", description: "Unique artwork for each month by local artists", features: ["Original Art", "Premium Paper", "8.5x11 inches"], badge: "Artistic" },
+    { id: 107, type: 'mini', name: "Magnetic Fridge Calendar", priceUSD: 6.30, image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop", description: "Small magnetic calendar perfect for your refrigerator", features: ["Magnetic Back", "Monthly View", "5x7 inches"], badge: "Practical" },
+    { id: 108, type: 'mini', name: "Credit Card Pocket Calendar", priceUSD: 4.50, image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400&h=300&fit=crop", description: "Ultra-thin calendar that fits in your wallet", features: ["Credit Card Size", "12 Months", "Plastic Coated"], badge: "Portable" },
+    { id: 109, type: 'mini', name: "Sticky Note Calendar", priceUSD: 8.10, image: "https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=300&fit=crop", description: "Monthly sticky notes you can write on", features: ["Writeable Surface", "12 Month Pads", "Desktop Design"], badge: "Functional" },
+    { id: 110, type: 'photo', name: "12-Photo Custom Calendar", priceUSD: 16.20, image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=300&fit=crop", description: "One special photo for each month of the year", features: ["12 Custom Photos", "Premium Glossy", "Wire-O Bound"], badge: "Personalized" },
+    { id: 111, type: 'photo', name: "Photo Collage Calendar", priceUSD: 19.80, image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop", description: "Multiple photos per month in beautiful layouts", features: ["Collage Layouts", "Hard Cover", "12x12 inches"], badge: "Deluxe" },
+    { id: 112, type: 'photo', name: "Baby's 1st Year Calendar", priceUSD: 21.60, image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=300&fit=crop", description: "Special calendar to track baby's milestones", features: ["Baby Themed", "Milestone Stickers", "Premium Binding"], badge: "Baby" }
 ];
 
 // ============== TEMPLATE CONFIGURATION ==============
@@ -834,12 +814,12 @@ const editorFeatures = {
 const chatAI = {
     responses: {
         greeting: ["Hello! 👋 How can I help you with your photo printing needs today?", "Hi there! Welcome to FOTOCENTER. What can I assist you with?"],
-        pricing: ["Our photo prints start at ₱25 for 4x6 prints. Cards range from ₱150-₱350. Would you like specific pricing for any product?", "Prices vary by product: Photos (₱25-₱50), Cards (₱150-₱350), Calendars (₱900), Photo Books (₱1500+). Need details?"],
-        delivery: ["Delivery takes 3-5 business days in Metro Manila, 5-7 days for provincial areas. Express delivery (+₱200) is available.", "Standard delivery: 3-5 days. We offer express options for faster service."],
+        pricing: ["Our photo prints start at $0.45 for 4x6 prints. Cards range from $2.70-$6.30. Would you like specific pricing for any product?", "Prices vary by product: Photos ($0.45-$0.90), Cards ($2.70-$6.30), Calendars ($16.20), Photo Books ($27.00+). Need details?"],
+        delivery: ["Delivery takes 3-5 business days in Metro Manila, 5-7 days for provincial areas. Express delivery (+$3.60) is available.", "Standard delivery: 3-5 days. We offer express options for faster service."],
         quality: ["We use professional-grade photo paper and printers for excellent quality. All prints come with a satisfaction guarantee!", "Our prints are made with archival-quality materials to ensure your memories last a lifetime."],
         upload: ["You can upload JPG, PNG, or GIF files up to 10MB each. Just drag & drop or click the upload area!", "Supported formats: JPG, PNG, GIF. Max 10MB per file. Need help with uploading?"],
         editing: ["Try our photo editor! You can adjust brightness, contrast, add filters, crop, and more before printing.", "Edit your photos with our tools - adjust colors, add filters, crop, or add text overlays."],
-        sizes: ["We offer 4x6, 5x7, and 8x10 inch prints. Cards come in 5x7, 8x10, and folded formats.", "Print sizes: 4x6 (₱25), 5x7 (₱35), 8x10 (₱50). Card sizes vary."],
+        sizes: ["We offer 4x6, 5x7, and 8x10 inch prints. Cards come in 5x7, 8x10, and folded formats.", "Print sizes: 4x6 ($0.45), 5x7 ($0.63), 8x10 ($0.90). Card sizes vary."],
         refund: ["We offer refunds within 7 days if prints are damaged or incorrect. Contact support with order details.", "Refund policy: 7-day window for damaged/incorrect items. Contact us for assistance."],
         payment: ["We accept GCash, Maya, credit/debit cards (Visa/Mastercard), and bank transfers.", "Payment methods: GCash, Maya, cards, and bank transfers."],
         default: ["I understand you're asking about that. For detailed assistance, please contact us at (+63) 929 725 2291.", "That's a great question! Let me connect you with a human agent for better assistance."]
@@ -1043,7 +1023,7 @@ function updateCartUI() {
 
 function calculateCartTotal() {
     return shoppingCart.reduce((total, item) => {
-        const itemPrice = item.basePriceUSD || (parsePhpPrice(item.price) * 0.018);
+        const itemPrice = item.basePriceUSD || 0;
         return total + (itemPrice * (item.quantity || 1));
     }, 0);
 }
@@ -1124,8 +1104,6 @@ function renderShopProducts() {
     const grid = document.getElementById('shopProductsGrid');
     if (!grid) return;
     grid.innerHTML = products.map(p => {
-        const phpPrice = parsePhpPrice(p.price);
-        const usdPrice = phpPrice * 0.018;
         return `
         <div class="product-card" onclick="openProductPage(${p.id})">
             <div class="product-image"><img src="${p.image}" alt="${p.name}" loading="lazy"></div>
@@ -1133,7 +1111,7 @@ function renderShopProducts() {
                 <h4 data-i18n="product_${p.name.toLowerCase().replace(/ /g, '_')}_name">${p.name}</h4>
                 <p data-i18n="product_${p.name.toLowerCase().replace(/ /g, '_')}_desc">${p.description}</p>
                 <div class="product-footer">
-                    <span class="price" data-usd="${usdPrice.toFixed(2)}">${formatPrice(usdPrice)}</span>
+                    <span class="price" data-usd="${p.priceUSD.toFixed(2)}">${formatPrice(p.priceUSD)}</span>
                     <button onclick="navigateTo('photos');" data-i18n="edit_btn">Edit</button>
                 </div>
             </div>
@@ -1312,8 +1290,6 @@ function displayHomeProducts() {
     if (!productsContainer) return;
 
     productsContainer.innerHTML = products.map(product => {
-        const phpPrice = parsePhpPrice(product.price);
-        const usdPrice = phpPrice * 0.018;
         return `
         <div class="product-card" onclick="openProductPage(${product.id})">
             <div class="product-image">
@@ -1323,7 +1299,7 @@ function displayHomeProducts() {
                 <h3 data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_name">${product.name}</h3>
                 <p class="product-desc" data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_desc">${product.description}</p>
                 <div class="product-footer">
-                    <span class="price" data-usd="${usdPrice.toFixed(2)}">${formatPrice(usdPrice)}</span>
+                    <span class="price" data-usd="${product.priceUSD.toFixed(2)}">${formatPrice(product.priceUSD)}</span>
                     <button class="add-btn" onclick="event.stopPropagation(); addToCartProduct(${product.id});" data-i18n="add_to_cart_btn">Add to Cart</button>
                 </div>
             </div>
@@ -1337,8 +1313,6 @@ function displayProductsGrid() {
     if (!productsGrid) return;
 
     productsGrid.innerHTML = products.map(product => {
-        const phpPrice = parsePhpPrice(product.price);
-        const usdPrice = phpPrice * 0.018;
         return `
         <div class="product-card" onclick="openProductPage(${product.id})">
             <div class="product-image">
@@ -1348,7 +1322,7 @@ function displayProductsGrid() {
                 <h3 data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_name">${product.name}</h3>
                 <p class="product-desc" data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_desc">${product.description}</p>
                 <div class="product-footer">
-                    <span class="price" data-usd="${usdPrice.toFixed(2)}">${formatPrice(usdPrice)}</span>
+                    <span class="price" data-usd="${product.priceUSD.toFixed(2)}">${formatPrice(product.priceUSD)}</span>
                     <button class="add-btn" onclick="event.stopPropagation(); addToCartProduct(${product.id})" data-i18n="add_to_cart_btn">Add to Cart</button>
                 </div>
             </div>
@@ -1361,9 +1335,6 @@ function showProductDetail(productId) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
-    const phpPrice = parsePhpPrice(product.price);
-    const usdPrice = phpPrice * 0.018;
-
     const detailContent = document.getElementById('detail-content');
     detailContent.innerHTML = `
         <div class="detail-layout">
@@ -1374,7 +1345,7 @@ function showProductDetail(productId) {
                 <h2 data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_name">${product.name}</h2>
                 <p class="detail-desc" data-i18n="product_${product.name.toLowerCase().replace(/ /g, '_')}_desc">${product.description}</p>
                 <div class="price-section">
-                    <span class="detail-price" data-usd="${usdPrice.toFixed(2)}">${formatPrice(usdPrice)}</span>
+                    <span class="detail-price" data-usd="${product.priceUSD.toFixed(2)}">${formatPrice(product.priceUSD)}</span>
                 </div>
                 <div class="quantity-section">
                     <label for="quantity" data-i18n="quantity_label">Quantity:</label>
@@ -1394,9 +1365,6 @@ function addToCartProduct(productId) {
     const quantityInput = document.getElementById('quantity');
     const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
 
-    const phpPrice = parsePhpPrice(product.price);
-    const usdPrice = phpPrice * 0.018;
-
     const cartItem = {
         id: productId,
         type: 'product',
@@ -1404,8 +1372,7 @@ function addToCartProduct(productId) {
         productName: product.name,
         name: product.name,
         image: product.image,
-        price: product.price, // Keep original for display if needed, but don't use for calculation
-        basePriceUSD: usdPrice, // NEW: Store base price in USD
+        basePriceUSD: product.priceUSD,
         quantity: quantity,
         selected: true,
         sizeMode: 'fill',
@@ -2239,7 +2206,7 @@ window.calculatePrice = function calculatePrice() {
             const option = options.find(opt => opt.value === sizeValue);
             console.log('5. Found option:', option);
 
-            basePriceUSD = option ? parseFloat(option.price) * 0.018 : 0.45;
+            basePriceUSD = option ? option.priceUSD : 0.45;
             console.log('6. Calculated basePriceUSD:', basePriceUSD);
         }
     } else {
@@ -2338,12 +2305,12 @@ function updatePrintOptions(productType) {
 
     let html = '';
     options.forEach(opt => {
-        const usdPrice = (parseFloat(opt.price) * 0.018).toFixed(2);
+        const usdPrice = opt.priceUSD.toFixed(2);
         html += `
             <label class="print-size-btn small">
                 <input type="radio" name="advancedPrintSize" value="${opt.value}" onchange="onSizeSelect()">
                 <span class="size-label">${opt.value}"</span>
-                <span class="size-price" data-usd="${usdPrice}">$${usdPrice}</span>
+                <span class="size-price" data-usd="${usdPrice}">${formatPrice(opt.priceUSD)}</span>
             </label>
         `;
     });
@@ -3437,19 +3404,15 @@ function updateCalendarPrice() {
     const bindingType = document.getElementById('bindingType').value;
     const quantity = parseInt(document.getElementById('calendarQuantity').value) || 1;
 
-    const basePricesPHP = { 'desk': 800, 'wall': 650, 'mini': 350, 'photo': 900 };
-    const sizeAdjustmentsPHP = { '8x10': 0, '12x12': 200, '8.5x11': 100, '11x17': 300 };
-    const paperAdjustmentsPHP = { 'glossy': 0, 'matte': 100, 'premium': 200 };
-    const bindingAdjustmentsPHP = { 'spiral': 0, 'wire': 50, 'hardcover': 300 };
+    const basePricesUSD = { 'desk': 14.40, 'wall': 11.70, 'mini': 6.30, 'photo': 16.20 };
+    const sizeAdjustmentsUSD = { '8x10': 0, '12x12': 3.60, '8.5x11': 1.80, '11x17': 5.40 };
+    const paperAdjustmentsUSD = { 'glossy': 0, 'matte': 1.80, 'premium': 3.60 };
+    const bindingAdjustmentsUSD = { 'spiral': 0, 'wire': 0.90, 'hardcover': 5.40 };
 
-    const basePricePHP = basePricesPHP[calendarType] || 800;
-    const optionsPricePHP = (sizeAdjustmentsPHP[size] || 0) + (paperAdjustmentsPHP[paperType] || 0) + (bindingAdjustmentsPHP[bindingType] || 0);
-    const totalUnitPricePHP = basePricePHP + optionsPricePHP;
-    const totalPricePHP = totalUnitPricePHP * quantity;
-
-    const basePriceUSD = (basePricePHP * 0.018);
-    const optionsPriceUSD = (optionsPricePHP * 0.018);
-    const totalPriceUSD = (totalPricePHP * 0.018);
+    const basePriceUSD = basePricesUSD[calendarType] || 14.40;
+    const optionsPriceUSD = (sizeAdjustmentsUSD[size] || 0) + (paperAdjustmentsUSD[paperType] || 0) + (bindingAdjustmentsUSD[bindingType] || 0);
+    const totalUnitPriceUSD = basePriceUSD + optionsPriceUSD;
+    const totalPriceUSD = totalUnitPriceUSD * quantity;
 
     const basePriceEl = document.getElementById('basePrice');
     const optionsPriceEl = document.getElementById('optionsPrice');
@@ -3473,7 +3436,7 @@ function updateCalendarPrice() {
         finalPriceEl.textContent = formatPrice(totalPriceUSD);
     }
 
-    return totalUnitPricePHP * 0.018; // Return unit price in USD
+    return totalUnitPriceUSD;
 }
 
 function updateCalendarQuantity(change) {
@@ -3511,8 +3474,7 @@ function displayCalendarProducts() {
         `;
 
         groupedCalendars[type].forEach(product => {
-            const phpPrice = parsePhpPrice(product.price);
-            const usdPrice = phpPrice * 0.018;
+            const usdPrice = product.priceUSD;
             html += `
                 <div class="calendar-product-card">
                     ${product.badge ? `<div class="calendar-badge" data-i18n="badge_${product.badge.toLowerCase()}">${product.badge}</div>` : ''}
@@ -3564,9 +3526,6 @@ function addCalendarProductToCart(productId) {
     const product = calendarProducts.find(p => p.id === productId);
     if (!product) return;
 
-    const phpPrice = parsePhpPrice(product.price);
-    const usdPrice = phpPrice * 0.018;
-
     const cartItem = {
         id: productId,
         type: 'calendar',
@@ -3574,8 +3533,7 @@ function addCalendarProductToCart(productId) {
         productName: product.name,
         name: product.name,
         image: product.image,
-        price: product.price,
-        basePriceUSD: usdPrice,
+        basePriceUSD: product.priceUSD,
         quantity: 1,
         selected: true,
         sizeMode: 'fill',
@@ -3669,15 +3627,14 @@ function displayCardsProducts() {
     if (!grid) return;
 
     const cardProducts = [
-        { id: 201, name: "Standard Photo Card", price: "₱150", image: "https://i5.walmartimages.com/seo/48-Pack-Photo-Frame-Cards-with-Envelopes-Notecards-for-4x6-Picture-Insert-Ivory_5339c47e-9e2e-4d17-bbcc-46da7d0288fb.88480b050f2d7e488cd5a07e5e90cfb5.jpeg", description: "5x7 inch photo card with envelope" },
-        { id: 202, name: "Premium Photo Card", price: "₱250", image: "https://framkallning.fotocenter.se/templates2/categories/FOLDEDCARDS/mobile_image.png", description: "8x10 inch premium card with matte finish" },
-        { id: 203, name: "Folded Greeting Card", price: "₱350", image: "https://th.bing.com/th/id/OIP.2JQJy-hTVtAdeD9wR7SFZgHaHa?w=188&h=188&c=7&r=0&o=7&pid=1.7&rm=3", description: "Folded card with multiple photo slots" },
-        { id: 204, name: "Holiday Card Pack", price: "₱600", image: "https://th.bing.com/th/id/OIP.qtYORFPfMvfnjzqE2NZ7bQHaHa?w=197&h=197&c=7&r=0&o=7&pid=1.7&rm=3", description: "Pack of 10 holiday-themed cards" }
+        { id: 201, name: "Standard Photo Card", priceUSD: 2.70, image: "https://i5.walmartimages.com/seo/48-Pack-Photo-Frame-Cards-with-Envelopes-Notecards-for-4x6-Picture-Insert-Ivory_5339c47e-9e2e-4d17-bbcc-46da7d0288fb.88480b050f2d7e488cd5a07e5e90cfb5.jpeg", description: "5x7 inch photo card with envelope" },
+        { id: 202, name: "Premium Photo Card", priceUSD: 4.50, image: "https://framkallning.fotocenter.se/templates2/categories/FOLDEDCARDS/mobile_image.png", description: "8x10 inch premium card with matte finish" },
+        { id: 203, name: "Folded Greeting Card", priceUSD: 6.30, image: "https://th.bing.com/th/id/OIP.2JQJy-hTVtAdeD9wR7SFZgHaHa?w=188&h=188&c=7&r=0&o=7&pid=1.7&rm=3", description: "Folded card with multiple photo slots" },
+        { id: 204, name: "Holiday Card Pack", priceUSD: 10.80, image: "https://th.bing.com/th/id/OIP.qtYORFPfMvfnjzqE2NZ7bQHaHa?w=197&h=197&c=7&r=0&o=7&pid=1.7&rm=3", description: "Pack of 10 holiday-themed cards" }
     ];
 
     grid.innerHTML = cardProducts.map(product => {
-        const phpPrice = parsePhpPrice(product.price);
-        const usdPrice = phpPrice * 0.018;
+        const usdPrice = product.priceUSD;
         return `
         <div class="product-card">
             <div class="product-image">
@@ -3744,8 +3701,7 @@ function addCardsToCart() {
     }
 
     const size = selectedSize.value;
-    const pricePHP = getCardPriceForSize(size);
-    const priceUSD = pricePHP * 0.018;
+    const priceUSD = getCardPriceForSize(size);
 
     const cartItem = {
         id: 'card-' + Date.now(),
@@ -3769,11 +3725,11 @@ function addCardsToCart() {
 
 function getCardPriceForSize(size) {
     const prices = {
-        '5x7': 150.00,
-        '8x10': 250.00,
-        'folded': 350.00
+        '5x7': 2.70,
+        '8x10': 4.50,
+        'folded': 6.30
     };
-    return prices[size] || 150.00;
+    return prices[size] || 2.70;
 }
 
 // ============== SEARCH BAR ==============
@@ -4153,12 +4109,12 @@ function generateReceiptFile(orderData) {
         const price = parseFloat(photo.price || 25) * (photo.quantity || 1);
         totalAmount += price;
 
-        const line = `${displayName.padEnd(25)} ₱${price.toFixed(2).padStart(7)} ${sizeDisplay.padEnd(10)} ${paperType}`;
+        const line = `${displayName.padEnd(25)} $${price.toFixed(2).padStart(7)} ${sizeDisplay.padEnd(10)} ${paperType}`;
         receipt += line + "\n";
     });
 
     receipt += "-".repeat(60) + "\n";
-    receipt += `\nTotal Amount: ₱${totalAmount.toFixed(2)}\n`;
+    receipt += `\nTotal Amount: $${totalAmount.toFixed(2)}\n`;
     receipt += `Total Items: ${orderData.photos.length}\n\n`;
     receipt += "=".repeat(60) + "\n";
     receipt += "Thank you for choosing FOTOCENTER!\n";
@@ -4246,7 +4202,7 @@ function renderCartPage() {
     document.getElementById('totalCount').textContent = shoppingCart.length;
 
     container.innerHTML = shoppingCart.map((item, index) => {
-        const itemPriceUSD = item.basePriceUSD || (parsePhpPrice(item.price) * 0.018);
+        const itemPriceUSD = item.basePriceUSD || 0;
         const totalItemPriceUSD = itemPriceUSD * (item.quantity || 1);
         const sizeModeDisplay = item.sizeMode === 'fill' ? 'Fill' : 'Fit';
         const photoCount = item.photoCount || 1;
@@ -4430,7 +4386,7 @@ function updateCartSelection() {
     }
 
     const totalUSD = selectedItems.reduce((total, item) => {
-        const itemPriceUSD = item.basePriceUSD || (parsePhpPrice(item.price) * 0.018);
+        const itemPriceUSD = item.basePriceUSD || 0;
         return total + (itemPriceUSD * (item.quantity || 1));
     }, 0);
 
@@ -4515,7 +4471,7 @@ async function processOrderFromCart() {
                     data: imageData,
                     size: item.size || '4x6',
                     quantity: 1,
-                    price: item.basePrice || parseFloat(item.price.toString().replace('₱', '')) / item.photos.length,
+                    price: item.basePriceUSD || 0,
                     paperType: item.paperType || 'standard',
                     isCustom: item.isCustom || false,
                     customWidth: item.customDimensions?.width || null,
@@ -4556,7 +4512,7 @@ async function processOrderFromCart() {
                 data: imageData,
                 size: item.size || '4x6',
                 quantity: item.quantity || 1,
-                price: parseFloat(item.price.toString().replace('₱', '').replace(',', '')) / (item.quantity || 1),
+                price: item.basePriceUSD || 0,
                 paperType: item.paperType || 'standard',
                 isCustom: item.isCustom || false,
                 customWidth: item.customDimensions?.width || null,
@@ -4674,7 +4630,7 @@ function updateCartHover() {
     itemsHtml += '<div class="cart-hover-items">';
 
     shoppingCart.slice(0, 3).forEach((item, index) => {
-        const itemPriceUSD = item.basePriceUSD || (parsePhpPrice(item.price) * 0.018);
+        const itemPriceUSD = item.basePriceUSD || 0;
         const totalItemPriceUSD = itemPriceUSD * (item.quantity || 1);
         itemsHtml += `
             <div class="cart-hover-item">
