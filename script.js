@@ -232,7 +232,7 @@ window.printOptionsConfig = printOptionsConfig;
 const productDatabase = {
     photocards: {
         name: 'Photo Cards',
-        basePricePHP: 25,
+        basePricePHP: 26,
         mainImage: 'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
         thumbnails: [
             'https://images.pexels.com/photos/1037992/pexels-photo-1037992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
@@ -358,9 +358,13 @@ function loadProductDetails(productType) {
     if (!product) return;
 
     document.getElementById('productMainImage').src = product.mainImage;
-    document.getElementById('productName').textContent = product.name;
+
+    const nameElement = document.getElementById('productName');
+    nameElement.textContent = product.name;
+    nameElement.setAttribute('data-i18n', `product_${productType}_name`);
 
     const priceElement = document.getElementById('productPrice');
+    priceElement.removeAttribute('data-php');
     const productUsdPrice = (product.basePricePHP * 0.018).toFixed(2);
     priceElement.setAttribute('data-usd', productUsdPrice);
     priceElement.textContent = `$${productUsdPrice}`;
@@ -745,7 +749,6 @@ function updateCustomSizeUnit() {
 function changeUnit(unit) {
     currentUnit = unit;
     updateUnitDisplay();
-    calculatePrice();
 }
 
 function getEventClient(e) {
@@ -2222,8 +2225,10 @@ window.calculatePrice = function calculatePrice() {
         console.log('3. Size value:', sizeValue);
 
         if (sizeValue === 'custom') {
-            const width = parseFloat(document.getElementById('customWidth')?.value) || 8;
-            const height = parseFloat(document.getElementById('customHeight')?.value) || 10;
+            const widthEl = document.getElementById('customWidth');
+            const heightEl = document.getElementById('customHeight');
+            const width = parseFloat(widthEl?.getAttribute('data-inches') || widthEl?.value) || 8;
+            const height = parseFloat(heightEl?.getAttribute('data-inches') || heightEl?.value) || 10;
             const area = width * height;
             basePriceUSD = Math.max(0.45, Math.round(area * 0.009 * 100) / 100);
             console.log('4. Custom size calculation:', { width, height, area, basePriceUSD });
